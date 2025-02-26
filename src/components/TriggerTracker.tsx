@@ -1,0 +1,203 @@
+
+import { motion } from "framer-motion";
+import { AlertCircle, Plus } from "lucide-react";
+import { useState } from "react";
+
+interface Trigger {
+  id: number;
+  trigger: string;
+  thoughts: string;
+  coping: string;
+  alternatives: string;
+}
+
+const TriggerTracker = () => {
+  const [triggers, setTriggers] = useState<Trigger[]>([]);
+  const [isAdding, setIsAdding] = useState(false);
+
+  const addTrigger = (trigger: Trigger) => {
+    setTriggers([...triggers, trigger]);
+    setIsAdding(false);
+  };
+
+  return (
+    <section id="triggers" className="py-16">
+      <div className="mindtrack-container">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className="mb-8"
+        >
+          <h2 className="section-title">Trigger Tracking</h2>
+          <p className="text-mindtrack-stone/80 max-w-2xl">
+            Track your emotional triggers and develop healthier coping mechanisms. Understanding your patterns is the first step toward positive change.
+          </p>
+        </motion.div>
+
+        <div className="space-y-6">
+          {triggers.map((trigger, index) => (
+            <motion.div
+              key={trigger.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="mindtrack-card"
+            >
+              <div className="grid md:grid-cols-4 gap-4">
+                <div>
+                  <h3 className="font-medium text-mindtrack-stone">Trigger</h3>
+                  <p className="mt-1 text-mindtrack-stone/80">{trigger.trigger}</p>
+                </div>
+                <div>
+                  <h3 className="font-medium text-mindtrack-stone">Thoughts & Feelings</h3>
+                  <p className="mt-1 text-mindtrack-stone/80">{trigger.thoughts}</p>
+                </div>
+                <div>
+                  <h3 className="font-medium text-mindtrack-stone">Current Coping</h3>
+                  <p className="mt-1 text-mindtrack-stone/80">{trigger.coping}</p>
+                </div>
+                <div>
+                  <h3 className="font-medium text-mindtrack-stone">Alternatives</h3>
+                  <p className="mt-1 text-mindtrack-stone/80">{trigger.alternatives}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+
+          {!isAdding && (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setIsAdding(true)}
+              className="w-full mindtrack-card flex items-center justify-center gap-2 text-mindtrack-sage hover:text-mindtrack-sage/80"
+            >
+              <Plus className="w-5 h-5" />
+              Add New Trigger
+            </motion.button>
+          )}
+
+          {isAdding && (
+            <TriggerForm onSubmit={addTrigger} onCancel={() => setIsAdding(false)} />
+          )}
+
+          {triggers.length === 0 && !isAdding && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mindtrack-card flex items-center gap-3 text-mindtrack-stone/70"
+            >
+              <AlertCircle className="w-5 h-5" />
+              <p>No triggers logged yet. Add your first one to start tracking.</p>
+            </motion.div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const TriggerForm = ({ 
+  onSubmit, 
+  onCancel 
+}: { 
+  onSubmit: (trigger: Trigger) => void;
+  onCancel: () => void;
+}) => {
+  const [formData, setFormData] = useState({
+    trigger: "",
+    thoughts: "",
+    coping: "",
+    alternatives: ""
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({
+      id: Date.now(),
+      ...formData
+    });
+  };
+
+  return (
+    <motion.form
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mindtrack-card space-y-4"
+      onSubmit={handleSubmit}
+    >
+      <div className="grid md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-mindtrack-stone mb-1">
+            Trigger
+          </label>
+          <input
+            type="text"
+            required
+            value={formData.trigger}
+            onChange={(e) => setFormData({ ...formData, trigger: e.target.value })}
+            className="w-full p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20"
+            placeholder="What triggered you?"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-mindtrack-stone mb-1">
+            Thoughts & Feelings
+          </label>
+          <input
+            type="text"
+            required
+            value={formData.thoughts}
+            onChange={(e) => setFormData({ ...formData, thoughts: e.target.value })}
+            className="w-full p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20"
+            placeholder="How did you feel?"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-mindtrack-stone mb-1">
+            Current Coping
+          </label>
+          <input
+            type="text"
+            required
+            value={formData.coping}
+            onChange={(e) => setFormData({ ...formData, coping: e.target.value })}
+            className="w-full p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20"
+            placeholder="How did you cope?"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-mindtrack-stone mb-1">
+            Alternative Coping
+          </label>
+          <input
+            type="text"
+            required
+            value={formData.alternatives}
+            onChange={(e) => setFormData({ ...formData, alternatives: e.target.value })}
+            className="w-full p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20"
+            placeholder="What could you do instead?"
+          />
+        </div>
+      </div>
+      <div className="flex justify-end gap-3">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 text-mindtrack-stone hover:bg-mindtrack-sage/5 rounded-md transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors"
+        >
+          Save
+        </button>
+      </div>
+    </motion.form>
+  );
+};
+
+export default TriggerTracker;
