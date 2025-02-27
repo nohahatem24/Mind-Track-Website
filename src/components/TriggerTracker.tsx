@@ -1,24 +1,30 @@
 
 import { motion } from "framer-motion";
-import { AlertCircle, Plus } from "lucide-react";
+import { AlertCircle, Pencil, Plus, X } from "lucide-react";
 import { useState } from "react";
 
 interface Trigger {
   id: number;
   trigger: string;
-  thoughts?: string; // Made optional
-  coping?: string; // Made optional
-  alternatives?: string; // Made optional
+  thoughts?: string;
+  coping?: string;
+  alternatives?: string;
   timestamp: string;
 }
 
 const TriggerTracker = () => {
   const [triggers, setTriggers] = useState<Trigger[]>([]);
   const [isAdding, setIsAdding] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const addTrigger = (trigger: Trigger) => {
-    setTriggers([...triggers, trigger]);
+    setTriggers([trigger, ...triggers]);
     setIsAdding(false);
+  };
+
+  const updateTrigger = (updatedTrigger: Trigger) => {
+    setTriggers(triggers.map(t => t.id === updatedTrigger.id ? updatedTrigger : t));
+    setEditingId(null);
   };
 
   return (
@@ -46,33 +52,51 @@ const TriggerTracker = () => {
               transition={{ delay: index * 0.1 }}
               className="mindtrack-card"
             >
-              <div className="text-sm text-mindtrack-stone/60 mb-4">
-                {trigger.timestamp}
-              </div>
-              <div className="grid md:grid-cols-4 gap-4">
-                <div>
-                  <h3 className="font-medium text-mindtrack-stone">Trigger</h3>
-                  <p className="mt-1 text-mindtrack-stone/80">{trigger.trigger}</p>
-                </div>
-                {trigger.thoughts && (
-                  <div>
-                    <h3 className="font-medium text-mindtrack-stone">Thoughts & Feelings</h3>
-                    <p className="mt-1 text-mindtrack-stone/80">{trigger.thoughts}</p>
+              {editingId === trigger.id ? (
+                <TriggerForm 
+                  onSubmit={updateTrigger} 
+                  onCancel={() => setEditingId(null)}
+                  initialData={trigger}
+                />
+              ) : (
+                <>
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="text-sm text-mindtrack-stone/60">
+                      {trigger.timestamp}
+                    </div>
+                    <button
+                      onClick={() => setEditingId(trigger.id)}
+                      className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                    >
+                      <Pencil className="w-4 h-4 text-mindtrack-sage" />
+                    </button>
                   </div>
-                )}
-                {trigger.coping && (
-                  <div>
-                    <h3 className="font-medium text-mindtrack-stone">Current Coping</h3>
-                    <p className="mt-1 text-mindtrack-stone/80">{trigger.coping}</p>
+                  <div className="grid md:grid-cols-4 gap-4">
+                    <div>
+                      <h3 className="font-medium text-mindtrack-stone">Trigger</h3>
+                      <p className="mt-1 text-mindtrack-stone/80">{trigger.trigger}</p>
+                    </div>
+                    {trigger.thoughts && (
+                      <div>
+                        <h3 className="font-medium text-mindtrack-stone">Thoughts & Feelings</h3>
+                        <p className="mt-1 text-mindtrack-stone/80">{trigger.thoughts}</p>
+                      </div>
+                    )}
+                    {trigger.coping && (
+                      <div>
+                        <h3 className="font-medium text-mindtrack-stone">Current Coping</h3>
+                        <p className="mt-1 text-mindtrack-stone/80">{trigger.coping}</p>
+                      </div>
+                    )}
+                    {trigger.alternatives && (
+                      <div>
+                        <h3 className="font-medium text-mindtrack-stone">Alternatives</h3>
+                        <p className="mt-1 text-mindtrack-stone/80">{trigger.alternatives}</p>
+                      </div>
+                    )}
                   </div>
-                )}
-                {trigger.alternatives && (
-                  <div>
-                    <h3 className="font-medium text-mindtrack-stone">Alternatives</h3>
-                    <p className="mt-1 text-mindtrack-stone/80">{trigger.alternatives}</p>
-                  </div>
-                )}
-              </div>
+                </>
+              )}
             </motion.div>
           ))}
 
@@ -110,28 +134,30 @@ const TriggerTracker = () => {
 
 const TriggerForm = ({ 
   onSubmit, 
-  onCancel 
+  onCancel,
+  initialData
 }: { 
   onSubmit: (trigger: Trigger) => void;
   onCancel: () => void;
+  initialData?: Trigger;
 }) => {
   const [formData, setFormData] = useState({
-    trigger: "",
-    thoughts: "",
-    coping: "",
-    alternatives: ""
+    trigger: initialData?.trigger || "",
+    thoughts: initialData?.thoughts || "",
+    coping: initialData?.coping || "",
+    alternatives: initialData?.alternatives || ""
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const now = new Date();
     onSubmit({
-      id: Date.now(),
+      id: initialData?.id || Date.now(),
       trigger: formData.trigger,
       ...(formData.thoughts ? { thoughts: formData.thoughts } : {}),
       ...(formData.coping ? { coping: formData.coping } : {}),
       ...(formData.alternatives ? { alternatives: formData.alternatives } : {}),
-      timestamp: now.toLocaleString("en-US", {
+      timestamp: initialData?.timestamp || now.toLocaleString("en-US", {
         weekday: "long",
         year: "numeric",
         month: "long",

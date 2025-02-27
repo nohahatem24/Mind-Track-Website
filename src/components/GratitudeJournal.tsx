@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { Heart, PlusCircle } from "lucide-react";
+import { Heart, Pencil, PlusCircle, X } from "lucide-react";
 import { useState } from "react";
 
 interface GratitudeEntry {
@@ -13,6 +13,8 @@ interface GratitudeEntry {
 const GratitudeJournal = () => {
   const [entries, setEntries] = useState<GratitudeEntry[]>([]);
   const [newEntry, setNewEntry] = useState("");
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingContent, setEditingContent] = useState("");
 
   const addEntry = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +38,26 @@ const GratitudeJournal = () => {
 
     setEntries([entry, ...entries]);
     setNewEntry("");
+  };
+
+  const startEditing = (entry: GratitudeEntry) => {
+    setEditingId(entry.id);
+    setEditingContent(entry.content);
+  };
+
+  const saveEdit = (entry: GratitudeEntry) => {
+    if (!editingContent.trim()) return;
+    
+    const updatedEntries = entries.map(e => {
+      if (e.id === entry.id) {
+        return { ...e, content: editingContent };
+      }
+      return e;
+    });
+    
+    setEntries(updatedEntries);
+    setEditingId(null);
+    setEditingContent("");
   };
 
   return (
@@ -91,10 +113,44 @@ const GratitudeJournal = () => {
                 <div className="flex items-start gap-3">
                   <Heart className="w-5 h-5 text-mindtrack-sage flex-shrink-0 mt-1" />
                   <div className="flex-1">
-                    <p className="text-mindtrack-stone">{entry.content}</p>
-                    <p className="mt-2 text-sm text-mindtrack-stone/60">
-                      {entry.date} at {entry.time}
-                    </p>
+                    {editingId === entry.id ? (
+                      <div className="space-y-3">
+                        <textarea
+                          value={editingContent}
+                          onChange={(e) => setEditingContent(e.target.value)}
+                          className="w-full p-3 min-h-[100px] rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20 resize-none"
+                        />
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => setEditingId(null)}
+                            className="px-3 py-1.5 text-mindtrack-stone hover:bg-mindtrack-sage/5 rounded-md transition-colors text-sm"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={() => saveEdit(entry)}
+                            className="px-3 py-1.5 bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors text-sm"
+                          >
+                            Save
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex justify-between items-start">
+                          <p className="text-mindtrack-stone">{entry.content}</p>
+                          <button
+                            onClick={() => startEditing(entry)}
+                            className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors ml-2"
+                          >
+                            <Pencil className="w-4 h-4 text-mindtrack-sage" />
+                          </button>
+                        </div>
+                        <p className="mt-2 text-sm text-mindtrack-stone/60">
+                          {entry.date} at {entry.time}
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
               </motion.div>
