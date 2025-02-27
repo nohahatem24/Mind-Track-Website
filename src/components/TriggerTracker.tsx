@@ -5,7 +5,7 @@ import { useState } from "react";
 
 interface Trigger {
   id: number;
-  trigger: string;
+  trigger?: string; // Made optional
   thoughts?: string;
   coping?: string;
   alternatives?: string;
@@ -37,9 +37,9 @@ const TriggerTracker = () => {
           viewport={{ once: true }}
           className="mb-8"
         >
-          <h2 className="section-title">Trigger Tracking</h2>
+          <h2 className="section-title">Emotion Tracking</h2>
           <p className="text-mindtrack-stone/80 max-w-2xl">
-            Track your emotional triggers and develop healthier coping mechanisms. Fill in what feels relevant - only the trigger itself is required.
+            Track your emotional experiences. Fill in any aspect that feels relevant - whether it's a specific trigger, your thoughts, feelings, or coping strategies.
           </p>
         </motion.div>
 
@@ -72,10 +72,12 @@ const TriggerTracker = () => {
                     </button>
                   </div>
                   <div className="grid md:grid-cols-4 gap-4">
-                    <div>
-                      <h3 className="font-medium text-mindtrack-stone">Trigger</h3>
-                      <p className="mt-1 text-mindtrack-stone/80">{trigger.trigger}</p>
-                    </div>
+                    {trigger.trigger && (
+                      <div>
+                        <h3 className="font-medium text-mindtrack-stone">Trigger</h3>
+                        <p className="mt-1 text-mindtrack-stone/80">{trigger.trigger}</p>
+                      </div>
+                    )}
                     {trigger.thoughts && (
                       <div>
                         <h3 className="font-medium text-mindtrack-stone">Thoughts & Feelings</h3>
@@ -108,7 +110,7 @@ const TriggerTracker = () => {
               className="w-full mindtrack-card flex items-center justify-center gap-2 text-mindtrack-sage hover:text-mindtrack-sage/80"
             >
               <Plus className="w-5 h-5" />
-              Add New Trigger
+              Add New Entry
             </motion.button>
           )}
 
@@ -123,7 +125,7 @@ const TriggerTracker = () => {
               className="mindtrack-card flex items-center gap-3 text-mindtrack-stone/70"
             >
               <AlertCircle className="w-5 h-5" />
-              <p>No triggers logged yet. Add your first one to start tracking.</p>
+              <p>No entries logged yet. Add your first one to start tracking.</p>
             </motion.div>
           )}
         </div>
@@ -151,9 +153,11 @@ const TriggerForm = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const now = new Date();
-    onSubmit({
+
+    // Only include fields that have content
+    const submissionData = {
       id: initialData?.id || Date.now(),
-      trigger: formData.trigger,
+      ...(formData.trigger ? { trigger: formData.trigger } : {}),
       ...(formData.thoughts ? { thoughts: formData.thoughts } : {}),
       ...(formData.coping ? { coping: formData.coping } : {}),
       ...(formData.alternatives ? { alternatives: formData.alternatives } : {}),
@@ -165,7 +169,16 @@ const TriggerForm = ({
         hour: "2-digit",
         minute: "2-digit",
       }),
-    });
+    };
+
+    // Check if at least one field has content
+    if (!Object.keys(submissionData).some(key => 
+      ['trigger', 'thoughts', 'coping', 'alternatives'].includes(key) && submissionData[key]
+    )) {
+      return; // Don't submit if all fields are empty
+    }
+
+    onSubmit(submissionData as Trigger);
   };
 
   return (
@@ -178,15 +191,14 @@ const TriggerForm = ({
       <div className="grid md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-mindtrack-stone mb-1">
-            Trigger <span className="text-mindtrack-sage">*</span>
+            Trigger <span className="text-mindtrack-stone/60">(optional)</span>
           </label>
           <input
             type="text"
-            required
             value={formData.trigger}
             onChange={(e) => setFormData({ ...formData, trigger: e.target.value })}
             className="w-full p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20"
-            placeholder="What triggered you?"
+            placeholder="What triggered you? (if known)"
           />
         </div>
         <div>
@@ -236,7 +248,8 @@ const TriggerForm = ({
         </button>
         <button
           type="submit"
-          className="px-4 py-2 bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors"
+          className="px-4 py-2 bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors disabled:opacity-50"
+          disabled={!formData.trigger && !formData.thoughts && !formData.coping && !formData.alternatives}
         >
           Save
         </button>
