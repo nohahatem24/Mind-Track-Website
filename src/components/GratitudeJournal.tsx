@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Heart, Pencil, PlusCircle, X } from "lucide-react";
 import { useState } from "react";
@@ -8,13 +7,22 @@ interface GratitudeEntry {
   content: string;
   date: string;
   time: string;
+  isFavorite: boolean;
 }
 
-const GratitudeJournal = () => {
+interface GratitudeJournalProps {
+  showOnlyFavorites?: boolean;
+}
+
+const GratitudeJournal = ({ showOnlyFavorites = false }: GratitudeJournalProps) => {
   const [entries, setEntries] = useState<GratitudeEntry[]>([]);
   const [newEntry, setNewEntry] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState("");
+
+  const visibleEntries = showOnlyFavorites 
+    ? entries.filter(entry => entry.isFavorite)
+    : entries;
 
   const addEntry = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +42,7 @@ const GratitudeJournal = () => {
         hour: "2-digit",
         minute: "2-digit",
       }),
+      isFavorite: false,
     };
 
     setEntries([entry, ...entries]);
@@ -102,7 +111,7 @@ const GratitudeJournal = () => {
           </motion.form>
 
           <div className="space-y-4">
-            {entries.map((entry, index) => (
+            {visibleEntries.map((entry, index) => (
               <motion.div
                 key={entry.id}
                 initial={{ opacity: 0, y: 20 }}
