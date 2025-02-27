@@ -1,11 +1,13 @@
-
 import { motion } from "framer-motion";
-import { BookHeart, ScrollText, Sparkles } from "lucide-react";
+import { BookHeart, Heart, ScrollText, Sparkles } from "lucide-react";
 import GratitudeJournal from "@/components/GratitudeJournal";
 import Navigation from "@/components/Navigation";
 import TriggerTracker from "@/components/TriggerTracker";
+import { useState, useEffect } from "react";
 
 const Index = () => {
+  const [showFavorites, setShowFavorites] = useState(false);
+  
   return (
     <div className="min-h-screen">
       <Navigation />
@@ -49,8 +51,20 @@ const Index = () => {
         </div>
       </section>
 
-      <TriggerTracker />
-      <GratitudeJournal />
+      {/* Favorites Toggle */}
+      <div className="mindtrack-container">
+        <button
+          onClick={() => setShowFavorites(!showFavorites)}
+          className="mb-8 inline-flex items-center gap-2 px-4 py-2 bg-white border border-mindtrack-sage/10 rounded-lg shadow-sm hover:bg-mindtrack-sage/5 transition-colors"
+        >
+          <Heart className={`w-4 h-4 ${showFavorites ? 'fill-mindtrack-sage text-mindtrack-sage' : 'text-mindtrack-sage'}`} />
+          {showFavorites ? 'Show All Entries' : 'Show Favorites'}
+        </button>
+      </div>
+
+      {/* Content */}
+      <TriggerTracker showOnlyFavorites={showFavorites} />
+      <GratitudeJournal showOnlyFavorites={showFavorites} />
 
       {/* Footer */}
       <footer className="py-8 border-t border-mindtrack-sage/10">

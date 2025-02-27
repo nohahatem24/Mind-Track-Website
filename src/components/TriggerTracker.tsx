@@ -1,18 +1,22 @@
-
 import { motion } from "framer-motion";
-import { AlertCircle, Pencil, Plus, X } from "lucide-react";
+import { AlertCircle, Heart, Pencil, Plus, X } from "lucide-react";
 import { useState } from "react";
 
 interface Trigger {
   id: number;
-  trigger?: string; // Made optional
+  trigger?: string;
   thoughts?: string;
   coping?: string;
   alternatives?: string;
   timestamp: string;
+  isFavorite?: boolean;
 }
 
-const TriggerTracker = () => {
+interface TriggerTrackerProps {
+  showOnlyFavorites?: boolean;
+}
+
+const TriggerTracker = ({ showOnlyFavorites = false }: TriggerTrackerProps) => {
   const [triggers, setTriggers] = useState<Trigger[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -26,6 +30,10 @@ const TriggerTracker = () => {
     setTriggers(triggers.map(t => t.id === updatedTrigger.id ? updatedTrigger : t));
     setEditingId(null);
   };
+
+  const visibleTriggers = showOnlyFavorites 
+    ? triggers.filter(trigger => trigger.isFavorite)
+    : triggers;
 
   return (
     <section id="triggers" className="py-16">
@@ -44,7 +52,7 @@ const TriggerTracker = () => {
         </motion.div>
 
         <div className="space-y-6">
-          {triggers.map((trigger, index) => (
+          {visibleTriggers.map((trigger, index) => (
             <motion.div
               key={trigger.id}
               initial={{ opacity: 0, y: 20 }}
@@ -64,12 +72,27 @@ const TriggerTracker = () => {
                     <div className="text-sm text-mindtrack-stone/60">
                       {trigger.timestamp}
                     </div>
-                    <button
-                      onClick={() => setEditingId(trigger.id)}
-                      className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
-                    >
-                      <Pencil className="w-4 h-4 text-mindtrack-sage" />
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          const updatedTriggers = triggers.map(t => 
+                            t.id === trigger.id ? { ...t, isFavorite: !t.isFavorite } : t
+                          );
+                          setTriggers(updatedTriggers);
+                        }}
+                        className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                      >
+                        <Heart 
+                          className={`w-4 h-4 ${trigger.isFavorite ? 'fill-mindtrack-sage text-mindtrack-sage' : 'text-mindtrack-sage'}`} 
+                        />
+                      </button>
+                      <button
+                        onClick={() => setEditingId(trigger.id)}
+                        className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                      >
+                        <Pencil className="w-4 h-4 text-mindtrack-sage" />
+                      </button>
+                    </div>
                   </div>
                   <div className="grid md:grid-cols-4 gap-4">
                     {trigger.trigger && (
