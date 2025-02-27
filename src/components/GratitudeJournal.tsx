@@ -7,6 +7,7 @@ interface GratitudeEntry {
   id: number;
   content: string;
   date: string;
+  time: string;
 }
 
 const GratitudeJournal = () => {
@@ -17,10 +18,20 @@ const GratitudeJournal = () => {
     e.preventDefault();
     if (!newEntry.trim()) return;
 
+    const now = new Date();
     const entry: GratitudeEntry = {
       id: Date.now(),
       content: newEntry,
-      date: new Date().toLocaleDateString(),
+      date: now.toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+      time: now.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     };
 
     setEntries([entry, ...entries]);
@@ -81,7 +92,9 @@ const GratitudeJournal = () => {
                   <Heart className="w-5 h-5 text-mindtrack-sage flex-shrink-0 mt-1" />
                   <div className="flex-1">
                     <p className="text-mindtrack-stone">{entry.content}</p>
-                    <p className="mt-2 text-sm text-mindtrack-stone/60">{entry.date}</p>
+                    <p className="mt-2 text-sm text-mindtrack-stone/60">
+                      {entry.date} at {entry.time}
+                    </p>
                   </div>
                 </div>
               </motion.div>

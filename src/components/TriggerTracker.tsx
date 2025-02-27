@@ -9,6 +9,7 @@ interface Trigger {
   thoughts: string;
   coping: string;
   alternatives: string;
+  timestamp: string; // Add timestamp field
 }
 
 const TriggerTracker = () => {
@@ -45,6 +46,9 @@ const TriggerTracker = () => {
               transition={{ delay: index * 0.1 }}
               className="mindtrack-card"
             >
+              <div className="text-sm text-mindtrack-stone/60 mb-4">
+                {trigger.timestamp}
+              </div>
               <div className="grid md:grid-cols-4 gap-4">
                 <div>
                   <h3 className="font-medium text-mindtrack-stone">Trigger</h3>
@@ -114,9 +118,18 @@ const TriggerForm = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const now = new Date();
     onSubmit({
       id: Date.now(),
-      ...formData
+      ...formData,
+      timestamp: now.toLocaleString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     });
   };
 
