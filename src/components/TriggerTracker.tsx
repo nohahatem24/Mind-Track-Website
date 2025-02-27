@@ -6,10 +6,10 @@ import { useState } from "react";
 interface Trigger {
   id: number;
   trigger: string;
-  thoughts: string;
-  coping: string;
-  alternatives: string;
-  timestamp: string; // Add timestamp field
+  thoughts?: string; // Made optional
+  coping?: string; // Made optional
+  alternatives?: string; // Made optional
+  timestamp: string;
 }
 
 const TriggerTracker = () => {
@@ -33,7 +33,7 @@ const TriggerTracker = () => {
         >
           <h2 className="section-title">Trigger Tracking</h2>
           <p className="text-mindtrack-stone/80 max-w-2xl">
-            Track your emotional triggers and develop healthier coping mechanisms. Understanding your patterns is the first step toward positive change.
+            Track your emotional triggers and develop healthier coping mechanisms. Fill in what feels relevant - only the trigger itself is required.
           </p>
         </motion.div>
 
@@ -54,18 +54,24 @@ const TriggerTracker = () => {
                   <h3 className="font-medium text-mindtrack-stone">Trigger</h3>
                   <p className="mt-1 text-mindtrack-stone/80">{trigger.trigger}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium text-mindtrack-stone">Thoughts & Feelings</h3>
-                  <p className="mt-1 text-mindtrack-stone/80">{trigger.thoughts}</p>
-                </div>
-                <div>
-                  <h3 className="font-medium text-mindtrack-stone">Current Coping</h3>
-                  <p className="mt-1 text-mindtrack-stone/80">{trigger.coping}</p>
-                </div>
-                <div>
-                  <h3 className="font-medium text-mindtrack-stone">Alternatives</h3>
-                  <p className="mt-1 text-mindtrack-stone/80">{trigger.alternatives}</p>
-                </div>
+                {trigger.thoughts && (
+                  <div>
+                    <h3 className="font-medium text-mindtrack-stone">Thoughts & Feelings</h3>
+                    <p className="mt-1 text-mindtrack-stone/80">{trigger.thoughts}</p>
+                  </div>
+                )}
+                {trigger.coping && (
+                  <div>
+                    <h3 className="font-medium text-mindtrack-stone">Current Coping</h3>
+                    <p className="mt-1 text-mindtrack-stone/80">{trigger.coping}</p>
+                  </div>
+                )}
+                {trigger.alternatives && (
+                  <div>
+                    <h3 className="font-medium text-mindtrack-stone">Alternatives</h3>
+                    <p className="mt-1 text-mindtrack-stone/80">{trigger.alternatives}</p>
+                  </div>
+                )}
               </div>
             </motion.div>
           ))}
@@ -121,7 +127,10 @@ const TriggerForm = ({
     const now = new Date();
     onSubmit({
       id: Date.now(),
-      ...formData,
+      trigger: formData.trigger,
+      ...(formData.thoughts ? { thoughts: formData.thoughts } : {}),
+      ...(formData.coping ? { coping: formData.coping } : {}),
+      ...(formData.alternatives ? { alternatives: formData.alternatives } : {}),
       timestamp: now.toLocaleString("en-US", {
         weekday: "long",
         year: "numeric",
@@ -143,7 +152,7 @@ const TriggerForm = ({
       <div className="grid md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-mindtrack-stone mb-1">
-            Trigger
+            Trigger <span className="text-mindtrack-sage">*</span>
           </label>
           <input
             type="text"
@@ -156,11 +165,10 @@ const TriggerForm = ({
         </div>
         <div>
           <label className="block text-sm font-medium text-mindtrack-stone mb-1">
-            Thoughts & Feelings
+            Thoughts & Feelings <span className="text-mindtrack-stone/60">(optional)</span>
           </label>
           <input
             type="text"
-            required
             value={formData.thoughts}
             onChange={(e) => setFormData({ ...formData, thoughts: e.target.value })}
             className="w-full p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20"
@@ -169,11 +177,10 @@ const TriggerForm = ({
         </div>
         <div>
           <label className="block text-sm font-medium text-mindtrack-stone mb-1">
-            Current Coping
+            Current Coping <span className="text-mindtrack-stone/60">(optional)</span>
           </label>
           <input
             type="text"
-            required
             value={formData.coping}
             onChange={(e) => setFormData({ ...formData, coping: e.target.value })}
             className="w-full p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20"
@@ -182,11 +189,10 @@ const TriggerForm = ({
         </div>
         <div>
           <label className="block text-sm font-medium text-mindtrack-stone mb-1">
-            Alternative Coping
+            Alternative Coping <span className="text-mindtrack-stone/60">(optional)</span>
           </label>
           <input
             type="text"
-            required
             value={formData.alternatives}
             onChange={(e) => setFormData({ ...formData, alternatives: e.target.value })}
             className="w-full p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20"
