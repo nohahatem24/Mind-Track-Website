@@ -1,12 +1,17 @@
+
 import { motion } from "framer-motion";
-import { BookHeart, Heart, ScrollText, Sparkles } from "lucide-react";
+import { BookHeart, Heart, ScrollText, Sparkles, BarChart3, Target, Brain } from "lucide-react";
 import GratitudeJournal from "@/components/GratitudeJournal";
 import Navigation from "@/components/Navigation";
 import TriggerTracker from "@/components/TriggerTracker";
+import MoodTracker from "@/components/MoodTracker";
+import CBTTechniques from "@/components/CBTTechniques";
+import GoalTracker from "@/components/GoalTracker";
 import { useState, useEffect } from "react";
 
 const Index = () => {
   const [showFavorites, setShowFavorites] = useState(false);
+  const [activeTab, setActiveTab] = useState("mood");
   
   return (
     <div className="min-h-screen">
@@ -34,8 +39,13 @@ const Index = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="grid md:grid-cols-2 gap-6 mt-12"
+              className="grid md:grid-cols-3 gap-6 mt-12"
             >
+              <FeatureCard
+                icon={<BarChart3 className="w-6 h-6" />}
+                title="Mood Tracking"
+                description="Track your daily moods from -10 to +10 and visualize changes over time."
+              />
               <FeatureCard
                 icon={<ScrollText className="w-6 h-6" />}
                 title="Trigger Tracking"
@@ -46,10 +56,83 @@ const Index = () => {
                 title="Gratitude Journal"
                 description="Cultivate positivity by recording daily moments of gratitude and appreciation."
               />
+              <FeatureCard
+                icon={<Brain className="w-6 h-6" />}
+                title="CBT Techniques"
+                description="Access proven cognitive behavioral therapy exercises to improve your mental wellbeing."
+              />
+              <FeatureCard
+                icon={<Target className="w-6 h-6" />}
+                title="Goal Setting"
+                description="Set and track personal growth goals aligned with your mental health journey."
+              />
+              <FeatureCard
+                icon={<Heart className="w-6 h-6" />}
+                title="Favorites"
+                description="Save important entries and insights for quick access and review."
+              />
             </motion.div>
           </div>
         </div>
       </section>
+
+      {/* Dashboard Tabs */}
+      <div className="mindtrack-container mb-8">
+        <div className="border-b border-mindtrack-sage/10">
+          <div className="flex overflow-x-auto no-scrollbar">
+            <button
+              onClick={() => setActiveTab("mood")}
+              className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
+                activeTab === "mood"
+                  ? "border-mindtrack-sage text-mindtrack-sage"
+                  : "border-transparent text-mindtrack-stone/70 hover:text-mindtrack-stone"
+              }`}
+            >
+              Mood Tracking
+            </button>
+            <button
+              onClick={() => setActiveTab("trigger")}
+              className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
+                activeTab === "trigger"
+                  ? "border-mindtrack-sage text-mindtrack-sage"
+                  : "border-transparent text-mindtrack-stone/70 hover:text-mindtrack-stone"
+              }`}
+            >
+              Trigger Tracking
+            </button>
+            <button
+              onClick={() => setActiveTab("gratitude")}
+              className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
+                activeTab === "gratitude"
+                  ? "border-mindtrack-sage text-mindtrack-sage"
+                  : "border-transparent text-mindtrack-stone/70 hover:text-mindtrack-stone"
+              }`}
+            >
+              Gratitude Journal
+            </button>
+            <button
+              onClick={() => setActiveTab("cbt")}
+              className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
+                activeTab === "cbt"
+                  ? "border-mindtrack-sage text-mindtrack-sage"
+                  : "border-transparent text-mindtrack-stone/70 hover:text-mindtrack-stone"
+              }`}
+            >
+              CBT Techniques
+            </button>
+            <button
+              onClick={() => setActiveTab("goals")}
+              className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
+                activeTab === "goals"
+                  ? "border-mindtrack-sage text-mindtrack-sage"
+                  : "border-transparent text-mindtrack-stone/70 hover:text-mindtrack-stone"
+              }`}
+            >
+              Goal Tracker
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Favorites Toggle */}
       <div className="mindtrack-container">
@@ -63,8 +146,11 @@ const Index = () => {
       </div>
 
       {/* Content */}
-      <TriggerTracker showOnlyFavorites={showFavorites} />
-      <GratitudeJournal showOnlyFavorites={showFavorites} />
+      {activeTab === "mood" && <MoodTracker showOnlyFavorites={showFavorites} />}
+      {activeTab === "trigger" && <TriggerTracker showOnlyFavorites={showFavorites} />}
+      {activeTab === "gratitude" && <GratitudeJournal showOnlyFavorites={showFavorites} />}
+      {activeTab === "cbt" && <CBTTechniques showOnlyFavorites={showFavorites} />}
+      {activeTab === "goals" && <GoalTracker showOnlyFavorites={showFavorites} />}
 
       {/* Footer */}
       <footer className="py-8 border-t border-mindtrack-sage/10">
