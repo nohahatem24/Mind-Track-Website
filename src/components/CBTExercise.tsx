@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, Plus, X } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -390,7 +390,7 @@ export const BreathingExercise = ({
   };
 
   // Effect to handle the breathing animation
-  React.useEffect(() => {
+  useEffect(() => {
     let intervalId: NodeJS.Timeout;
     
     if (isActive) {
