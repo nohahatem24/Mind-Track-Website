@@ -2,6 +2,9 @@
 import { motion } from "framer-motion";
 import { AlertCircle, BookmarkPlus, Brain, Check, ChevronDown, Heart, MessageSquare, MoreHorizontal, X } from "lucide-react";
 import { useState } from "react";
+import { CognitiveRestructuringExercise, GroundingExercise, BreathingExercise } from "./CBTExercise";
+import ThoughtRecord from "./ThoughtRecord";
+import BehavioralActivation from "./BehavioralActivation";
 
 interface Technique {
   id: string;
@@ -106,6 +109,7 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [completedExercises, setCompletedExercises] = useState<string[]>([]);
+  const [activeExercise, setActiveExercise] = useState<string | null>(null);
 
   const toggleFavorite = (id: string) => {
     if (favorites.includes(id)) {
@@ -125,9 +129,76 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
     setCompletedExercises(completedExercises.filter(exerciseId => exerciseId !== id));
   };
 
+  const startExercise = (id: string) => {
+    setActiveExercise(id);
+  };
+
+  const completeExercise = (id: string) => {
+    markAsCompleted(id);
+    setActiveExercise(null);
+  };
+
+  const cancelExercise = () => {
+    setActiveExercise(null);
+  };
+
   const filteredTechniques = techniques
     .filter(technique => showOnlyFavorites ? favorites.includes(technique.id) : true)
     .filter(technique => selectedCategory === "all" ? true : technique.category === selectedCategory);
+
+  const renderExerciseContent = (techniqueId: string) => {
+    switch (techniqueId) {
+      case "cog-restructuring":
+        return (
+          <CognitiveRestructuringExercise 
+            onComplete={() => completeExercise(techniqueId)}
+            onCancel={cancelExercise}
+          />
+        );
+      case "thought-record":
+        return (
+          <ThoughtRecord 
+            onComplete={() => completeExercise(techniqueId)}
+            onCancel={cancelExercise}
+          />
+        );
+      case "behav-activation":
+        return (
+          <BehavioralActivation 
+            onComplete={() => completeExercise(techniqueId)}
+            onCancel={cancelExercise}
+          />
+        );
+      case "grounding":
+        return (
+          <GroundingExercise 
+            onComplete={() => completeExercise(techniqueId)}
+            onCancel={cancelExercise}
+          />
+        );
+      case "deep-breathing":
+        return (
+          <BreathingExercise
+            onComplete={() => completeExercise(techniqueId)}
+            onCancel={cancelExercise}
+          />
+        );
+      default:
+        return (
+          <div className="text-center py-8">
+            <p className="text-mindtrack-stone/70">
+              This interactive exercise is coming soon!
+            </p>
+            <button 
+              onClick={cancelExercise}
+              className="mt-4 px-4 py-2 text-mindtrack-stone hover:bg-mindtrack-sage/5 rounded-md transition-colors"
+            >
+              Go Back
+            </button>
+          </div>
+        );
+    }
+  };
 
   return (
     <section id="cbt" className="py-16 bg-mindtrack-cream/30">
@@ -172,8 +243,21 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
           </div>
         </motion.div>
 
+        {activeExercise && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mindtrack-card mb-6"
+          >
+            <h3 className="text-xl font-semibold text-mindtrack-stone mb-4">
+              {techniques.find(t => t.id === activeExercise)?.title}
+            </h3>
+            {renderExerciseContent(activeExercise)}
+          </motion.div>
+        )}
+
         <div className="space-y-4">
-          {filteredTechniques.length === 0 ? (
+          {!activeExercise && filteredTechniques.length === 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -182,69 +266,78 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
               <AlertCircle className="w-5 h-5" />
               <p>No techniques match your current filter.</p>
             </motion.div>
-          ) : (
-            filteredTechniques.map((technique, index) => (
-              <motion.div
-                key={technique.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className={`mindtrack-card ${
-                  completedExercises.includes(technique.id) ? "border-l-4 border-l-mindtrack-sage" : ""
-                }`}
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex items-center gap-3">
-                    <Brain className="w-5 h-5 text-mindtrack-sage flex-shrink-0" />
-                    <h3 className="text-lg font-semibold text-mindtrack-stone">{technique.title}</h3>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => toggleFavorite(technique.id)}
-                      className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
-                    >
-                      <Heart 
-                        className={`w-4 h-4 ${favorites.includes(technique.id) ? 'fill-mindtrack-sage text-mindtrack-sage' : 'text-mindtrack-sage'}`} 
-                      />
-                    </button>
-                    <button
-                      onClick={() => setExpandedId(expandedId === technique.id ? null : technique.id)}
-                      className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
-                    >
-                      <ChevronDown 
-                        className={`w-4 h-4 text-mindtrack-sage transform transition-transform ${expandedId === technique.id ? 'rotate-180' : ''}`} 
-                      />
-                    </button>
-                  </div>
+          )}
+
+          {!activeExercise && filteredTechniques.map((technique, index) => (
+            <motion.div
+              key={technique.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className={`mindtrack-card ${
+                completedExercises.includes(technique.id) ? "border-l-4 border-l-mindtrack-sage" : ""
+              }`}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <div className="flex items-center gap-3">
+                  <Brain className="w-5 h-5 text-mindtrack-sage flex-shrink-0" />
+                  <h3 className="text-lg font-semibold text-mindtrack-stone">{technique.title}</h3>
                 </div>
-                <p className="text-mindtrack-stone/80 mb-2">{technique.description}</p>
-                <div className="flex gap-2 text-xs">
-                  <span className="px-2 py-1 bg-mindtrack-sage/10 text-mindtrack-sage rounded-full">
-                    {technique.category}
-                  </span>
-                  {completedExercises.includes(technique.id) && (
-                    <span className="px-2 py-1 bg-mindtrack-sage/10 text-mindtrack-sage rounded-full flex items-center gap-1">
-                      <Check className="w-3 h-3" /> Completed
-                    </span>
-                  )}
-                </div>
-                
-                {expandedId === technique.id && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    className="mt-4 pt-4 border-t border-mindtrack-sage/10"
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => toggleFavorite(technique.id)}
+                    className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
                   >
-                    <h4 className="font-medium text-mindtrack-stone mb-2">Steps:</h4>
-                    <ol className="list-decimal pl-5 space-y-2 mb-4">
-                      {technique.steps.map((step, i) => (
-                        <li key={i} className="text-mindtrack-stone/80">{step}</li>
-                      ))}
-                    </ol>
+                    <Heart 
+                      className={`w-4 h-4 ${favorites.includes(technique.id) ? 'fill-mindtrack-sage text-mindtrack-sage' : 'text-mindtrack-sage'}`} 
+                    />
+                  </button>
+                  <button
+                    onClick={() => setExpandedId(expandedId === technique.id ? null : technique.id)}
+                    className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                  >
+                    <ChevronDown 
+                      className={`w-4 h-4 text-mindtrack-sage transform transition-transform ${expandedId === technique.id ? 'rotate-180' : ''}`} 
+                    />
+                  </button>
+                </div>
+              </div>
+              <p className="text-mindtrack-stone/80 mb-2">{technique.description}</p>
+              <div className="flex gap-2 text-xs">
+                <span className="px-2 py-1 bg-mindtrack-sage/10 text-mindtrack-sage rounded-full">
+                  {technique.category}
+                </span>
+                {completedExercises.includes(technique.id) && (
+                  <span className="px-2 py-1 bg-mindtrack-sage/10 text-mindtrack-sage rounded-full flex items-center gap-1">
+                    <Check className="w-3 h-3" /> Completed
+                  </span>
+                )}
+              </div>
+              
+              {expandedId === technique.id && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="mt-4 pt-4 border-t border-mindtrack-sage/10"
+                >
+                  <h4 className="font-medium text-mindtrack-stone mb-2">Steps:</h4>
+                  <ol className="list-decimal pl-5 space-y-2 mb-4">
+                    {technique.steps.map((step, i) => (
+                      <li key={i} className="text-mindtrack-stone/80">{step}</li>
+                    ))}
+                  </ol>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      onClick={() => startExercise(technique.id)}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors"
+                    >
+                      <Brain className="w-4 h-4" />
+                      Try Exercise
+                    </button>
                     {!completedExercises.includes(technique.id) ? (
                       <button
                         onClick={() => markAsCompleted(technique.id)}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors"
+                        className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-white border border-mindtrack-sage text-mindtrack-sage rounded-md hover:bg-mindtrack-sage/5 transition-colors"
                       >
                         <Check className="w-4 h-4" />
                         Mark as Completed
@@ -258,11 +351,11 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
                         Unmark as Completed
                       </button>
                     )}
-                  </motion.div>
-                )}
-              </motion.div>
-            ))
-          )}
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
