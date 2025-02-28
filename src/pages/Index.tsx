@@ -13,6 +13,14 @@ const Index = () => {
   const [showFavorites, setShowFavorites] = useState(false);
   const [activeTab, setActiveTab] = useState("mood");
   
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+      setActiveTab(sectionId);
+    }
+  };
+
   return (
     <div className="min-h-screen">
       <Navigation />
@@ -45,31 +53,37 @@ const Index = () => {
                 icon={<BarChart3 className="w-6 h-6" />}
                 title="Mood Tracking"
                 description="Track your daily moods from -10 to +10 and visualize changes over time."
+                onClick={() => scrollToSection("mood")}
               />
               <FeatureCard
                 icon={<ScrollText className="w-6 h-6" />}
                 title="Trigger Tracking"
                 description="Document and understand your emotional triggers to develop healthier coping mechanisms."
+                onClick={() => scrollToSection("trigger")}
               />
               <FeatureCard
                 icon={<Sparkles className="w-6 h-6" />}
                 title="Gratitude Journal"
                 description="Cultivate positivity by recording daily moments of gratitude and appreciation."
+                onClick={() => scrollToSection("gratitude")}
               />
               <FeatureCard
                 icon={<Brain className="w-6 h-6" />}
                 title="CBT Techniques"
                 description="Access proven cognitive behavioral therapy exercises to improve your mental wellbeing."
+                onClick={() => scrollToSection("cbt")}
               />
               <FeatureCard
                 icon={<Target className="w-6 h-6" />}
                 title="Goal Setting"
                 description="Set and track personal growth goals aligned with your mental health journey."
+                onClick={() => scrollToSection("goals")}
               />
               <FeatureCard
                 icon={<Heart className="w-6 h-6" />}
                 title="Favorites"
                 description="Save important entries and insights for quick access and review."
+                onClick={() => setShowFavorites(!showFavorites)}
               />
             </motion.div>
           </div>
@@ -168,15 +182,18 @@ const Index = () => {
 const FeatureCard = ({ 
   icon, 
   title, 
-  description 
+  description, 
+  onClick
 }: { 
   icon: React.ReactNode;
   title: string;
   description: string;
+  onClick?: () => void;
 }) => (
   <motion.div
     whileHover={{ y: -2 }}
-    className="mindtrack-card"
+    className="mindtrack-card cursor-pointer"
+    onClick={onClick}
   >
     <div className="text-mindtrack-sage mb-3">{icon}</div>
     <h3 className="text-lg font-semibold text-mindtrack-stone mb-2">{title}</h3>

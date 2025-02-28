@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { AlertCircle, Heart, LineChart, Pencil, Plus } from "lucide-react";
+import { AlertCircle, Heart, LineChart, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps } from 'recharts';
 
@@ -10,6 +10,7 @@ interface MoodEntry {
   note?: string;
   timestamp: string;
   date: string; // For chart grouping
+  time?: string; // For detailed display
   isFavorite?: boolean;
 }
 
@@ -51,8 +52,11 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
     .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
     .map(entry => ({
       date: entry.date,
+      time: entry.time || "",
       mood: entry.mood,
-      category: getMoodCategory(entry.mood).label
+      category: getMoodCategory(entry.mood).label,
+      note: entry.note || "",
+      fullTimestamp: entry.timestamp
     }));
 
   const addEntry = (entry: MoodEntry) => {
@@ -63,6 +67,10 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
   const updateEntry = (updatedEntry: MoodEntry) => {
     setEntries(entries.map(e => e.id === updatedEntry.id ? updatedEntry : e));
     setEditingId(null);
+  };
+
+  const deleteEntry = (entryId: number) => {
+    setEntries(entries.filter(entry => entry.id !== entryId));
   };
 
   return (
@@ -178,6 +186,12 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
                       >
                         <Pencil className="w-4 h-4 text-mindtrack-sage" />
                       </button>
+                      <button
+                        onClick={() => deleteEntry(entry.id)}
+                        className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                      </button>
                     </div>
                   </div>
                   <div className="flex flex-col md:flex-row gap-6">
@@ -245,11 +259,17 @@ const MoodForm = ({
       day: "numeric",
     });
     
+    const formattedTime = now.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    
     onSubmit({
       id: initialData?.id || Date.now(),
       mood,
       ...(note ? { note } : {}),
       date: formattedDate,
+      time: formattedTime,
       timestamp: initialData?.timestamp || now.toLocaleString("en-US", {
         weekday: "long",
         year: "numeric",
@@ -333,10 +353,18 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
     return (
       <div className="bg-white p-3 border border-mindtrack-sage/10 rounded-md shadow-sm">
         <p className="text-sm font-medium">{label}</p>
+        {payload[0].payload.time && (
+          <p className="text-sm text-mindtrack-stone/70">{payload[0].payload.time}</p>
+        )}
         <p className="text-sm text-mindtrack-stone">
           Mood: <span className="font-medium">{payload[0].value}</span>
         </p>
         <p className="text-sm text-mindtrack-stone/70">{payload[0].payload.category}</p>
+        {payload[0].payload.note && (
+          <p className="text-sm text-mindtrack-stone/70 mt-1">
+            Note: {payload[0].payload.note.length > 50 ? payload[0].payload.note.substring(0, 50) + '...' : payload[0].payload.note}
+          </p>
+        )}
       </div>
     );
   }

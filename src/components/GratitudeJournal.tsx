@@ -1,5 +1,6 @@
+
 import { motion } from "framer-motion";
-import { Heart, Pencil, PlusCircle, X } from "lucide-react";
+import { AlertCircle, Heart, Pencil, PlusCircle, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface GratitudeEntry {
@@ -7,7 +8,7 @@ interface GratitudeEntry {
   content: string;
   date: string;
   time: string;
-  isFavorite: boolean;
+  isFavorite?: boolean;
 }
 
 interface GratitudeJournalProps {
@@ -69,6 +70,10 @@ const GratitudeJournal = ({ showOnlyFavorites = false }: GratitudeJournalProps) 
     setEditingContent("");
   };
 
+  const deleteEntry = (entryId: number) => {
+    setEntries(entries.filter(entry => entry.id !== entryId));
+  };
+
   return (
     <section id="gratitude" className="py-16 bg-mindtrack-cream/30">
       <div className="mindtrack-container">
@@ -111,6 +116,17 @@ const GratitudeJournal = ({ showOnlyFavorites = false }: GratitudeJournalProps) 
           </motion.form>
 
           <div className="space-y-4">
+            {visibleEntries.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="mindtrack-card flex items-center gap-3 text-mindtrack-stone/70"
+              >
+                <AlertCircle className="w-5 h-5" />
+                <p>No gratitude entries yet. Take a moment to reflect on what you're thankful for.</p>
+              </motion.div>
+            )}
+
             {visibleEntries.map((entry, index) => (
               <motion.div
                 key={entry.id}
@@ -148,12 +164,33 @@ const GratitudeJournal = ({ showOnlyFavorites = false }: GratitudeJournalProps) 
                       <>
                         <div className="flex justify-between items-start">
                           <p className="text-mindtrack-stone">{entry.content}</p>
-                          <button
-                            onClick={() => startEditing(entry)}
-                            className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors ml-2"
-                          >
-                            <Pencil className="w-4 h-4 text-mindtrack-sage" />
-                          </button>
+                          <div className="flex gap-2 ml-2">
+                            <button
+                              onClick={() => {
+                                const updatedEntries = entries.map(e => 
+                                  e.id === entry.id ? { ...e, isFavorite: !e.isFavorite } : e
+                                );
+                                setEntries(updatedEntries);
+                              }}
+                              className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                            >
+                              <Heart 
+                                className={`w-4 h-4 ${entry.isFavorite ? 'fill-mindtrack-sage text-mindtrack-sage' : 'text-mindtrack-sage'}`} 
+                              />
+                            </button>
+                            <button
+                              onClick={() => startEditing(entry)}
+                              className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                            >
+                              <Pencil className="w-4 h-4 text-mindtrack-sage" />
+                            </button>
+                            <button
+                              onClick={() => deleteEntry(entry.id)}
+                              className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4 text-red-500" />
+                            </button>
+                          </div>
                         </div>
                         <p className="mt-2 text-sm text-mindtrack-stone/60">
                           {entry.date} at {entry.time}

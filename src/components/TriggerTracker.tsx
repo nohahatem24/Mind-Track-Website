@@ -1,5 +1,6 @@
+
 import { motion } from "framer-motion";
-import { AlertCircle, Heart, Pencil, Plus, X } from "lucide-react";
+import { AlertCircle, Heart, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface Trigger {
@@ -31,12 +32,16 @@ const TriggerTracker = ({ showOnlyFavorites = false }: TriggerTrackerProps) => {
     setEditingId(null);
   };
 
+  const deleteTrigger = (triggerId: number) => {
+    setTriggers(triggers.filter(trigger => trigger.id !== triggerId));
+  };
+
   const visibleTriggers = showOnlyFavorites 
     ? triggers.filter(trigger => trigger.isFavorite)
     : triggers;
 
   return (
-    <section id="triggers" className="py-16">
+    <section id="trigger" className="py-16">
       <div className="mindtrack-container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -91,6 +96,12 @@ const TriggerTracker = ({ showOnlyFavorites = false }: TriggerTrackerProps) => {
                         className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
                       >
                         <Pencil className="w-4 h-4 text-mindtrack-sage" />
+                      </button>
+                      <button
+                        onClick={() => deleteTrigger(trigger.id)}
+                        className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-500" />
                       </button>
                     </div>
                   </div>
@@ -192,6 +203,7 @@ const TriggerForm = ({
         hour: "2-digit",
         minute: "2-digit",
       }),
+      isFavorite: initialData?.isFavorite || false
     };
 
     // Check if at least one field has content

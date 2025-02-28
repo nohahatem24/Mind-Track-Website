@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { AlertCircle, BookmarkPlus, Brain, Check, ChevronDown, Heart, MessageSquare, MoreHorizontal } from "lucide-react";
+import { AlertCircle, BookmarkPlus, Brain, Check, ChevronDown, Heart, MessageSquare, MoreHorizontal, X } from "lucide-react";
 import { useState } from "react";
 
 interface Technique {
@@ -121,6 +121,10 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
     }
   };
 
+  const unmarkAsCompleted = (id: string) => {
+    setCompletedExercises(completedExercises.filter(exerciseId => exerciseId !== id));
+  };
+
   const filteredTechniques = techniques
     .filter(technique => showOnlyFavorites ? favorites.includes(technique.id) : true)
     .filter(technique => selectedCategory === "all" ? true : technique.category === selectedCategory);
@@ -237,13 +241,21 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
                         <li key={i} className="text-mindtrack-stone/80">{step}</li>
                       ))}
                     </ol>
-                    {!completedExercises.includes(technique.id) && (
+                    {!completedExercises.includes(technique.id) ? (
                       <button
                         onClick={() => markAsCompleted(technique.id)}
                         className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors"
                       >
                         <Check className="w-4 h-4" />
                         Mark as Completed
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => unmarkAsCompleted(technique.id)}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-mindtrack-sage text-mindtrack-sage rounded-md hover:bg-mindtrack-sage/5 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                        Unmark as Completed
                       </button>
                     )}
                   </motion.div>
