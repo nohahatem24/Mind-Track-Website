@@ -21,6 +21,12 @@ const Index = () => {
     }
   };
 
+  // This function will handle tab changes and scrolling
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    scrollToSection(tabId);
+  };
+
   return (
     <div className="min-h-screen">
       <Navigation />
@@ -53,31 +59,31 @@ const Index = () => {
                 icon={<BarChart3 className="w-6 h-6" />}
                 title="Mood Tracking"
                 description="Track your daily moods from -10 to +10 and visualize changes over time."
-                onClick={() => scrollToSection("mood")}
+                onClick={() => handleTabChange("mood")}
               />
               <FeatureCard
                 icon={<ScrollText className="w-6 h-6" />}
                 title="Trigger Tracking"
                 description="Document and understand your emotional triggers to develop healthier coping mechanisms."
-                onClick={() => scrollToSection("trigger")}
+                onClick={() => handleTabChange("trigger")}
               />
               <FeatureCard
                 icon={<Sparkles className="w-6 h-6" />}
                 title="Gratitude Journal"
                 description="Cultivate positivity by recording daily moments of gratitude and appreciation."
-                onClick={() => scrollToSection("gratitude")}
+                onClick={() => handleTabChange("gratitude")}
               />
               <FeatureCard
                 icon={<Brain className="w-6 h-6" />}
                 title="CBT Techniques"
                 description="Access proven cognitive behavioral therapy exercises to improve your mental wellbeing."
-                onClick={() => scrollToSection("cbt")}
+                onClick={() => handleTabChange("cbt")}
               />
               <FeatureCard
                 icon={<Target className="w-6 h-6" />}
                 title="Goal Setting"
                 description="Set and track personal growth goals aligned with your mental health journey."
-                onClick={() => scrollToSection("goals")}
+                onClick={() => handleTabChange("goals")}
               />
               <FeatureCard
                 icon={<Heart className="w-6 h-6" />}
@@ -95,7 +101,7 @@ const Index = () => {
         <div className="border-b border-mindtrack-sage/10">
           <div className="flex overflow-x-auto no-scrollbar">
             <button
-              onClick={() => setActiveTab("mood")}
+              onClick={() => handleTabChange("mood")}
               className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
                 activeTab === "mood"
                   ? "border-mindtrack-sage text-mindtrack-sage"
@@ -105,7 +111,7 @@ const Index = () => {
               Mood Tracking
             </button>
             <button
-              onClick={() => setActiveTab("trigger")}
+              onClick={() => handleTabChange("trigger")}
               className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
                 activeTab === "trigger"
                   ? "border-mindtrack-sage text-mindtrack-sage"
@@ -115,7 +121,7 @@ const Index = () => {
               Trigger Tracking
             </button>
             <button
-              onClick={() => setActiveTab("gratitude")}
+              onClick={() => handleTabChange("gratitude")}
               className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
                 activeTab === "gratitude"
                   ? "border-mindtrack-sage text-mindtrack-sage"
@@ -125,7 +131,7 @@ const Index = () => {
               Gratitude Journal
             </button>
             <button
-              onClick={() => setActiveTab("cbt")}
+              onClick={() => handleTabChange("cbt")}
               className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
                 activeTab === "cbt"
                   ? "border-mindtrack-sage text-mindtrack-sage"
@@ -135,7 +141,7 @@ const Index = () => {
               CBT Techniques
             </button>
             <button
-              onClick={() => setActiveTab("goals")}
+              onClick={() => handleTabChange("goals")}
               className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
                 activeTab === "goals"
                   ? "border-mindtrack-sage text-mindtrack-sage"

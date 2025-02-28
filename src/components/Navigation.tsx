@@ -20,11 +20,6 @@ const Navigation = () => {
             <span className="text-xl font-semibold text-mindtrack-stone">MindTrack</span>
           </motion.div>
 
-          <div className="hidden md:flex items-center gap-6">
-            <NavLink href="#triggers">Triggers</NavLink>
-            <NavLink href="#gratitude">Gratitude</NavLink>
-          </div>
-
           <button 
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden p-2 hover:bg-mindtrack-sage/5 rounded-lg"
@@ -42,11 +37,20 @@ const Navigation = () => {
           className="md:hidden border-t border-mindtrack-sage/10"
         >
           <div className="mindtrack-container py-4 space-y-2">
-            <MobileNavLink href="#triggers" onClick={() => setIsOpen(false)}>
-              Triggers
+            <MobileNavLink href="#mood" onClick={() => setIsOpen(false)}>
+              Mood Tracking
+            </MobileNavLink>
+            <MobileNavLink href="#trigger" onClick={() => setIsOpen(false)}>
+              Trigger Tracking
             </MobileNavLink>
             <MobileNavLink href="#gratitude" onClick={() => setIsOpen(false)}>
-              Gratitude
+              Gratitude Journal
+            </MobileNavLink>
+            <MobileNavLink href="#cbt" onClick={() => setIsOpen(false)}>
+              CBT Techniques
+            </MobileNavLink>
+            <MobileNavLink href="#goals" onClick={() => setIsOpen(false)}>
+              Goal Tracker
             </MobileNavLink>
           </div>
         </motion.div>
@@ -54,15 +58,6 @@ const Navigation = () => {
     </nav>
   );
 };
-
-const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
-  <a 
-    href={href}
-    className="text-mindtrack-stone hover:text-mindtrack-sage transition-colors font-medium"
-  >
-    {children}
-  </a>
-);
 
 const MobileNavLink = ({ 
   href, 
