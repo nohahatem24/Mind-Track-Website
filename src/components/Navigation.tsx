@@ -3,8 +3,27 @@ import { motion } from "framer-motion";
 import { BookHeart, Menu } from "lucide-react";
 import { useState } from "react";
 
+interface MobileNavLinkProps {
+  sectionId: string;
+  children: React.ReactNode;
+  onClick: (sectionId: string) => void;
+}
+
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleMobileNavClick = (sectionId: string) => {
+    // Close the mobile menu
+    setIsOpen(false);
+    
+    // Scroll to the section
+    const section = document.getElementById(sectionId);
+    if (section) {
+      setTimeout(() => {
+        section.scrollIntoView({ behavior: 'smooth' });
+      }, 150); // Small delay to allow the mobile menu to close
+    }
+  };
 
   return (
     <nav className="fixed w-full bg-white/80 backdrop-blur-lg z-50 border-b border-mindtrack-sage/10">
@@ -37,19 +56,19 @@ const Navigation = () => {
           className="md:hidden border-t border-mindtrack-sage/10"
         >
           <div className="mindtrack-container py-4 space-y-2">
-            <MobileNavLink href="#mood" onClick={() => setIsOpen(false)}>
+            <MobileNavLink sectionId="mood" onClick={handleMobileNavClick}>
               Mood Tracking
             </MobileNavLink>
-            <MobileNavLink href="#trigger" onClick={() => setIsOpen(false)}>
+            <MobileNavLink sectionId="trigger" onClick={handleMobileNavClick}>
               Trigger Tracking
             </MobileNavLink>
-            <MobileNavLink href="#gratitude" onClick={() => setIsOpen(false)}>
+            <MobileNavLink sectionId="gratitude" onClick={handleMobileNavClick}>
               Gratitude Journal
             </MobileNavLink>
-            <MobileNavLink href="#cbt" onClick={() => setIsOpen(false)}>
+            <MobileNavLink sectionId="cbt" onClick={handleMobileNavClick}>
               CBT Techniques
             </MobileNavLink>
-            <MobileNavLink href="#goals" onClick={() => setIsOpen(false)}>
+            <MobileNavLink sectionId="goals" onClick={handleMobileNavClick}>
               Goal Tracker
             </MobileNavLink>
           </div>
@@ -60,21 +79,16 @@ const Navigation = () => {
 };
 
 const MobileNavLink = ({ 
-  href, 
+  sectionId, 
   children, 
   onClick 
-}: { 
-  href: string; 
-  children: React.ReactNode;
-  onClick: () => void;
-}) => (
-  <a
-    href={href}
-    onClick={onClick}
-    className="block py-2 px-4 text-mindtrack-stone hover:bg-mindtrack-sage/5 rounded-lg transition-colors"
+}: MobileNavLinkProps) => (
+  <button
+    onClick={() => onClick(sectionId)}
+    className="block w-full text-left py-2 px-4 text-mindtrack-stone hover:bg-mindtrack-sage/5 rounded-lg transition-colors"
   >
     {children}
-  </a>
+  </button>
 );
 
 export default Navigation;

@@ -1,7 +1,7 @@
 
 import { motion } from "framer-motion";
 import { AlertCircle, BookmarkPlus, Brain, Check, ChevronDown, Heart, MessageSquare, MoreHorizontal, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CognitiveRestructuringExercise, GroundingExercise, BreathingExercise } from "./CBTExercise";
 import ThoughtRecord from "./ThoughtRecord";
 import BehavioralActivation from "./BehavioralActivation";
@@ -15,9 +15,20 @@ interface Technique {
   isFavorite?: boolean;
 }
 
+interface CBTHistoryEntry {
+  id: string;
+  techniqueId: string;
+  date: string;
+  notes?: string;
+}
+
 interface CBTTechniquesProps {
   showOnlyFavorites?: boolean;
 }
+
+const FAVORITES_STORAGE_KEY = 'mindtrack_cbt_favorites';
+const COMPLETED_STORAGE_KEY = 'mindtrack_cbt_completed';
+const HISTORY_STORAGE_KEY = 'mindtrack_cbt_history';
 
 const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
   const [techniques] = useState<Technique[]>([
@@ -109,7 +120,53 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [completedExercises, setCompletedExercises] = useState<string[]>([]);
+  const [exerciseHistory, setExerciseHistory] = useState<CBTHistoryEntry[]>([]);
   const [activeExercise, setActiveExercise] = useState<string | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Load saved data from localStorage on component mount
+  useEffect(() => {
+    const savedFavorites = localStorage.getItem(FAVORITES_STORAGE_KEY);
+    const savedCompleted = localStorage.getItem(COMPLETED_STORAGE_KEY);
+    const savedHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
+
+    if (savedFavorites) {
+      try {
+        setFavorites(JSON.parse(savedFavorites));
+      } catch (e) {
+        console.error("Error parsing saved favorites:", e);
+      }
+    }
+
+    if (savedCompleted) {
+      try {
+        setCompletedExercises(JSON.parse(savedCompleted));
+      } catch (e) {
+        console.error("Error parsing saved completed exercises:", e);
+      }
+    }
+
+    if (savedHistory) {
+      try {
+        setExerciseHistory(JSON.parse(savedHistory));
+      } catch (e) {
+        console.error("Error parsing saved exercise history:", e);
+      }
+    }
+  }, []);
+
+  // Save data to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
+  }, [favorites]);
+
+  useEffect(() => {
+    localStorage.setItem(COMPLETED_STORAGE_KEY, JSON.stringify(completedExercises));
+  }, [completedExercises]);
+
+  useEffect(() => {
+    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(exerciseHistory));
+  }, [exerciseHistory]);
 
   const toggleFavorite = (id: string) => {
     if (favorites.includes(id)) {
@@ -122,6 +179,17 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
   const markAsCompleted = (id: string) => {
     if (!completedExercises.includes(id)) {
       setCompletedExercises([...completedExercises, id]);
+      
+      // Add to history
+      const now = new Date();
+      const historyEntry: CBTHistoryEntry = {
+        id: Date.now().toString(),
+        techniqueId: id,
+        date: now.toLocaleString(),
+        notes: "Completed exercise"
+      };
+      
+      setExerciseHistory([historyEntry, ...exerciseHistory]);
     }
   };
 
@@ -183,6 +251,13 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
             onCancel={cancelExercise}
           />
         );
+      case "progressive-relaxation":
+        return (
+          <ProgressiveMuscleRelaxationExercise
+            onComplete={() => completeExercise(techniqueId)}
+            onCancel={cancelExercise}
+          />
+        );
       default:
         return (
           <div className="text-center py-8">
@@ -215,33 +290,82 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
             Evidence-based cognitive behavioral therapy exercises to help manage emotions, change unhelpful thinking patterns, and develop healthier behaviors.
           </p>
           
-          <div className="flex flex-wrap gap-2 mb-6">
-            <CategoryButton 
-              active={selectedCategory === "all"}
-              onClick={() => setSelectedCategory("all")}
+          <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+            <div className="flex flex-wrap gap-2">
+              <CategoryButton 
+                active={selectedCategory === "all"}
+                onClick={() => setSelectedCategory("all")}
+              >
+                All Techniques
+              </CategoryButton>
+              <CategoryButton 
+                active={selectedCategory === "cognitive"}
+                onClick={() => setSelectedCategory("cognitive")}
+              >
+                Cognitive
+              </CategoryButton>
+              <CategoryButton 
+                active={selectedCategory === "behavioral"}
+                onClick={() => setSelectedCategory("behavioral")}
+              >
+                Behavioral
+              </CategoryButton>
+              <CategoryButton 
+                active={selectedCategory === "mindfulness"}
+                onClick={() => setSelectedCategory("mindfulness")}
+              >
+                Mindfulness
+              </CategoryButton>
+            </div>
+            
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className="px-4 py-2 border border-mindtrack-sage text-mindtrack-sage rounded-md hover:bg-mindtrack-sage/5"
             >
-              All Techniques
-            </CategoryButton>
-            <CategoryButton 
-              active={selectedCategory === "cognitive"}
-              onClick={() => setSelectedCategory("cognitive")}
-            >
-              Cognitive
-            </CategoryButton>
-            <CategoryButton 
-              active={selectedCategory === "behavioral"}
-              onClick={() => setSelectedCategory("behavioral")}
-            >
-              Behavioral
-            </CategoryButton>
-            <CategoryButton 
-              active={selectedCategory === "mindfulness"}
-              onClick={() => setSelectedCategory("mindfulness")}
-            >
-              Mindfulness
-            </CategoryButton>
+              {showHistory ? "Hide History" : "View History"}
+            </button>
           </div>
         </motion.div>
+
+        {/* Exercise History */}
+        {showHistory && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="mindtrack-card mb-8"
+          >
+            <h3 className="text-xl font-semibold text-mindtrack-stone mb-4">Exercise History</h3>
+            
+            {exerciseHistory.length > 0 ? (
+              <div className="space-y-4">
+                {exerciseHistory.map(entry => {
+                  const technique = techniques.find(t => t.id === entry.techniqueId);
+                  
+                  return (
+                    <div key={entry.id} className="p-3 border-b border-mindtrack-sage/10">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-medium text-mindtrack-stone">{technique?.title || "Unknown Exercise"}</h4>
+                          <p className="text-sm text-mindtrack-stone/60">{entry.date}</p>
+                        </div>
+                        <span className="px-2 py-1 bg-mindtrack-sage/10 text-mindtrack-sage rounded-full text-xs">
+                          {technique?.category || "unknown"}
+                        </span>
+                      </div>
+                      {entry.notes && (
+                        <p className="mt-2 text-sm text-mindtrack-stone/80">{entry.notes}</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-6 text-mindtrack-stone/70">
+                No exercise history yet. Complete exercises to build your history.
+              </div>
+            )}
+          </motion.div>
+        )}
 
         {activeExercise && (
           <motion.div
@@ -359,6 +483,242 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
         </div>
       </div>
     </section>
+  );
+};
+
+// A simple implementation for Progressive Muscle Relaxation
+const ProgressiveMuscleRelaxationExercise = ({ 
+  onComplete,
+  onCancel
+}: { 
+  onComplete: () => void;
+  onCancel: () => void;
+}) => {
+  const muscleGroups = [
+    "Feet and toes",
+    "Calves",
+    "Thighs",
+    "Buttocks",
+    "Abdomen",
+    "Chest",
+    "Back",
+    "Arms and hands",
+    "Shoulders",
+    "Neck",
+    "Face"
+  ];
+  
+  const [currentStep, setCurrentStep] = useState(0);
+  const [stepStatus, setStepStatus] = useState<Record<number, boolean>>({});
+  const [timerSeconds, setTimerSeconds] = useState(0);
+  const [timerActive, setTimerActive] = useState(false);
+  const [relaxing, setRelaxing] = useState(false);
+  
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (timerActive) {
+      interval = setInterval(() => {
+        setTimerSeconds(prev => {
+          const nextValue = prev + 1;
+          
+          // Auto-switch to relaxation after 10 seconds of tension
+          if (!relaxing && nextValue >= 10) {
+            setRelaxing(true);
+            return 0;
+          }
+          
+          // Auto-mark group as complete after 15 seconds of relaxation
+          if (relaxing && nextValue >= 15) {
+            completeCurrentStep();
+            return 0;
+          }
+          
+          return nextValue;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timerActive, relaxing]);
+  
+  const startMuscleGroup = () => {
+    setTimerActive(true);
+    setTimerSeconds(0);
+    setRelaxing(false);
+  };
+  
+  const switchToRelaxation = () => {
+    setTimerSeconds(0);
+    setRelaxing(true);
+  };
+  
+  const completeCurrentStep = () => {
+    setStepStatus({ ...stepStatus, [currentStep]: true });
+    setTimerActive(false);
+    
+    // Move to next step if not at the end
+    if (currentStep < muscleGroups.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+  
+  const resetExercise = () => {
+    setCurrentStep(0);
+    setStepStatus({});
+    setTimerActive(false);
+    setTimerSeconds(0);
+    setRelaxing(false);
+  };
+  
+  const isExerciseComplete = Object.keys(stepStatus).length === muscleGroups.length;
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="space-y-6"
+    >
+      <div className="text-center mb-6">
+        <h3 className="text-lg font-medium text-mindtrack-stone mb-2">
+          Progressive Muscle Relaxation
+        </h3>
+        <p className="text-mindtrack-stone/80">
+          Systematically tense and relax each muscle group to reduce physical tension and promote relaxation.
+        </p>
+      </div>
+      
+      <div className="grid md:grid-cols-2 gap-8">
+        <div className="space-y-4">
+          <h4 className="font-medium text-mindtrack-stone">Muscle Groups</h4>
+          <div className="space-y-2 max-h-[400px] overflow-y-auto p-1">
+            {muscleGroups.map((group, index) => (
+              <div 
+                key={index}
+                className={`p-3 border rounded-md ${
+                  currentStep === index 
+                    ? "border-mindtrack-sage bg-mindtrack-sage/5" 
+                    : stepStatus[index]
+                      ? "border-green-300 bg-green-50"
+                      : "border-gray-200"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {stepStatus[index] && (
+                      <Check className="w-4 h-4 text-green-500" />
+                    )}
+                    <span className={stepStatus[index] ? "line-through text-gray-500" : ""}>
+                      {group}
+                    </span>
+                  </div>
+                  
+                  {currentStep === index && !stepStatus[index] && (
+                    <span className="text-xs px-2 py-1 bg-mindtrack-sage/10 text-mindtrack-sage rounded-full">
+                      Current
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        <div className="space-y-6">
+          <div className="p-6 border border-mindtrack-sage/20 rounded-lg bg-mindtrack-sage/5">
+            <h4 className="font-medium text-mindtrack-stone mb-4">
+              {currentStep < muscleGroups.length ? `Current: ${muscleGroups[currentStep]}` : "Exercise Complete!"}
+            </h4>
+            
+            {!isExerciseComplete && (
+              <>
+                {!timerActive ? (
+                  <button
+                    onClick={startMuscleGroup}
+                    className="w-full py-3 mb-4 bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors"
+                  >
+                    Start Tensing This Muscle Group
+                  </button>
+                ) : (
+                  <div className="mb-4 space-y-3">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold">{timerSeconds}s</div>
+                      <p className="text-sm text-mindtrack-stone/70">
+                        {relaxing 
+                          ? "Feel the relaxation... breathe deeply..." 
+                          : "Tense the muscles... hold..."}
+                      </p>
+                    </div>
+                    
+                    {!relaxing && (
+                      <button
+                        onClick={switchToRelaxation}
+                        className="w-full py-2 border border-mindtrack-sage text-mindtrack-sage rounded-md hover:bg-mindtrack-sage/5 transition-colors"
+                      >
+                        Release & Relax Now
+                      </button>
+                    )}
+                    
+                    {relaxing && (
+                      <button
+                        onClick={completeCurrentStep}
+                        className="w-full py-2 bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors"
+                      >
+                        Complete & Move to Next
+                      </button>
+                    )}
+                  </div>
+                )}
+                
+                <div className="space-y-2">
+                  <h5 className="font-medium text-sm text-mindtrack-stone">Instructions:</h5>
+                  <ol className="list-decimal text-sm pl-5 space-y-1 text-mindtrack-stone/80">
+                    <li>Get into a comfortable position</li>
+                    <li>Focus on the current muscle group</li>
+                    <li>Tense the muscles for 5-10 seconds</li>
+                    <li>Release and notice the feeling of relaxation</li>
+                    <li>Rest for 15-20 seconds before moving to the next group</li>
+                  </ol>
+                </div>
+              </>
+            )}
+            
+            {isExerciseComplete && (
+              <div className="text-center space-y-4">
+                <p className="text-mindtrack-stone/80">
+                  Great job! You've completed the full progressive muscle relaxation exercise.
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <button
+                    onClick={resetExercise}
+                    className="px-4 py-2 border border-mindtrack-sage text-mindtrack-sage rounded-md hover:bg-mindtrack-sage/5 transition-colors"
+                  >
+                    Start Over
+                  </button>
+                  <button
+                    onClick={onComplete}
+                    className="px-4 py-2 bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors"
+                  >
+                    Complete Exercise
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex justify-end">
+            <button
+              onClick={onCancel}
+              className="text-mindtrack-stone/70 hover:text-mindtrack-stone underline"
+            >
+              Cancel Exercise
+            </button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
   );
 };
 

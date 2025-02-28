@@ -7,24 +7,43 @@ import TriggerTracker from "@/components/TriggerTracker";
 import MoodTracker from "@/components/MoodTracker";
 import CBTTechniques from "@/components/CBTTechniques";
 import GoalTracker from "@/components/GoalTracker";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const Index = () => {
   const [showFavorites, setShowFavorites] = useState(false);
   const [activeTab, setActiveTab] = useState("mood");
   
-  const scrollToSection = (sectionId: string) => {
-    const section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
-      setActiveTab(sectionId);
+  // Refs for each section
+  const moodRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const gratitudeRef = useRef<HTMLDivElement>(null);
+  const cbtRef = useRef<HTMLDivElement>(null);
+  const goalsRef = useRef<HTMLDivElement>(null);
+
+  // Get ref based on section ID
+  const getSectionRef = (sectionId: string) => {
+    switch (sectionId) {
+      case "mood": return moodRef;
+      case "trigger": return triggerRef;
+      case "gratitude": return gratitudeRef;
+      case "cbt": return cbtRef;
+      case "goals": return goalsRef;
+      default: return null;
     }
   };
-
+  
   // This function will handle tab changes and scrolling
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
-    scrollToSection(tabId);
+    
+    // Scroll to the selected section
+    const sectionRef = getSectionRef(tabId);
+    if (sectionRef && sectionRef.current) {
+      sectionRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
   };
 
   return (
@@ -165,12 +184,22 @@ const Index = () => {
         </button>
       </div>
 
-      {/* Content */}
-      {activeTab === "mood" && <MoodTracker showOnlyFavorites={showFavorites} />}
-      {activeTab === "trigger" && <TriggerTracker showOnlyFavorites={showFavorites} />}
-      {activeTab === "gratitude" && <GratitudeJournal showOnlyFavorites={showFavorites} />}
-      {activeTab === "cbt" && <CBTTechniques showOnlyFavorites={showFavorites} />}
-      {activeTab === "goals" && <GoalTracker showOnlyFavorites={showFavorites} />}
+      {/* Content with refs for each section */}
+      <div ref={moodRef}>
+        {activeTab === "mood" && <MoodTracker showOnlyFavorites={showFavorites} />}
+      </div>
+      <div ref={triggerRef}>
+        {activeTab === "trigger" && <TriggerTracker showOnlyFavorites={showFavorites} />}
+      </div>
+      <div ref={gratitudeRef}>
+        {activeTab === "gratitude" && <GratitudeJournal showOnlyFavorites={showFavorites} />}
+      </div>
+      <div ref={cbtRef}>
+        {activeTab === "cbt" && <CBTTechniques showOnlyFavorites={showFavorites} />}
+      </div>
+      <div ref={goalsRef}>
+        {activeTab === "goals" && <GoalTracker showOnlyFavorites={showFavorites} />}
+      </div>
 
       {/* Footer */}
       <footer className="py-8 border-t border-mindtrack-sage/10">

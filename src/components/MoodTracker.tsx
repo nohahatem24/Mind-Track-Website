@@ -25,10 +25,14 @@ interface MoodTrackerProps {
   showOnlyFavorites?: boolean;
 }
 
+const STORAGE_KEY = 'mindtrack_mood_entries';
+
 const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
   const [entries, setEntries] = useState<MoodEntry[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [calendarView, setCalendarView] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   
   const moodCategories: MoodCategory[] = [
     { range: [-10, -6], label: "Severely Low", color: "#d97706", description: "Severe depression, emotional shutdown" },
@@ -38,6 +42,23 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
     { range: [6, 10], label: "Highly Elevated", color: "#22c55e", description: "Energetic, intense excitement, joy" },
   ];
 
+  // Load entries from localStorage on component mount
+  useEffect(() => {
+    const savedEntries = localStorage.getItem(STORAGE_KEY);
+    if (savedEntries) {
+      try {
+        setEntries(JSON.parse(savedEntries));
+      } catch (e) {
+        console.error("Error parsing saved mood entries:", e);
+      }
+    }
+  }, []);
+
+  // Save entries to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  }, [entries]);
+
   const getMoodCategory = (moodValue: number): MoodCategory => {
     return moodCategories.find(category => 
       moodValue >= category.range[0] && moodValue <= category.range[1]
@@ -46,7 +67,9 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
 
   const visibleEntries = showOnlyFavorites
     ? entries.filter(entry => entry.isFavorite)
-    : entries;
+    : selectedDate 
+      ? entries.filter(entry => entry.date === selectedDate)
+      : entries;
 
   const chartData = [...entries]
     .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
@@ -73,6 +96,17 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
     setEntries(entries.filter(entry => entry.id !== entryId));
   };
 
+  const toggleFavorite = (entryId: number) => {
+    setEntries(entries.map(entry => 
+      entry.id === entryId 
+        ? { ...entry, isFavorite: !entry.isFavorite } 
+        : entry
+    ));
+  };
+
+  // Get unique dates for the calendar view
+  const uniqueDates = [...new Set(entries.map(entry => entry.date))];
+
   return (
     <section id="mood" className="py-16">
       <div className="mindtrack-container">
@@ -88,6 +122,74 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
             Track your daily mood on a scale from -10 (extremely low) to +10 (extremely high) to identify patterns and monitor your emotional well-being.
           </p>
         </motion.div>
+
+        {/* View Toggle */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCalendarView(false)}
+              className={`px-4 py-2 rounded-md ${!calendarView ? 'bg-mindtrack-sage text-white' : 'bg-gray-100 text-mindtrack-stone'}`}
+            >
+              List View
+            </button>
+            <button
+              onClick={() => setCalendarView(true)}
+              className={`px-4 py-2 rounded-md ${calendarView ? 'bg-mindtrack-sage text-white' : 'bg-gray-100 text-mindtrack-stone'}`}
+            >
+              Calendar View
+            </button>
+          </div>
+          
+          {selectedDate && (
+            <button
+              onClick={() => setSelectedDate(null)}
+              className="text-mindtrack-sage hover:underline"
+            >
+              Clear Date Filter
+            </button>
+          )}
+        </div>
+
+        {/* Calendar View */}
+        {calendarView && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mindtrack-card mb-8 grid grid-cols-7 gap-2"
+          >
+            {uniqueDates.length > 0 ? (
+              uniqueDates.map(date => {
+                const dateEntries = entries.filter(e => e.date === date);
+                const avgMood = dateEntries.reduce((sum, entry) => sum + entry.mood, 0) / dateEntries.length;
+                const category = getMoodCategory(avgMood);
+                
+                return (
+                  <div
+                    key={date}
+                    onClick={() => setSelectedDate(date)}
+                    className={`p-3 rounded-md cursor-pointer border ${
+                      selectedDate === date 
+                        ? 'border-mindtrack-sage' 
+                        : 'border-gray-100 hover:border-mindtrack-sage/50'
+                    }`}
+                    style={{ backgroundColor: `${category.color}10` }}
+                  >
+                    <p className="font-medium text-mindtrack-stone">{date}</p>
+                    <p className="text-sm text-mindtrack-stone/70">{dateEntries.length} entries</p>
+                    <div 
+                      className="mt-2 h-2 rounded-full" 
+                      style={{ backgroundColor: category.color }}
+                    ></div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="col-span-7 text-center py-6 text-mindtrack-stone/70">
+                No mood entries yet. Start tracking to build your calendar.
+              </div>
+            )}
+          </motion.div>
+        )}
 
         {/* Mood Chart */}
         {entries.length > 0 && (
@@ -168,12 +270,7 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
                     </div>
                     <div className="flex gap-2">
                       <button
-                        onClick={() => {
-                          const updatedEntries = entries.map(e => 
-                            e.id === entry.id ? { ...e, isFavorite: !e.isFavorite } : e
-                          );
-                          setEntries(updatedEntries);
-                        }}
+                        onClick={() => toggleFavorite(entry.id)}
                         className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
                       >
                         <Heart 
@@ -233,6 +330,17 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
               <p>No mood entries logged yet. Start tracking how you feel to see patterns over time.</p>
             </motion.div>
           )}
+          
+          {entries.length > 0 && visibleEntries.length === 0 && !isAdding && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mindtrack-card flex items-center gap-3 text-mindtrack-stone/70"
+            >
+              <AlertCircle className="w-5 h-5" />
+              <p>No entries match your current filters.</p>
+            </motion.div>
+          )}
         </div>
       </div>
     </section>
@@ -268,8 +376,8 @@ const MoodForm = ({
       id: initialData?.id || Date.now(),
       mood,
       ...(note ? { note } : {}),
-      date: formattedDate,
-      time: formattedTime,
+      date: initialData?.date || formattedDate,
+      time: initialData?.time || formattedTime,
       timestamp: initialData?.timestamp || now.toLocaleString("en-US", {
         weekday: "long",
         year: "numeric",
