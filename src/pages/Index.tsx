@@ -4,7 +4,7 @@ import { BookHeart, Heart, ScrollText, Sparkles, BarChart3, Target, Brain } from
 import GratitudeJournal from "@/components/GratitudeJournal";
 import Navigation from "@/components/Navigation";
 import TriggerTracker from "@/components/TriggerTracker";
-import MoodTracker from "@/components/MoodTracker";
+import MoodTracker from "@/components/mood-tracker/MoodTracker";
 import CBTTechniques from "@/components/CBTTechniques";
 import GoalTracker from "@/components/GoalTracker";
 import { useState, useEffect, useRef } from "react";
