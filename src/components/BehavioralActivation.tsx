@@ -14,22 +14,31 @@ interface Activity {
 }
 
 interface BehavioralActivationProps {
-  onComplete: () => void;
+  onComplete: (data: Record<string, any>) => void;
   onCancel: () => void;
+  initialData?: Record<string, any>;
+  isEditing?: boolean;
 }
 
-const BehavioralActivation = ({ onComplete, onCancel }: BehavioralActivationProps) => {
-  const [activities, setActivities] = useState<Activity[]>([
-    {
-      id: 1,
-      name: "",
-      enjoyment: 5,
-      scheduled: "",
-      moodBefore: undefined,
-      moodAfter: undefined,
-      completed: false
-    }
-  ]);
+const BehavioralActivation = ({ 
+  onComplete, 
+  onCancel,
+  initialData,
+  isEditing = false
+}: BehavioralActivationProps) => {
+  const [activities, setActivities] = useState<Activity[]>(
+    initialData?.activities || [
+      {
+        id: 1,
+        name: "",
+        enjoyment: 5,
+        scheduled: "",
+        moodBefore: undefined,
+        moodAfter: undefined,
+        completed: false
+      }
+    ]
+  );
 
   const [newActivity, setNewActivity] = useState({
     name: "",
@@ -82,7 +91,10 @@ const BehavioralActivation = ({ onComplete, onCancel }: BehavioralActivationProp
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onComplete();
+    onComplete({
+      activities,
+      date: new Date().toISOString()
+    });
   };
 
   const isFormValid = () => {
@@ -283,7 +295,7 @@ const BehavioralActivation = ({ onComplete, onCancel }: BehavioralActivationProp
           className="px-4 py-2 bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors disabled:opacity-50"
           disabled={!isFormValid()}
         >
-          Complete Exercise
+          {isEditing ? "Save Changes" : "Complete Exercise"}
         </button>
       </div>
     </motion.form>
