@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { AlertCircle, BookmarkPlus, Brain, Check, ChevronDown, Edit, Heart, MessageSquare, MoreHorizontal, Trash2, X } from "lucide-react";
 import { useState, useEffect } from "react";
