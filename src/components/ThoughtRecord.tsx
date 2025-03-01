@@ -4,20 +4,27 @@ import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface ThoughtRecordProps {
-  onComplete: () => void;
+  onComplete: (data: Record<string, any>) => void;
   onCancel: () => void;
+  initialData?: Record<string, any>;
+  isEditing?: boolean;
 }
 
-const ThoughtRecord = ({ onComplete, onCancel }: ThoughtRecordProps) => {
+const ThoughtRecord = ({ 
+  onComplete, 
+  onCancel, 
+  initialData,
+  isEditing = false
+}: ThoughtRecordProps) => {
   const [formData, setFormData] = useState({
-    situation: "",
-    automaticThoughts: "",
-    emotions: "",
-    supportingEvidence: "",
-    contradictingEvidence: "",
-    balancedPerspective: "",
-    beforeRating: "5",
-    afterRating: "5"
+    situation: initialData?.situation || "",
+    automaticThoughts: initialData?.automaticThoughts || "",
+    emotions: initialData?.emotions || "",
+    supportingEvidence: initialData?.supportingEvidence || "",
+    contradictingEvidence: initialData?.contradictingEvidence || "",
+    balancedPerspective: initialData?.balancedPerspective || "",
+    beforeRating: initialData?.beforeRating || "5",
+    afterRating: initialData?.afterRating || "5"
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -27,7 +34,10 @@ const ThoughtRecord = ({ onComplete, onCancel }: ThoughtRecordProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onComplete();
+    onComplete({
+      ...formData,
+      date: new Date().toISOString()
+    });
   };
 
   const isFormValid = () => {
@@ -106,7 +116,7 @@ const ThoughtRecord = ({ onComplete, onCancel }: ThoughtRecordProps) => {
         </div>
         <div>
           <label className="block text-sm font-medium text-mindtrack-stone mb-1">
-            Evidence Contradicting Thoughts
+            Evidence Contradicting Thoughts (optional)
           </label>
           <textarea
             name="contradictingEvidence"
@@ -182,7 +192,7 @@ const ThoughtRecord = ({ onComplete, onCancel }: ThoughtRecordProps) => {
           className="px-4 py-2 bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors disabled:opacity-50"
           disabled={!isFormValid()}
         >
-          Complete Exercise
+          {isEditing ? "Save Changes" : "Complete Exercise"}
         </button>
       </div>
     </motion.form>

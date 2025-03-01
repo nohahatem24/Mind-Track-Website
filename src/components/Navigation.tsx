@@ -17,11 +17,22 @@ const Navigation = () => {
     setIsOpen(false);
     
     // Scroll to the section
+    scrollToSection(sectionId);
+  };
+
+  // Function to scroll to a section
+  const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
     if (section) {
-      setTimeout(() => {
-        section.scrollIntoView({ behavior: 'smooth' });
-      }, 150); // Small delay to allow the mobile menu to close
+      // Calculate offset to account for the fixed header
+      const headerOffset = 80; // Adjust based on your header height
+      const elementPosition = section.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
     }
   };
 

@@ -36,15 +36,39 @@ const Index = () => {
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
     
-    // Scroll to the selected section
-    const sectionRef = getSectionRef(tabId);
+    // Immediate scrolling to the selected section
+    scrollToSection(tabId);
+  };
+
+  // Function to scroll to a section
+  const scrollToSection = (sectionId: string) => {
+    const sectionRef = getSectionRef(sectionId);
+    
     if (sectionRef && sectionRef.current) {
-      sectionRef.current.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
+      // Calculate offset to account for the fixed header
+      const headerOffset = 80; // Adjust based on your header height
+      const elementPosition = sectionRef.current.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
       });
     }
   };
+
+  // Handle initial scrolling if there's a hash in the URL
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+      const validSections = ['mood', 'trigger', 'gratitude', 'cbt', 'goals'];
+      if (validSections.includes(hash)) {
+        setActiveTab(hash);
+        // Use a small timeout to ensure the page is fully loaded
+        setTimeout(() => scrollToSection(hash), 100);
+      }
+    }
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -185,19 +209,19 @@ const Index = () => {
       </div>
 
       {/* Content with refs for each section */}
-      <div ref={moodRef}>
+      <div id="mood" ref={moodRef}>
         {activeTab === "mood" && <MoodTracker showOnlyFavorites={showFavorites} />}
       </div>
-      <div ref={triggerRef}>
+      <div id="trigger" ref={triggerRef}>
         {activeTab === "trigger" && <TriggerTracker showOnlyFavorites={showFavorites} />}
       </div>
-      <div ref={gratitudeRef}>
+      <div id="gratitude" ref={gratitudeRef}>
         {activeTab === "gratitude" && <GratitudeJournal showOnlyFavorites={showFavorites} />}
       </div>
-      <div ref={cbtRef}>
+      <div id="cbt" ref={cbtRef}>
         {activeTab === "cbt" && <CBTTechniques showOnlyFavorites={showFavorites} />}
       </div>
-      <div ref={goalsRef}>
+      <div id="goals" ref={goalsRef}>
         {activeTab === "goals" && <GoalTracker showOnlyFavorites={showFavorites} />}
       </div>
 

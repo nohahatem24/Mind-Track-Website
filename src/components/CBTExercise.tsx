@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Check, Plus, X } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -9,21 +9,27 @@ interface CognitiveDistortion {
   description: string;
 }
 
+interface ExerciseProps {
+  onComplete: (data: Record<string, any>) => void;
+  onCancel: () => void;
+  initialData?: Record<string, any>;
+  isEditing?: boolean;
+}
+
 // Cognitive Restructuring Exercise
 export const CognitiveRestructuringExercise = ({ 
   onComplete,
-  onCancel
-}: { 
-  onComplete: () => void;
-  onCancel: () => void;
-}) => {
-  const [negativeThought, setNegativeThought] = useState("");
-  const [selectedDistortions, setSelectedDistortions] = useState<string[]>([]);
+  onCancel,
+  initialData,
+  isEditing = false
+}: ExerciseProps) => {
+  const [negativeThought, setNegativeThought] = useState(initialData?.negativeThought || "");
+  const [selectedDistortions, setSelectedDistortions] = useState<string[]>(initialData?.selectedDistortions || []);
   const [evidence, setEvidence] = useState({
-    supporting: "",
-    contradicting: ""
+    supporting: initialData?.evidence?.supporting || "",
+    contradicting: initialData?.evidence?.contradicting || ""
   });
-  const [balancedThought, setBalancedThought] = useState("");
+  const [balancedThought, setBalancedThought] = useState(initialData?.balancedThought || "");
 
   const distortions: CognitiveDistortion[] = [
     { 
@@ -88,14 +94,19 @@ export const CognitiveRestructuringExercise = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onComplete();
+    onComplete({
+      negativeThought,
+      selectedDistortions,
+      evidence,
+      balancedThought,
+      date: new Date().toISOString()
+    });
   };
 
   const isFormValid = () => {
     return (
       negativeThought.trim() !== "" &&
       selectedDistortions.length > 0 &&
-      (evidence.supporting.trim() !== "" || evidence.contradicting.trim() !== "") &&
       balancedThought.trim() !== ""
     );
   };
@@ -165,7 +176,7 @@ export const CognitiveRestructuringExercise = ({
         </div>
         <div>
           <label className="block text-sm font-medium text-mindtrack-stone mb-1">
-            Evidence that contradicts the thought
+            Evidence that contradicts the thought (optional)
           </label>
           <textarea
             value={evidence.contradicting}
@@ -202,7 +213,7 @@ export const CognitiveRestructuringExercise = ({
           className="px-4 py-2 bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors disabled:opacity-50"
           disabled={!isFormValid()}
         >
-          Complete Exercise
+          {isEditing ? "Save Changes" : "Complete Exercise"}
         </button>
       </div>
     </motion.form>
@@ -212,17 +223,16 @@ export const CognitiveRestructuringExercise = ({
 // Grounding Technique Exercise
 export const GroundingExercise = ({ 
   onComplete,
-  onCancel
-}: { 
-  onComplete: () => void;
-  onCancel: () => void;
-}) => {
+  onCancel,
+  initialData,
+  isEditing = false
+}: ExerciseProps) => {
   const [inputs, setInputs] = useState({
-    see: ["", "", "", "", ""],
-    touch: ["", "", "", ""],
-    hear: ["", "", ""],
-    smell: ["", ""],
-    taste: [""],
+    see: initialData?.see || ["", "", "", "", ""],
+    touch: initialData?.touch || ["", "", "", ""],
+    hear: initialData?.hear || ["", "", ""],
+    smell: initialData?.smell || ["", ""],
+    taste: initialData?.taste || [""],
   });
 
   const updateInput = (category: keyof typeof inputs, index: number, value: string) => {
@@ -235,7 +245,10 @@ export const GroundingExercise = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onComplete();
+    onComplete({
+      ...inputs,
+      date: new Date().toISOString()
+    });
   };
 
   const isFormValid = () => {
@@ -358,7 +371,7 @@ export const GroundingExercise = ({
           className="px-4 py-2 bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors disabled:opacity-50"
           disabled={!isFormValid()}
         >
-          Complete Exercise
+          {isEditing ? "Save Changes" : "Complete Exercise"}
         </button>
       </div>
     </motion.form>
@@ -368,15 +381,16 @@ export const GroundingExercise = ({
 // Breathing Exercise
 export const BreathingExercise = ({ 
   onComplete,
-  onCancel
-}: { 
-  onComplete: () => void;
-  onCancel: () => void;
-}) => {
+  onCancel,
+  initialData,
+  isEditing = false
+}: ExerciseProps) => {
   const [isActive, setIsActive] = useState(false);
   const [phase, setPhase] = useState<"inhale" | "hold" | "exhale">("inhale");
   const [count, setCount] = useState(0);
-  const [cycles, setCycles] = useState(0);
+  const [cycles, setCycles] = useState(initialData?.cycles || 0);
+  const [totalTime, setTotalTime] = useState(initialData?.totalTime || 0);
+  const [sessionTime, setSessionTime] = useState(0);
 
   // Start/stop the breathing exercise
   const toggleExercise = () => {
@@ -409,6 +423,10 @@ export const BreathingExercise = ({
           }
           return prevCount + 1;
         });
+        
+        // Update timers
+        setTotalTime(prev => prev + 1);
+        setSessionTime(prev => prev + 1);
       }, 1000);
     }
     
@@ -416,6 +434,22 @@ export const BreathingExercise = ({
       if (intervalId) clearInterval(intervalId);
     };
   }, [isActive, phase]);
+
+  const handleComplete = () => {
+    onComplete({
+      cycles,
+      totalTime,
+      sessionTime,
+      date: new Date().toISOString()
+    });
+  };
+
+  // Format seconds into minutes and seconds
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}m ${remainingSeconds}s`;
+  };
 
   return (
     <motion.div
@@ -430,6 +464,9 @@ export const BreathingExercise = ({
         <p className="text-mindtrack-stone/80">
           Follow the circle as it expands and contracts. Breathe in for 4 seconds, hold for 2 seconds, and exhale for 6 seconds.
         </p>
+        <div className="mt-2 text-sm text-mindtrack-sage">
+          Session time: {formatTime(sessionTime)}
+        </div>
       </div>
 
       <div className="flex flex-col items-center justify-center">
@@ -472,10 +509,10 @@ export const BreathingExercise = ({
           {cycles > 0 && (
             <button
               type="button"
-              onClick={onComplete}
+              onClick={handleComplete}
               className="px-6 py-3 border border-mindtrack-sage text-mindtrack-sage rounded-md hover:bg-mindtrack-sage/5 transition-colors"
             >
-              Finish Exercise
+              {isEditing ? "Save Changes" : "Finish Exercise"}
             </button>
           )}
         </div>
