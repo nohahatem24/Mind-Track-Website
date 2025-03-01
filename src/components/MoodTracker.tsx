@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { AlertCircle, Heart, LineChart, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps } from 'recharts';
+import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps, Dot } from 'recharts';
 
 interface MoodEntry {
   id: number;
@@ -35,9 +35,9 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   
   const moodCategories: MoodCategory[] = [
-    { range: [-10, -6], label: "Severely Low", color: "#d97706", description: "Severe depression, emotional shutdown" },
-    { range: [-5, -1], label: "Mildly Low", color: "#a8a29e", description: "Sadness, low energy, anxiety" },
-    { range: [0, 0], label: "Neutral", color: "#78716c", description: "Balanced, even emotional state" },
+    { range: [-10, -6], label: "Severely Low", color: "#ef4444", description: "Severe depression, emotional shutdown" },
+    { range: [-5, -1], label: "Mildly Low", color: "#f97316", description: "Sadness, low energy, anxiety" },
+    { range: [0, 0], label: "Neutral", color: "#facc15", description: "Balanced, even emotional state" },
     { range: [1, 5], label: "Mildly Elevated", color: "#84cc16", description: "Happiness, calmness, satisfaction" },
     { range: [6, 10], label: "Highly Elevated", color: "#22c55e", description: "Energetic, intense excitement, joy" },
   ];
@@ -78,6 +78,7 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
       time: entry.time || "",
       mood: entry.mood,
       category: getMoodCategory(entry.mood).label,
+      color: getMoodCategory(entry.mood).color,
       note: entry.note || "",
       fullTimestamp: entry.timestamp
     }));
@@ -102,6 +103,21 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
         ? { ...entry, isFavorite: !entry.isFavorite } 
         : entry
     ));
+  };
+
+  // Custom dot component for rendering colored points on the chart
+  const CustomDot = (props: any) => {
+    const { cx, cy, payload } = props;
+    return (
+      <Dot 
+        cx={cx} 
+        cy={cy} 
+        r={5} 
+        fill={payload.color} 
+        stroke="#fff" 
+        strokeWidth={1} 
+      />
+    );
   };
 
   // Get unique dates for the calendar view
@@ -214,8 +230,8 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
                     dataKey="mood" 
                     stroke="#8A9A5B" 
                     strokeWidth={2}
-                    dot={{ r: 4, fill: "#8A9A5B" }} 
-                    activeDot={{ r: 6, fill: "#8A9A5B" }} 
+                    dot={<CustomDot />} 
+                    activeDot={{ r: 6, stroke: "#8A9A5B", strokeWidth: 2 }} 
                   />
                 </RechartsLineChart>
               </ResponsiveContainer>
