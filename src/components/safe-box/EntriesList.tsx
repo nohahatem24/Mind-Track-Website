@@ -1,5 +1,5 @@
 
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import { SafeEntry, SafeCategory, DateRangeFilter } from "./types";
 import EntryItem from "./EntryItem";
@@ -11,8 +11,10 @@ interface EntriesListProps {
   searchQuery: string;
   selectedCategory: string | null;
   dateRange: DateRangeFilter;
+  showFavoritesOnly: boolean;
   onEdit: (entry: SafeEntry) => void;
   onDelete: (id: string) => void;
+  onToggleFavorite: (id: string) => void;
 }
 
 const EntriesList = ({ 
@@ -21,10 +23,12 @@ const EntriesList = ({
   searchQuery, 
   selectedCategory,
   dateRange,
+  showFavoritesOnly,
   onEdit, 
-  onDelete 
+  onDelete,
+  onToggleFavorite
 }: EntriesListProps) => {
-  // Filter entries by category, search query, and date range
+  // Filter entries by category, search query, date range, and favorites
   const filteredEntries = entries.filter(entry => {
     const matchesCategory = selectedCategory ? entry.category === selectedCategory : true;
     const matchesSearch = searchQuery 
@@ -32,8 +36,9 @@ const EntriesList = ({
         entry.content.toLowerCase().includes(searchQuery.toLowerCase())
       : true;
     const matchesDateRange = isDateInRange(entry.dateModified, dateRange.startDate, dateRange.endDate);
+    const matchesFavorite = showFavoritesOnly ? !!entry.isFavorite : true;
     
-    return matchesCategory && matchesSearch && matchesDateRange;
+    return matchesCategory && matchesSearch && matchesDateRange && matchesFavorite;
   });
 
   // Get category color
@@ -56,7 +61,9 @@ const EntriesList = ({
         className="mindtrack-card flex items-center gap-3 text-mindtrack-stone/70"
       >
         <AlertCircle className="w-5 h-5" />
-        {searchQuery || dateRange.startDate || dateRange.endDate ? (
+        {showFavoritesOnly ? (
+          <p>No favorite entries found. Star some entries to see them here.</p>
+        ) : searchQuery || dateRange.startDate || dateRange.endDate ? (
           <p>No entries match your search criteria.</p>
         ) : selectedCategory ? (
           <p>No entries in this category yet. Add your first one!</p>
@@ -77,6 +84,7 @@ const EntriesList = ({
           categoryName={getCategoryName(entry.category)}
           onEdit={onEdit}
           onDelete={onDelete}
+          onToggleFavorite={onToggleFavorite}
         />
       ))}
     </div>

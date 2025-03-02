@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronDown, Edit, FileLock2, Trash2 } from "lucide-react";
+import { ChevronDown, Edit, FileLock2, Trash2, Star } from "lucide-react";
 import { SafeEntry } from "./types";
 import { formatDate } from "./utils";
 
@@ -11,6 +11,7 @@ interface EntryItemProps {
   categoryName: string;
   onEdit: (entry: SafeEntry) => void;
   onDelete: (id: string) => void;
+  onToggleFavorite: (id: string) => void;
 }
 
 const EntryItem = ({ 
@@ -18,7 +19,8 @@ const EntryItem = ({
   categoryColor, 
   categoryName, 
   onEdit, 
-  onDelete 
+  onDelete,
+  onToggleFavorite
 }: EntryItemProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -39,11 +41,23 @@ const EntryItem = ({
               <span className="px-2 py-0.5 rounded-full bg-mindtrack-sage/10" style={{ color: categoryColor }}>
                 {categoryName}
               </span>
+              {entry.isFavorite && (
+                <span className="text-amber-500">★ Favorite</span>
+              )}
             </div>
           </div>
         </div>
         
         <div className="flex gap-1">
+          <button
+            onClick={() => onToggleFavorite(entry.id)}
+            className="p-1 hover:bg-amber-50 rounded-full transition-colors"
+            title={entry.isFavorite ? "Remove from favorites" : "Add to favorites"}
+          >
+            <Star 
+              className={`w-4 h-4 ${entry.isFavorite ? 'text-amber-500 fill-amber-500' : 'text-mindtrack-stone/50'}`} 
+            />
+          </button>
           <button
             onClick={() => onEdit(entry)}
             className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"

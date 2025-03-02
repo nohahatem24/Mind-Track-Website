@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Lock, Plus } from "lucide-react";
+import { Lock, Plus, Star } from "lucide-react";
 import { toast } from "sonner";
 
 import { 
@@ -32,6 +32,7 @@ const DigitalSafeBox = () => {
   const [isSettingPassword, setIsSettingPassword] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [savedPassword, setSavedPassword] = useState('');
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [dateRange, setDateRange] = useState<DateRangeFilter>({
     startDate: null,
     endDate: null
@@ -233,6 +234,26 @@ const DigitalSafeBox = () => {
     setDateRange(newDateRange);
   };
 
+  // Handle favorite toggling
+  const handleToggleFavorite = (id: string) => {
+    const updatedEntries = entries.map(entry => 
+      entry.id === id 
+        ? { ...entry, isFavorite: !entry.isFavorite }
+        : entry
+    );
+    
+    setEntries(updatedEntries);
+    
+    const entry = entries.find(e => e.id === id);
+    if (entry) {
+      toast.success(
+        entry.isFavorite 
+          ? `"${entry.title}" removed from favorites` 
+          : `"${entry.title}" added to favorites`
+      );
+    }
+  };
+
   // Render lock screen
   if (isLocked) {
     return <LockScreen onUnlock={handleUnlock} passwordError={passwordError} />;
@@ -312,19 +333,34 @@ const DigitalSafeBox = () => {
                 )}
               </div>
               
-              {/* Date range filter */}
+              {/* Filters */}
               <div className="flex flex-wrap gap-2 items-center">
                 <DateRangeFilterComponent 
                   dateRange={dateRange}
                   onDateRangeChange={handleDateRangeChange}
                 />
                 
-                {hasActiveFilters && (
+                {/* Favorites filter */}
+                <button
+                  onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm transition-colors ${
+                    showFavoritesOnly 
+                      ? 'bg-amber-100 text-amber-700 border border-amber-200' 
+                      : 'bg-white border border-mindtrack-sage/30 text-mindtrack-stone/70 hover:bg-mindtrack-sage/5'
+                  }`}
+                >
+                  <Star className={`w-4 h-4 ${showFavoritesOnly ? 'fill-amber-500 text-amber-500' : ''}`} />
+                  Favorites
+                </button>
+                
+                {/* Clear filters button */}
+                {(hasActiveFilters || showFavoritesOnly) && (
                   <button
                     onClick={() => {
                       setSearchQuery('');
                       setSelectedCategory(null);
                       setDateRange({ startDate: null, endDate: null });
+                      setShowFavoritesOnly(false);
                     }}
                     className="text-xs text-mindtrack-stone/60 hover:text-mindtrack-stone underline"
                   >
@@ -361,8 +397,10 @@ const DigitalSafeBox = () => {
               searchQuery={searchQuery}
               selectedCategory={selectedCategory}
               dateRange={dateRange}
+              showFavoritesOnly={showFavoritesOnly}
               onEdit={startEditing}
               onDelete={handleDeleteEntry}
+              onToggleFavorite={handleToggleFavorite}
             />
           </div>
         </div>
