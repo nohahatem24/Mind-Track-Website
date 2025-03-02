@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { 
@@ -15,6 +14,7 @@ import {
   Unlock, 
   X 
 } from "lucide-react";
+import { toast } from "sonner";
 
 interface SafeEntry {
   id: string;
@@ -93,8 +93,10 @@ const DigitalSafeBox = () => {
       // Create default category if none exist
       initializeDefaultCategory();
     }
+  }, []);
 
-    // Only load entries if unlocked (for this demo - in a real app, entries would be encrypted)
+  // Load entries when unlocked
+  useEffect(() => {
     if (!isLocked) {
       loadEntries();
     }
@@ -168,7 +170,7 @@ const DigitalSafeBox = () => {
       setIsLocked(false);
       setPassword('');
       setPasswordError('');
-      loadEntries();
+      toast.success('Safebox unlocked successfully');
     } else {
       setPasswordError('Incorrect password. Please try again.');
     }
@@ -184,8 +186,10 @@ const DigitalSafeBox = () => {
     localStorage.setItem(PASSWORD_KEY, password);
     setSavedPassword(password);
     setIsSettingPassword(false);
+    setIsLocked(false);
     setPassword('');
     setPasswordError('');
+    toast.success('Password created successfully');
   };
 
   // Handle password input change
@@ -294,7 +298,7 @@ const DigitalSafeBox = () => {
   // Lock the safe box
   const lockSafeBox = () => {
     setIsLocked(true);
-    setEntries([]);
+    toast.success('Safebox locked successfully');
   };
 
   // Format date for display
