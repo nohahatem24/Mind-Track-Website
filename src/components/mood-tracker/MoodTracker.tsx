@@ -2,7 +2,8 @@
 import { motion } from "framer-motion";
 import { AlertCircle, Heart, LineChart, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { format } from "date-fns";
+import { format, startOfToday } from "date-fns";
+import { toast } from "sonner";
 
 import { MoodEntry, MoodCategory, STORAGE_KEY, getMoodCategory, TimeView, getFormattedDateFromTimestamp, getFormattedTimeFromTimestamp } from "./types";
 import MoodForm from "./MoodForm";
@@ -57,6 +58,17 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
   }, [entries]);
 
+  // Calculate daily average mood
+  const calculateDailyAverageMood = (date: Date) => {
+    const formattedDate = format(date, "MMM d");
+    const dayEntries = entries.filter(entry => entry.date === formattedDate);
+    
+    if (dayEntries.length === 0) return null;
+    
+    const sum = dayEntries.reduce((total, entry) => total + entry.mood, 0);
+    return (sum / dayEntries.length).toFixed(1);
+  };
+
   // Filter entries based on selected view and date
   const getVisibleEntries = () => {
     if (showOnlyFavorites) {
@@ -68,8 +80,8 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
     }
     
     if (timeView === "day" && !calendarView) {
-      const today = format(currentDate, "MMM d");
-      return entries.filter(entry => entry.date === today);
+      const formattedDate = format(currentDate, "MMM d");
+      return entries.filter(entry => entry.date === formattedDate);
     }
     
     return entries;
@@ -103,9 +115,11 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
   const addEntry = (entry: MoodEntry) => {
     setEntries([entry, ...entries]);
     setIsAdding(false);
+    toast.success("Mood entry added successfully!");
     
     // If adding an entry for today, ensure day view is selected
-    if (entry.date === format(new Date(), "MMM d")) {
+    const today = format(new Date(), "MMM d");
+    if (entry.date === today) {
       setTimeView("day");
       setCurrentDate(new Date());
     }
@@ -114,10 +128,12 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
   const updateEntry = (updatedEntry: MoodEntry) => {
     setEntries(entries.map(e => e.id === updatedEntry.id ? updatedEntry : e));
     setEditingId(null);
+    toast.success("Mood entry updated successfully!");
   };
 
   const deleteEntry = (entryId: number) => {
     setEntries(entries.filter(entry => entry.id !== entryId));
+    toast.success("Mood entry deleted successfully!");
   };
 
   const toggleFavorite = (entryId: number) => {
@@ -136,6 +152,15 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
     setTimeView(view);
     setCalendarView(false);
   };
+
+  // Handle date change for navigation
+  const handleDateChange = (date: Date) => {
+    setCurrentDate(date);
+    setSelectedDate(null);
+  };
+
+  // Get daily average mood for the currently selected date
+  const dailyAverageMood = calculateDailyAverageMood(currentDate);
 
   return (
     <section id="mood" className="py-16">
@@ -182,7 +207,28 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
 
         {/* Time View Selector (only show in list view) */}
         {!calendarView && entries.length > 0 && (
-          <TimeViewSelector currentView={timeView} onSelectView={handleTimeViewChange} />
+          <TimeViewSelector 
+            currentView={timeView} 
+            onSelectView={handleTimeViewChange}
+            currentDate={currentDate}
+            onDateChange={handleDateChange}
+          />
+        )}
+
+        {/* Daily Average Mood Display */}
+        {dailyAverageMood && !calendarView && timeView === "day" && (
+          <div className="mb-6 p-4 bg-mindtrack-sage/10 rounded-lg">
+            <h3 className="font-medium text-lg">
+              Daily Average Mood: <span style={{ color: getMoodCategory(parseFloat(dailyAverageMood)).color }}>{dailyAverageMood}</span>
+            </h3>
+            <p className="text-sm text-mindtrack-stone/80">
+              {parseFloat(dailyAverageMood) > 0 
+                ? "You're having a positive day! Keep it up." 
+                : parseFloat(dailyAverageMood) < 0 
+                ? "Your day seems challenging. Take some time for self-care." 
+                : "Your mood is neutral today."}
+            </p>
+          </div>
         )}
 
         {/* Calendar View */}
