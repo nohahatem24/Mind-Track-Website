@@ -2,13 +2,15 @@
 import { motion } from "framer-motion";
 import { AlertCircle, Heart, LineChart, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { format } from "date-fns";
 
-import { MoodEntry, MoodCategory, STORAGE_KEY, getMoodCategory } from "./types";
+import { MoodEntry, MoodCategory, STORAGE_KEY, getMoodCategory, TimeView, getFormattedDateFromTimestamp, getFormattedTimeFromTimestamp } from "./types";
 import MoodForm from "./MoodForm";
 import MoodChart from "./MoodChart";
 import MoodEntryComponent from "./MoodEntry";
 import CalendarView from "./CalendarView";
 import MoodInsights from "./MoodInsights";
+import TimeViewSelector from "./TimeViewSelector";
 
 interface MoodTrackerProps {
   showOnlyFavorites?: boolean;
@@ -20,13 +22,30 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [calendarView, setCalendarView] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [timeView, setTimeView] = useState<TimeView>("day");
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
   
   // Load entries from localStorage on component mount
   useEffect(() => {
     const savedEntries = localStorage.getItem(STORAGE_KEY);
     if (savedEntries) {
       try {
-        setEntries(JSON.parse(savedEntries));
+        const parsed = JSON.parse(savedEntries);
+        
+        // If old entries don't have exactTimestamp, add it
+        const updatedEntries = parsed.map((entry: MoodEntry) => {
+          if (!entry.exactTimestamp) {
+            // Create an approximate timestamp from the date string
+            const date = new Date(entry.timestamp);
+            return {
+              ...entry,
+              exactTimestamp: date.getTime()
+            };
+          }
+          return entry;
+        });
+        
+        setEntries(updatedEntries);
       } catch (e) {
         console.error("Error parsing saved mood entries:", e);
       }
@@ -38,27 +57,58 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
   }, [entries]);
 
-  const visibleEntries = showOnlyFavorites
-    ? entries.filter(entry => entry.isFavorite)
-    : selectedDate 
-      ? entries.filter(entry => entry.date === selectedDate)
-      : entries;
+  // Filter entries based on selected view and date
+  const getVisibleEntries = () => {
+    if (showOnlyFavorites) {
+      return entries.filter(entry => entry.isFavorite);
+    }
+    
+    if (selectedDate) {
+      return entries.filter(entry => entry.date === selectedDate);
+    }
+    
+    if (timeView === "day" && !calendarView) {
+      const today = format(currentDate, "MMM d");
+      return entries.filter(entry => entry.date === today);
+    }
+    
+    return entries;
+  };
 
-  const chartData = [...entries]
-    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-    .map(entry => ({
-      date: entry.date,
-      time: entry.time || "",
-      mood: entry.mood,
-      category: getMoodCategory(entry.mood).label,
-      color: getMoodCategory(entry.mood).color,
-      note: entry.note || "",
-      fullTimestamp: entry.timestamp
-    }));
+  const visibleEntries = getVisibleEntries();
+
+  // Prepare data for the chart
+  const prepareChartData = () => {
+    return [...entries]
+      .filter(entry => entry.exactTimestamp) // Ensure we have timestamp data
+      .sort((a, b) => {
+        const aTime = a.exactTimestamp || new Date(a.timestamp).getTime();
+        const bTime = b.exactTimestamp || new Date(b.timestamp).getTime();
+        return aTime - bTime;
+      })
+      .map(entry => ({
+        date: entry.date,
+        time: entry.time || "",
+        mood: entry.mood,
+        category: getMoodCategory(entry.mood).label,
+        color: getMoodCategory(entry.mood).color,
+        note: entry.note || "",
+        fullTimestamp: entry.timestamp,
+        exactTimestamp: entry.exactTimestamp
+      }));
+  };
+
+  const chartData = prepareChartData();
 
   const addEntry = (entry: MoodEntry) => {
     setEntries([entry, ...entries]);
     setIsAdding(false);
+    
+    // If adding an entry for today, ensure day view is selected
+    if (entry.date === format(new Date(), "MMM d")) {
+      setTimeView("day");
+      setCurrentDate(new Date());
+    }
   };
 
   const updateEntry = (updatedEntry: MoodEntry) => {
@@ -80,6 +130,12 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
 
   // Get unique dates for the calendar view
   const uniqueDates = [...new Set(entries.map(entry => entry.date))];
+
+  // Handle time view change
+  const handleTimeViewChange = (view: TimeView) => {
+    setTimeView(view);
+    setCalendarView(false);
+  };
 
   return (
     <section id="mood" className="py-16">
@@ -124,6 +180,11 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
           )}
         </div>
 
+        {/* Time View Selector (only show in list view) */}
+        {!calendarView && entries.length > 0 && (
+          <TimeViewSelector currentView={timeView} onSelectView={handleTimeViewChange} />
+        )}
+
         {/* Calendar View */}
         {calendarView && (
           <CalendarView 
@@ -134,14 +195,18 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
           />
         )}
 
-        {/* New Mood Insights Component */}
+        {/* Mood Insights */}
         {entries.length > 0 && (
           <MoodInsights entries={entries} />
         )}
 
         {/* Mood Chart */}
-        {entries.length > 0 && (
-          <MoodChart chartData={chartData} />
+        {entries.length > 0 && !calendarView && (
+          <MoodChart 
+            chartData={chartData} 
+            timeView={timeView}
+            selectedDate={currentDate}
+          />
         )}
 
         <div className="space-y-6">

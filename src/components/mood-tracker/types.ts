@@ -7,6 +7,7 @@ export interface MoodEntry {
   date: string; // For chart grouping
   time?: string; // For detailed display
   isFavorite?: boolean;
+  exactTimestamp?: number; // Unix timestamp for precise time tracking
 }
 
 export interface MoodCategory {
@@ -19,6 +20,8 @@ export interface MoodCategory {
 export interface MoodTrackerProps {
   showOnlyFavorites?: boolean;
 }
+
+export type TimeView = "day" | "week" | "month" | "year";
 
 export const STORAGE_KEY = 'mindtrack_mood_entries';
 
@@ -34,4 +37,32 @@ export const getMoodCategory = (moodValue: number): MoodCategory => {
   return moodCategories.find(category => 
     moodValue >= category.range[0] && moodValue <= category.range[1]
   ) || moodCategories[2]; // Default to neutral
+};
+
+// Helper function to get formatted time from Unix timestamp
+export const getFormattedTimeFromTimestamp = (timestamp: number): string => {
+  const date = new Date(timestamp);
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+// Helper function to get formatted date from Unix timestamp
+export const getFormattedDateFromTimestamp = (timestamp: number): string => {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+};
+
+// Helper function to format date for display
+export const formatDateForDisplay = (date: Date): string => {
+  return date.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 };

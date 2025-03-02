@@ -44,7 +44,8 @@ const MoodForm = ({
         hour: "2-digit",
         minute: "2-digit",
       }),
-      isFavorite: initialData?.isFavorite || false
+      isFavorite: initialData?.isFavorite || false,
+      exactTimestamp: initialData?.exactTimestamp || now.getTime()
     });
   };
 
