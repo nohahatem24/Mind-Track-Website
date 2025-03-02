@@ -28,6 +28,11 @@ export interface NewCategoryFormData {
   color: string;
 }
 
+export interface DateRangeFilter {
+  startDate: Date | null;
+  endDate: Date | null;
+}
+
 // Storage keys for localStorage
 export const STORAGE_KEY = 'mindtrack_safebox';
 export const CATEGORIES_KEY = 'mindtrack_safebox_categories';

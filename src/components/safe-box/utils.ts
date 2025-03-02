@@ -13,6 +13,17 @@ export const formatDate = (dateString: string): string => {
   });
 };
 
+// Check if a date is within a range
+export const isDateInRange = (dateString: string, startDate: Date | null, endDate: Date | null): boolean => {
+  if (!startDate && !endDate) return true;
+  
+  const date = new Date(dateString);
+  const isAfterStart = startDate ? date >= startDate : true;
+  const isBeforeEnd = endDate ? date <= endDate : true;
+  
+  return isAfterStart && isBeforeEnd;
+};
+
 // Initialize with default categories
 export const getDefaultCategories = (): SafeCategory[] => {
   return [

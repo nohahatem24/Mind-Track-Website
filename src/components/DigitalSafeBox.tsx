@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Lock, Plus } from "lucide-react";
@@ -9,6 +8,7 @@ import {
   SafeCategory, 
   NewEntryFormData, 
   NewCategoryFormData,
+  DateRangeFilter,
   STORAGE_KEY,
   CATEGORIES_KEY,
   PASSWORD_KEY
@@ -19,6 +19,7 @@ import PasswordSetupScreen from "./safe-box/PasswordSetupScreen";
 import CategoriesSidebar from "./safe-box/CategoriesSidebar";
 import EntryForm from "./safe-box/EntryForm";
 import EntriesList from "./safe-box/EntriesList";
+import DateRangeFilterComponent from "./safe-box/DateRangeFilter";
 
 const DigitalSafeBox = () => {
   const [entries, setEntries] = useState<SafeEntry[]>([]);
@@ -31,6 +32,10 @@ const DigitalSafeBox = () => {
   const [isSettingPassword, setIsSettingPassword] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [savedPassword, setSavedPassword] = useState('');
+  const [dateRange, setDateRange] = useState<DateRangeFilter>({
+    startDate: null,
+    endDate: null
+  });
   
   // New entry form state
   const [newEntry, setNewEntry] = useState<NewEntryFormData>({
@@ -223,6 +228,11 @@ const DigitalSafeBox = () => {
     toast.success('Safebox locked successfully');
   };
 
+  // Handle changing date range filter
+  const handleDateRangeChange = (newDateRange: DateRangeFilter) => {
+    setDateRange(newDateRange);
+  };
+
   // Render lock screen
   if (isLocked) {
     return <LockScreen onUnlock={handleUnlock} passwordError={passwordError} />;
@@ -232,6 +242,9 @@ const DigitalSafeBox = () => {
   if (isSettingPassword) {
     return <PasswordSetupScreen onSetPassword={handleSetPassword} passwordError={passwordError} />;
   }
+
+  // Check if any filters are active
+  const hasActiveFilters = !!searchQuery || !!selectedCategory || !!dateRange.startDate || !!dateRange.endDate;
 
   // Render main safe box UI
   return (
@@ -272,30 +285,53 @@ const DigitalSafeBox = () => {
           
           {/* Main content */}
           <div className="md:col-span-3 space-y-6">
-            {/* Search and add new */}
-            <div className="flex gap-3">
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search notes..."
-                  className="w-full p-3 pl-10 border border-mindtrack-sage/30 rounded-md focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/50"
-                />
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 absolute left-3 top-3.5 text-mindtrack-stone/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+            {/* Search and filters */}
+            <div className="space-y-3">
+              <div className="flex gap-3">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search notes..."
+                    className="w-full p-3 pl-10 border border-mindtrack-sage/30 rounded-md focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/50"
+                  />
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 absolute left-3 top-3.5 text-mindtrack-stone/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                
+                {!isAdding && !editingId && (
+                  <button
+                    onClick={() => setIsAdding(true)}
+                    className="px-4 py-3 bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors flex items-center gap-2"
+                  >
+                    <Plus className="w-5 h-5" />
+                    New Entry
+                  </button>
+                )}
               </div>
               
-              {!isAdding && !editingId && (
-                <button
-                  onClick={() => setIsAdding(true)}
-                  className="px-4 py-3 bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors flex items-center gap-2"
-                >
-                  <Plus className="w-5 h-5" />
-                  New Entry
-                </button>
-              )}
+              {/* Date range filter */}
+              <div className="flex flex-wrap gap-2 items-center">
+                <DateRangeFilterComponent 
+                  dateRange={dateRange}
+                  onDateRangeChange={handleDateRangeChange}
+                />
+                
+                {hasActiveFilters && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSelectedCategory(null);
+                      setDateRange({ startDate: null, endDate: null });
+                    }}
+                    className="text-xs text-mindtrack-stone/60 hover:text-mindtrack-stone underline"
+                  >
+                    Clear all filters
+                  </button>
+                )}
+              </div>
             </div>
             
             {/* Add/Edit Entry form */}
@@ -324,6 +360,7 @@ const DigitalSafeBox = () => {
               categories={categories}
               searchQuery={searchQuery}
               selectedCategory={selectedCategory}
+              dateRange={dateRange}
               onEdit={startEditing}
               onDelete={handleDeleteEntry}
             />
