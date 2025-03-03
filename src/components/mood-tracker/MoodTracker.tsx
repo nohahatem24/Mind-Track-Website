@@ -8,7 +8,6 @@ import MoodForm from "./MoodForm";
 import MoodChart from "./MoodChart";
 import MoodEntryComponent from "./MoodEntry";
 import CalendarView from "./CalendarView";
-import MoodInsights from "./MoodInsights";
 
 interface MoodTrackerProps {
   showOnlyFavorites?: boolean;
@@ -132,11 +131,6 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
             selectedDate={selectedDate} 
             onSelectDate={setSelectedDate} 
           />
-        )}
-
-        {/* New Mood Insights Component */}
-        {entries.length > 0 && (
-          <MoodInsights entries={entries} />
         )}
 
         {/* Mood Chart */}
