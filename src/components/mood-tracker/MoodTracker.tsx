@@ -2,16 +2,13 @@
 import { motion } from "framer-motion";
 import { AlertCircle, Heart, LineChart, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { format, startOfToday } from "date-fns";
-import { toast } from "sonner";
 
-import { MoodEntry, MoodCategory, STORAGE_KEY, getMoodCategory, TimeView, getFormattedDateFromTimestamp, getFormattedTimeFromTimestamp } from "./types";
+import { MoodEntry, MoodCategory, STORAGE_KEY, getMoodCategory } from "./types";
 import MoodForm from "./MoodForm";
 import MoodChart from "./MoodChart";
 import MoodEntryComponent from "./MoodEntry";
 import CalendarView from "./CalendarView";
 import MoodInsights from "./MoodInsights";
-import TimeViewSelector from "./TimeViewSelector";
 
 interface MoodTrackerProps {
   showOnlyFavorites?: boolean;
@@ -23,30 +20,13 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [calendarView, setCalendarView] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [timeView, setTimeView] = useState<TimeView>("day");
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
   
   // Load entries from localStorage on component mount
   useEffect(() => {
     const savedEntries = localStorage.getItem(STORAGE_KEY);
     if (savedEntries) {
       try {
-        const parsed = JSON.parse(savedEntries);
-        
-        // If old entries don't have exactTimestamp, add it
-        const updatedEntries = parsed.map((entry: MoodEntry) => {
-          if (!entry.exactTimestamp) {
-            // Create an approximate timestamp from the date string
-            const date = new Date(entry.timestamp);
-            return {
-              ...entry,
-              exactTimestamp: date.getTime()
-            };
-          }
-          return entry;
-        });
-        
-        setEntries(updatedEntries);
+        setEntries(JSON.parse(savedEntries));
       } catch (e) {
         console.error("Error parsing saved mood entries:", e);
       }
@@ -58,82 +38,36 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
   }, [entries]);
 
-  // Calculate daily average mood
-  const calculateDailyAverageMood = (date: Date) => {
-    const formattedDate = format(date, "MMM d");
-    const dayEntries = entries.filter(entry => entry.date === formattedDate);
-    
-    if (dayEntries.length === 0) return null;
-    
-    const sum = dayEntries.reduce((total, entry) => total + entry.mood, 0);
-    return (sum / dayEntries.length).toFixed(1);
-  };
+  const visibleEntries = showOnlyFavorites
+    ? entries.filter(entry => entry.isFavorite)
+    : selectedDate 
+      ? entries.filter(entry => entry.date === selectedDate)
+      : entries;
 
-  // Filter entries based on selected view and date
-  const getVisibleEntries = () => {
-    if (showOnlyFavorites) {
-      return entries.filter(entry => entry.isFavorite);
-    }
-    
-    if (selectedDate) {
-      return entries.filter(entry => entry.date === selectedDate);
-    }
-    
-    if (timeView === "day" && !calendarView) {
-      const formattedDate = format(currentDate, "MMM d");
-      return entries.filter(entry => entry.date === formattedDate);
-    }
-    
-    return entries;
-  };
-
-  const visibleEntries = getVisibleEntries();
-
-  // Prepare data for the chart
-  const prepareChartData = () => {
-    return [...entries]
-      .filter(entry => entry.exactTimestamp) // Ensure we have timestamp data
-      .sort((a, b) => {
-        const aTime = a.exactTimestamp || new Date(a.timestamp).getTime();
-        const bTime = b.exactTimestamp || new Date(b.timestamp).getTime();
-        return aTime - bTime;
-      })
-      .map(entry => ({
-        date: entry.date,
-        time: entry.time || "",
-        mood: entry.mood,
-        category: getMoodCategory(entry.mood).label,
-        color: getMoodCategory(entry.mood).color,
-        note: entry.note || "",
-        fullTimestamp: entry.timestamp,
-        exactTimestamp: entry.exactTimestamp
-      }));
-  };
-
-  const chartData = prepareChartData();
+  const chartData = [...entries]
+    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+    .map(entry => ({
+      date: entry.date,
+      time: entry.time || "",
+      mood: entry.mood,
+      category: getMoodCategory(entry.mood).label,
+      color: getMoodCategory(entry.mood).color,
+      note: entry.note || "",
+      fullTimestamp: entry.timestamp
+    }));
 
   const addEntry = (entry: MoodEntry) => {
     setEntries([entry, ...entries]);
     setIsAdding(false);
-    toast.success("Mood entry added successfully!");
-    
-    // If adding an entry for today, ensure day view is selected
-    const today = format(new Date(), "MMM d");
-    if (entry.date === today) {
-      setTimeView("day");
-      setCurrentDate(new Date());
-    }
   };
 
   const updateEntry = (updatedEntry: MoodEntry) => {
     setEntries(entries.map(e => e.id === updatedEntry.id ? updatedEntry : e));
     setEditingId(null);
-    toast.success("Mood entry updated successfully!");
   };
 
   const deleteEntry = (entryId: number) => {
     setEntries(entries.filter(entry => entry.id !== entryId));
-    toast.success("Mood entry deleted successfully!");
   };
 
   const toggleFavorite = (entryId: number) => {
@@ -146,21 +80,6 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
 
   // Get unique dates for the calendar view
   const uniqueDates = [...new Set(entries.map(entry => entry.date))];
-
-  // Handle time view change
-  const handleTimeViewChange = (view: TimeView) => {
-    setTimeView(view);
-    setCalendarView(false);
-  };
-
-  // Handle date change for navigation
-  const handleDateChange = (date: Date) => {
-    setCurrentDate(date);
-    setSelectedDate(null);
-  };
-
-  // Get daily average mood for the currently selected date
-  const dailyAverageMood = calculateDailyAverageMood(currentDate);
 
   return (
     <section id="mood" className="py-16">
@@ -205,32 +124,6 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
           )}
         </div>
 
-        {/* Time View Selector (only show in list view) */}
-        {!calendarView && entries.length > 0 && (
-          <TimeViewSelector 
-            currentView={timeView} 
-            onSelectView={handleTimeViewChange}
-            currentDate={currentDate}
-            onDateChange={handleDateChange}
-          />
-        )}
-
-        {/* Daily Average Mood Display */}
-        {dailyAverageMood && !calendarView && timeView === "day" && (
-          <div className="mb-6 p-4 bg-mindtrack-sage/10 rounded-lg">
-            <h3 className="font-medium text-lg">
-              Daily Average Mood: <span style={{ color: getMoodCategory(parseFloat(dailyAverageMood)).color }}>{dailyAverageMood}</span>
-            </h3>
-            <p className="text-sm text-mindtrack-stone/80">
-              {parseFloat(dailyAverageMood) > 0 
-                ? "You're having a positive day! Keep it up." 
-                : parseFloat(dailyAverageMood) < 0 
-                ? "Your day seems challenging. Take some time for self-care." 
-                : "Your mood is neutral today."}
-            </p>
-          </div>
-        )}
-
         {/* Calendar View */}
         {calendarView && (
           <CalendarView 
@@ -241,18 +134,14 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
           />
         )}
 
-        {/* Mood Insights */}
+        {/* New Mood Insights Component */}
         {entries.length > 0 && (
           <MoodInsights entries={entries} />
         )}
 
         {/* Mood Chart */}
-        {entries.length > 0 && !calendarView && (
-          <MoodChart 
-            chartData={chartData} 
-            timeView={timeView}
-            selectedDate={currentDate}
-          />
+        {entries.length > 0 && (
+          <MoodChart chartData={chartData} />
         )}
 
         <div className="space-y-6">
