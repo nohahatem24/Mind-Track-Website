@@ -1,15 +1,9 @@
 
 import { motion } from "framer-motion";
-import { AlertCircle, Heart, Pencil, PlusCircle, Trash2 } from "lucide-react";
 import { useState } from "react";
-
-interface GratitudeEntry {
-  id: number;
-  content: string;
-  date: string;
-  time: string;
-  isFavorite?: boolean;
-}
+import GratitudeForm from "./gratitude/GratitudeForm";
+import GratitudeEntryList from "./gratitude/GratitudeEntryList";
+import { GratitudeEntry } from "./gratitude/types";
 
 interface GratitudeJournalProps {
   showOnlyFavorites?: boolean;
@@ -17,22 +11,16 @@ interface GratitudeJournalProps {
 
 const GratitudeJournal = ({ showOnlyFavorites = false }: GratitudeJournalProps) => {
   const [entries, setEntries] = useState<GratitudeEntry[]>([]);
-  const [newEntry, setNewEntry] = useState("");
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editingContent, setEditingContent] = useState("");
 
   const visibleEntries = showOnlyFavorites 
     ? entries.filter(entry => entry.isFavorite)
     : entries;
 
-  const addEntry = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newEntry.trim()) return;
-
+  const addEntry = (content: string) => {
     const now = new Date();
     const entry: GratitudeEntry = {
       id: Date.now(),
-      content: newEntry,
+      content: content,
       date: now.toLocaleDateString("en-US", {
         weekday: "long",
         year: "numeric",
@@ -47,31 +35,28 @@ const GratitudeJournal = ({ showOnlyFavorites = false }: GratitudeJournalProps) 
     };
 
     setEntries([entry, ...entries]);
-    setNewEntry("");
   };
 
-  const startEditing = (entry: GratitudeEntry) => {
-    setEditingId(entry.id);
-    setEditingContent(entry.content);
-  };
-
-  const saveEdit = (entry: GratitudeEntry) => {
-    if (!editingContent.trim()) return;
-    
+  const editEntry = (entry: GratitudeEntry, newContent: string) => {
     const updatedEntries = entries.map(e => {
       if (e.id === entry.id) {
-        return { ...e, content: editingContent };
+        return { ...e, content: newContent };
       }
       return e;
     });
     
     setEntries(updatedEntries);
-    setEditingId(null);
-    setEditingContent("");
   };
 
   const deleteEntry = (entryId: number) => {
     setEntries(entries.filter(entry => entry.id !== entryId));
+  };
+
+  const toggleFavorite = (entry: GratitudeEntry) => {
+    const updatedEntries = entries.map(e => 
+      e.id === entry.id ? { ...e, isFavorite: !e.isFavorite } : e
+    );
+    setEntries(updatedEntries);
   };
 
   return (
@@ -91,117 +76,13 @@ const GratitudeJournal = ({ showOnlyFavorites = false }: GratitudeJournalProps) 
         </motion.div>
 
         <div className="max-w-2xl mx-auto space-y-6">
-          <motion.form 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mindtrack-card"
-            onSubmit={addEntry}
-          >
-            <textarea
-              value={newEntry}
-              onChange={(e) => setNewEntry(e.target.value)}
-              placeholder="I am grateful for..."
-              className="w-full p-3 min-h-[100px] rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20 resize-none"
-            />
-            <div className="mt-4 flex justify-end">
-              <button
-                type="submit"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors disabled:opacity-50"
-                disabled={!newEntry.trim()}
-              >
-                <PlusCircle className="w-4 h-4" />
-                Add Entry
-              </button>
-            </div>
-          </motion.form>
-
-          <div className="space-y-4">
-            {visibleEntries.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="mindtrack-card flex items-center gap-3 text-mindtrack-stone/70"
-              >
-                <AlertCircle className="w-5 h-5" />
-                <p>No gratitude entries yet. Take a moment to reflect on what you're thankful for.</p>
-              </motion.div>
-            )}
-
-            {visibleEntries.map((entry, index) => (
-              <motion.div
-                key={entry.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="mindtrack-card"
-              >
-                <div className="flex items-start gap-3">
-                  <Heart className="w-5 h-5 text-mindtrack-sage flex-shrink-0 mt-1" />
-                  <div className="flex-1">
-                    {editingId === entry.id ? (
-                      <div className="space-y-3">
-                        <textarea
-                          value={editingContent}
-                          onChange={(e) => setEditingContent(e.target.value)}
-                          className="w-full p-3 min-h-[100px] rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20 resize-none"
-                        />
-                        <div className="flex justify-end gap-2">
-                          <button
-                            onClick={() => setEditingId(null)}
-                            className="px-3 py-1.5 text-mindtrack-stone hover:bg-mindtrack-sage/5 rounded-md transition-colors text-sm"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={() => saveEdit(entry)}
-                            className="px-3 py-1.5 bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors text-sm"
-                          >
-                            Save
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="flex justify-between items-start">
-                          <p className="text-mindtrack-stone">{entry.content}</p>
-                          <div className="flex gap-2 ml-2">
-                            <button
-                              onClick={() => {
-                                const updatedEntries = entries.map(e => 
-                                  e.id === entry.id ? { ...e, isFavorite: !e.isFavorite } : e
-                                );
-                                setEntries(updatedEntries);
-                              }}
-                              className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
-                            >
-                              <Heart 
-                                className={`w-4 h-4 ${entry.isFavorite ? 'fill-mindtrack-sage text-mindtrack-sage' : 'text-mindtrack-sage'}`} 
-                              />
-                            </button>
-                            <button
-                              onClick={() => startEditing(entry)}
-                              className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
-                            >
-                              <Pencil className="w-4 h-4 text-mindtrack-sage" />
-                            </button>
-                            <button
-                              onClick={() => deleteEntry(entry.id)}
-                              className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4 text-red-500" />
-                            </button>
-                          </div>
-                        </div>
-                        <p className="mt-2 text-sm text-mindtrack-stone/60">
-                          {entry.date} at {entry.time}
-                        </p>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <GratitudeForm onAddEntry={addEntry} />
+          <GratitudeEntryList 
+            entries={visibleEntries}
+            onEdit={editEntry}
+            onDelete={deleteEntry}
+            onToggleFavorite={toggleFavorite}
+          />
         </div>
       </div>
     </section>
