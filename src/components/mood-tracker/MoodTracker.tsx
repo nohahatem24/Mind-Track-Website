@@ -1,13 +1,19 @@
 
 import { motion } from "framer-motion";
-import { AlertCircle, Calendar, Heart, LineChart, List, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 
-import { MoodEntry, MoodCategory, STORAGE_KEY, getMoodCategory } from "./types";
+import { MoodEntry, STORAGE_KEY } from "./types";
 import MoodForm from "./MoodForm";
 import MoodChart from "./MoodChart";
 import MoodEntryComponent from "./MoodEntry";
 import CalendarView from "./CalendarView";
+import TimeframeSelector from "./TimeframeSelector";
+import FavoritesToggle from "./FavoritesToggle";
+import EmptyState from "./EmptyState";
+import AddMoodButton from "./AddMoodButton";
+import DateFilter from "./DateFilter";
+import ViewToggle from "./ViewToggle";
+import MoodData from "./MoodData";
 
 interface MoodTrackerProps {
   showOnlyFavorites?: boolean;
@@ -20,6 +26,7 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
   const [calendarView, setCalendarView] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month' | 'year'>('week');
+  const [showFavoritesState, setShowFavoritesState] = useState(showOnlyFavorites);
   
   // Load entries from localStorage on component mount
   useEffect(() => {
@@ -38,24 +45,10 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
   }, [entries]);
 
-  const visibleEntries = showOnlyFavorites
-    ? entries.filter(entry => entry.isFavorite)
-    : selectedDate 
-      ? entries.filter(entry => entry.date === selectedDate)
-      : entries;
-
-  const chartData = [...entries]
-    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-    .map(entry => ({
-      date: entry.date,
-      time: entry.time || "",
-      mood: entry.mood,
-      category: getMoodCategory(entry.mood).label,
-      color: getMoodCategory(entry.mood).color,
-      note: entry.note || "",
-      fullTimestamp: entry.timestamp,
-      timestamp: new Date(entry.timestamp).getTime() // Add numeric timestamp for sorting
-    }));
+  // Update internal state when prop changes
+  useEffect(() => {
+    setShowFavoritesState(showOnlyFavorites);
+  }, [showOnlyFavorites]);
 
   const addEntry = (entry: MoodEntry) => {
     setEntries([entry, ...entries]);
@@ -100,31 +93,15 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
 
         {/* View Toggle */}
         <div className="flex justify-between items-center mb-6">
-          <div className="flex gap-2">
-            <button
-              onClick={() => setCalendarView(false)}
-              className={`px-4 py-2 rounded-md ${!calendarView ? 'bg-mindtrack-sage text-white' : 'bg-gray-100 text-mindtrack-stone'}`}
-            >
-              <List className="w-4 h-4 inline mr-1" />
-              List View
-            </button>
-            <button
-              onClick={() => setCalendarView(true)}
-              className={`px-4 py-2 rounded-md ${calendarView ? 'bg-mindtrack-sage text-white' : 'bg-gray-100 text-mindtrack-stone'}`}
-            >
-              <Calendar className="w-4 h-4 inline mr-1" />
-              Calendar View
-            </button>
-          </div>
+          <ViewToggle 
+            calendarView={calendarView} 
+            setCalendarView={setCalendarView} 
+          />
           
-          {selectedDate && (
-            <button
-              onClick={() => setSelectedDate(null)}
-              className="text-mindtrack-sage hover:underline"
-            >
-              Clear Date Filter
-            </button>
-          )}
+          <DateFilter 
+            selectedDate={selectedDate} 
+            clearDateFilter={() => setSelectedDate(null)} 
+          />
         </div>
 
         {/* Calendar View */}
@@ -139,96 +116,69 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
 
         {/* Timeframe Selection */}
         {entries.length > 0 && (
-          <div className="flex gap-2 mb-4">
-            <button
-              onClick={() => setTimeframe('day')}
-              className={`px-3 py-1 text-sm rounded-md ${timeframe === 'day' ? 'bg-mindtrack-sage text-white' : 'bg-gray-100 text-mindtrack-stone'}`}
-            >
-              Day
-            </button>
-            <button
-              onClick={() => setTimeframe('week')}
-              className={`px-3 py-1 text-sm rounded-md ${timeframe === 'week' ? 'bg-mindtrack-sage text-white' : 'bg-gray-100 text-mindtrack-stone'}`}
-            >
-              Week
-            </button>
-            <button
-              onClick={() => setTimeframe('month')}
-              className={`px-3 py-1 text-sm rounded-md ${timeframe === 'month' ? 'bg-mindtrack-sage text-white' : 'bg-gray-100 text-mindtrack-stone'}`}
-            >
-              Month
-            </button>
-            <button
-              onClick={() => setTimeframe('year')}
-              className={`px-3 py-1 text-sm rounded-md ${timeframe === 'year' ? 'bg-mindtrack-sage text-white' : 'bg-gray-100 text-mindtrack-stone'}`}
-            >
-              Year
-            </button>
-          </div>
-        )}
-
-        {/* Mood Chart */}
-        {entries.length > 0 && (
-          <MoodChart 
-            chartData={chartData} 
-            timeframe={timeframe}
-            selectedDate={selectedDate}
+          <TimeframeSelector 
+            timeframe={timeframe} 
+            setTimeframe={setTimeframe}
           />
         )}
 
-        <div className="space-y-6">
-          {!isAdding && (
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setIsAdding(true)}
-              className="w-full mindtrack-card flex items-center justify-center gap-2 text-mindtrack-sage hover:text-mindtrack-sage/80"
-            >
-              <Plus className="w-5 h-5" />
-              Log Your Current Mood
-            </motion.button>
-          )}
+        <MoodData 
+          entries={entries} 
+          showOnlyFavorites={showFavoritesState} 
+          selectedDate={selectedDate}
+        >
+          {({ visibleEntries, chartData }) => (
+            <>
+              {/* Mood Chart */}
+              {entries.length > 0 && (
+                <MoodChart 
+                  chartData={chartData} 
+                  timeframe={timeframe}
+                  selectedDate={selectedDate}
+                />
+              )}
 
-          {isAdding && (
-            <MoodForm onSubmit={addEntry} onCancel={() => setIsAdding(false)} />
-          )}
+              <div className="mindtrack-container">
+                <FavoritesToggle 
+                  showOnlyFavorites={showFavoritesState} 
+                  setShowOnlyFavorites={setShowFavoritesState}
+                />
+              </div>
 
-          {visibleEntries.map((entry, index) => (
-            <MoodEntryComponent
-              key={entry.id}
-              entry={entry}
-              editingId={editingId}
-              onDelete={deleteEntry}
-              onToggleFavorite={toggleFavorite}
-              onEdit={setEditingId}
-              onUpdate={updateEntry}
-              onCancelEdit={() => setEditingId(null)}
-              index={index}
-            />
-          ))}
+              <div className="space-y-6">
+                {!isAdding && (
+                  <AddMoodButton onClick={() => setIsAdding(true)} />
+                )}
 
-          {entries.length === 0 && !isAdding && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mindtrack-card flex items-center gap-3 text-mindtrack-stone/70"
-            >
-              <AlertCircle className="w-5 h-5" />
-              <p>No mood entries logged yet. Start tracking how you feel to see patterns over time.</p>
-            </motion.div>
+                {isAdding && (
+                  <MoodForm onSubmit={addEntry} onCancel={() => setIsAdding(false)} />
+                )}
+
+                {visibleEntries.map((entry, index) => (
+                  <MoodEntryComponent
+                    key={entry.id}
+                    entry={entry}
+                    editingId={editingId}
+                    onDelete={deleteEntry}
+                    onToggleFavorite={toggleFavorite}
+                    onEdit={setEditingId}
+                    onUpdate={updateEntry}
+                    onCancelEdit={() => setEditingId(null)}
+                    index={index}
+                  />
+                ))}
+
+                {entries.length === 0 && !isAdding && (
+                  <EmptyState message="No mood entries logged yet. Start tracking how you feel to see patterns over time." />
+                )}
+                
+                {entries.length > 0 && visibleEntries.length === 0 && !isAdding && (
+                  <EmptyState message="No entries match your current filters." />
+                )}
+              </div>
+            </>
           )}
-          
-          {entries.length > 0 && visibleEntries.length === 0 && !isAdding && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mindtrack-card flex items-center gap-3 text-mindtrack-stone/70"
-            >
-              <AlertCircle className="w-5 h-5" />
-              <p>No entries match your current filters.</p>
-            </motion.div>
-          )}
-        </div>
+        </MoodData>
       </div>
     </section>
   );
