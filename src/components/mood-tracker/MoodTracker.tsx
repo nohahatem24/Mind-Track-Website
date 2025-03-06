@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { AlertCircle, Heart, LineChart, Pencil, Plus, Trash2 } from "lucide-react";
+import { AlertCircle, Calendar, Heart, LineChart, List, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 
 import { MoodEntry, MoodCategory, STORAGE_KEY, getMoodCategory } from "./types";
@@ -19,6 +19,7 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [calendarView, setCalendarView] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month' | 'year'>('week');
   
   // Load entries from localStorage on component mount
   useEffect(() => {
@@ -52,7 +53,8 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
       category: getMoodCategory(entry.mood).label,
       color: getMoodCategory(entry.mood).color,
       note: entry.note || "",
-      fullTimestamp: entry.timestamp
+      fullTimestamp: entry.timestamp,
+      timestamp: new Date(entry.timestamp).getTime() // Add numeric timestamp for sorting
     }));
 
   const addEntry = (entry: MoodEntry) => {
@@ -103,12 +105,14 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
               onClick={() => setCalendarView(false)}
               className={`px-4 py-2 rounded-md ${!calendarView ? 'bg-mindtrack-sage text-white' : 'bg-gray-100 text-mindtrack-stone'}`}
             >
+              <List className="w-4 h-4 inline mr-1" />
               List View
             </button>
             <button
               onClick={() => setCalendarView(true)}
               className={`px-4 py-2 rounded-md ${calendarView ? 'bg-mindtrack-sage text-white' : 'bg-gray-100 text-mindtrack-stone'}`}
             >
+              <Calendar className="w-4 h-4 inline mr-1" />
               Calendar View
             </button>
           </div>
@@ -133,9 +137,43 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
           />
         )}
 
+        {/* Timeframe Selection */}
+        {entries.length > 0 && (
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setTimeframe('day')}
+              className={`px-3 py-1 text-sm rounded-md ${timeframe === 'day' ? 'bg-mindtrack-sage text-white' : 'bg-gray-100 text-mindtrack-stone'}`}
+            >
+              Day
+            </button>
+            <button
+              onClick={() => setTimeframe('week')}
+              className={`px-3 py-1 text-sm rounded-md ${timeframe === 'week' ? 'bg-mindtrack-sage text-white' : 'bg-gray-100 text-mindtrack-stone'}`}
+            >
+              Week
+            </button>
+            <button
+              onClick={() => setTimeframe('month')}
+              className={`px-3 py-1 text-sm rounded-md ${timeframe === 'month' ? 'bg-mindtrack-sage text-white' : 'bg-gray-100 text-mindtrack-stone'}`}
+            >
+              Month
+            </button>
+            <button
+              onClick={() => setTimeframe('year')}
+              className={`px-3 py-1 text-sm rounded-md ${timeframe === 'year' ? 'bg-mindtrack-sage text-white' : 'bg-gray-100 text-mindtrack-stone'}`}
+            >
+              Year
+            </button>
+          </div>
+        )}
+
         {/* Mood Chart */}
         {entries.length > 0 && (
-          <MoodChart chartData={chartData} />
+          <MoodChart 
+            chartData={chartData} 
+            timeframe={timeframe}
+            selectedDate={selectedDate}
+          />
         )}
 
         <div className="space-y-6">

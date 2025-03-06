@@ -1,12 +1,13 @@
 
 import { motion } from "framer-motion";
-import { BookHeart, Heart, ScrollText, Sparkles, BarChart3, Target, Brain } from "lucide-react";
+import { BookHeart, Heart, ScrollText, Sparkles, BarChart3, Target, Brain, Users } from "lucide-react";
 import GratitudeJournal from "@/components/GratitudeJournal";
 import Navigation from "@/components/Navigation";
 import TriggerTracker from "@/components/TriggerTracker";
 import MoodTracker from "@/components/mood-tracker/MoodTracker";
 import CBTTechniques from "@/components/CBTTechniques";
 import GoalTracker from "@/components/GoalTracker";
+import RelationshipTracker from "@/components/RelationshipTracker";
 import { useState, useEffect, useRef } from "react";
 
 const Index = () => {
