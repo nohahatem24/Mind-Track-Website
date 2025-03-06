@@ -1,8 +1,8 @@
+
 import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps, Dot } from 'recharts';
 import { LineChart } from "lucide-react";
 import { motion } from "framer-motion";
 import { moodCategories } from "./types";
-import { useState } from "react";
 
 interface ChartDataPoint {
   date: string;
@@ -110,6 +110,16 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
     return 12;
   };
 
+  // Function to determine curve type based on number of data points
+  const getCurveType = () => {
+    // For single data point, monotone doesn't make sense
+    if (filteredData.length <= 1) return "linear";
+    // For few data points, natural looks better
+    if (filteredData.length <= 3) return "natural";
+    // For more data points, monotone provides smooth transitions
+    return "monotone";
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -124,23 +134,34 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
       {filteredData.length > 0 ? (
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <RechartsLineChart data={filteredData} margin={{ top: 5, right: 20, bottom: 20, left: 20 }}>
+            <RechartsLineChart 
+              data={filteredData} 
+              margin={{ top: 5, right: 20, bottom: 20, left: 20 }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f1" />
               <XAxis 
                 dataKey="date" 
                 tickFormatter={formatXAxis} 
                 interval="preserveStartEnd"
                 tickCount={getTickCount()}
+                minTickGap={10}
               />
-              <YAxis domain={[-10, 10]} ticks={[-10, -5, 0, 5, 10]} />
+              <YAxis 
+                domain={[-10, 10]} 
+                ticks={[-10, -5, 0, 5, 10]} 
+                padding={{ top: 10, bottom: 10 }}
+              />
               <Tooltip content={<CustomTooltip />} />
               <Line 
-                type="monotone" 
+                type={getCurveType()}
                 dataKey="mood" 
                 stroke="#8A9A5B" 
                 strokeWidth={2}
                 dot={<CustomDot />} 
-                activeDot={{ r: 6, stroke: "#8A9A5B", strokeWidth: 2 }} 
+                activeDot={{ r: 6, stroke: "#8A9A5B", strokeWidth: 2 }}
+                connectNulls={true}
+                animationDuration={1000}
+                animationEasing="ease-in-out"
               />
             </RechartsLineChart>
           </ResponsiveContainer>
