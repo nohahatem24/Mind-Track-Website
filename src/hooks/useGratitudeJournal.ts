@@ -1,10 +1,34 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GratitudeEntry } from "@/components/gratitude/types";
+
+const STORAGE_KEY = "gratitude_entries";
 
 export const useGratitudeJournal = (initialShowOnlyFavorites = false) => {
   const [entries, setEntries] = useState<GratitudeEntry[]>([]);
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(initialShowOnlyFavorites);
+
+  // Load entries from localStorage on component mount
+  useEffect(() => {
+    const savedEntries = localStorage.getItem(STORAGE_KEY);
+    if (savedEntries) {
+      try {
+        setEntries(JSON.parse(savedEntries));
+      } catch (e) {
+        console.error("Error parsing saved gratitude entries:", e);
+      }
+    }
+  }, []);
+
+  // Save entries to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  }, [entries]);
+  
+  // Update internal state when prop changes
+  useEffect(() => {
+    setShowOnlyFavorites(initialShowOnlyFavorites);
+  }, [initialShowOnlyFavorites]);
 
   const visibleEntries = showOnlyFavorites 
     ? entries.filter(entry => entry.isFavorite)

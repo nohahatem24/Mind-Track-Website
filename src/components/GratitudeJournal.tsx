@@ -4,6 +4,7 @@ import GratitudeForm from "./gratitude/GratitudeForm";
 import GratitudeEntryList from "./gratitude/GratitudeEntryList";
 import GratitudeHeader from "./gratitude/GratitudeHeader";
 import { useGratitudeJournal } from "@/hooks/useGratitudeJournal";
+import FavoritesToggle from "./gratitude/FavoritesToggle";
 
 interface GratitudeJournalProps {
   showOnlyFavorites?: boolean;
@@ -15,7 +16,9 @@ const GratitudeJournal = ({ showOnlyFavorites = false }: GratitudeJournalProps) 
     addEntry,
     editEntry,
     deleteEntry,
-    toggleFavorite
+    toggleFavorite,
+    showOnlyFavorites: showFavoritesState,
+    toggleShowOnlyFavorites
   } = useGratitudeJournal(showOnlyFavorites);
 
   return (
@@ -24,7 +27,13 @@ const GratitudeJournal = ({ showOnlyFavorites = false }: GratitudeJournalProps) 
         <GratitudeHeader />
 
         <div className="max-w-2xl mx-auto space-y-6">
+          <FavoritesToggle 
+            showOnlyFavorites={showFavoritesState}
+            setShowOnlyFavorites={toggleShowOnlyFavorites}
+          />
+          
           <GratitudeForm onAddEntry={addEntry} />
+          
           <GratitudeEntryList 
             entries={entries}
             onEdit={editEntry}
