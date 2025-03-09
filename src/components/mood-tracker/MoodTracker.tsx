@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 
@@ -23,12 +22,11 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
   const [entries, setEntries] = useState<MoodEntry[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [calendarView, setCalendarView] = useState(false);
+  const [calendarView, setCalendarView] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month' | 'year'>('week');
   const [showFavoritesState, setShowFavoritesState] = useState(showOnlyFavorites);
   
-  // Load entries from localStorage on component mount
   useEffect(() => {
     const savedEntries = localStorage.getItem(STORAGE_KEY);
     if (savedEntries) {
@@ -40,12 +38,10 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
     }
   }, []);
 
-  // Save entries to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
   }, [entries]);
 
-  // Update internal state when prop changes
   useEffect(() => {
     setShowFavoritesState(showOnlyFavorites);
   }, [showOnlyFavorites]);
@@ -72,7 +68,6 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
     ));
   };
 
-  // Get unique dates for the calendar view
   const uniqueDates = [...new Set(entries.map(entry => entry.date))];
 
   return (
@@ -91,7 +86,6 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
           </p>
         </motion.div>
 
-        {/* View Toggle */}
         <div className="flex justify-between items-center mb-6">
           <ViewToggle 
             calendarView={calendarView} 
@@ -104,17 +98,13 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
           />
         </div>
 
-        {/* Calendar View */}
-        {calendarView && (
-          <CalendarView 
-            uniqueDates={uniqueDates} 
-            entries={entries} 
-            selectedDate={selectedDate} 
-            onSelectDate={setSelectedDate} 
-          />
-        )}
+        <CalendarView 
+          uniqueDates={uniqueDates} 
+          entries={entries} 
+          selectedDate={selectedDate} 
+          onSelectDate={setSelectedDate} 
+        />
 
-        {/* Timeframe Selection */}
         {entries.length > 0 && (
           <TimeframeSelector 
             timeframe={timeframe} 
@@ -129,7 +119,6 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
         >
           {({ visibleEntries, chartData }) => (
             <>
-              {/* Mood Chart */}
               {entries.length > 0 && (
                 <MoodChart 
                   chartData={chartData} 
