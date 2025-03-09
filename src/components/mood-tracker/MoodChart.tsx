@@ -47,14 +47,18 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
 
 const CustomDot = (props: any) => {
   const { cx, cy, payload } = props;
+  
+  // Make sure we have all required properties
+  if (!cx || !cy || !payload) return null;
+  
   return (
     <Dot 
       cx={cx} 
       cy={cy} 
       r={5} 
-      fill={payload.color} 
+      fill={payload.color || "#8A9A5B"} 
       stroke="#fff" 
-      strokeWidth={1} 
+      strokeWidth={2} 
     />
   );
 };
@@ -110,14 +114,9 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
     return 12;
   };
 
-  // Function to determine curve type based on number of data points
+  // Simplified curve type determination - always use monotone for smoothness, but fallback to linear for single points
   const getCurveType = () => {
-    // For single data point, monotone doesn't make sense
-    if (filteredData.length <= 1) return "linear";
-    // For few data points, natural looks better
-    if (filteredData.length <= 3) return "natural";
-    // For more data points, monotone provides smooth transitions
-    return "monotone";
+    return filteredData.length <= 1 ? "linear" : "monotone";
   };
 
   return (
@@ -157,7 +156,8 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
                 dataKey="mood" 
                 stroke="#8A9A5B" 
                 strokeWidth={2}
-                dot={<CustomDot />} 
+                dot={CustomDot}
+                isAnimationActive={true}
                 activeDot={{ r: 6, stroke: "#8A9A5B", strokeWidth: 2 }}
                 connectNulls={true}
                 animationDuration={1000}
