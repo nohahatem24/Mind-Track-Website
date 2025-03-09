@@ -12,7 +12,7 @@ const ViewToggle = ({ calendarView, setCalendarView }: ViewToggleProps) => {
     <div className="flex gap-2">
       <button
         onClick={() => setCalendarView(true)}
-        className="px-4 py-2 rounded-md bg-mindtrack-sage text-white"
+        className="px-4 py-2 rounded-md bg-mindtrack-sage text-white hover:bg-mindtrack-sage/90 transition-colors"
       >
         <Calendar className="w-4 h-4 inline mr-1" />
         Calendar View

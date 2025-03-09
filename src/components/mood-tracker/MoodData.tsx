@@ -24,6 +24,7 @@ interface MoodDataProps {
 }
 
 const MoodData = ({ entries, showOnlyFavorites, selectedDate, children }: MoodDataProps) => {
+  // Filter entries based on favorites toggle and selected date
   const visibleEntries = showOnlyFavorites
     ? entries.filter(entry => entry.isFavorite)
     : selectedDate 

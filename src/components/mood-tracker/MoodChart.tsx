@@ -78,7 +78,7 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
   const getFilteredData = () => {
     if (chartData.length === 0) return [];
     
-    // Sort data chronologically by timestamp to ensure left-to-right flow
+    // Sort data chronologically by timestamp to ensure correct left-to-right flow
     const sortedData = [...chartData].sort((a, b) => a.timestamp - b.timestamp);
     
     if (selectedDate) {
@@ -116,7 +116,7 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
     return 12;
   };
 
-  // Simplified curve type determination - always use monotone for smoothness, but fallback to linear for single points
+  // Always use monotone curve type for smoothness unless there's only 1 point
   const getCurveType = () => {
     return filteredData.length <= 1 ? "linear" : "monotone";
   };
@@ -158,7 +158,7 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
                 dataKey="mood" 
                 stroke="#8A9A5B" 
                 strokeWidth={2}
-                dot={CustomDot}
+                dot={<CustomDot />}
                 isAnimationActive={true}
                 activeDot={{ r: 6, stroke: "#8A9A5B", strokeWidth: 2 }}
                 connectNulls={true}
