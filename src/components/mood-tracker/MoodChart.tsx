@@ -78,9 +78,11 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
   const getFilteredData = () => {
     if (chartData.length === 0) return [];
     
+    // Sort data chronologically by timestamp to ensure left-to-right flow
     const sortedData = [...chartData].sort((a, b) => a.timestamp - b.timestamp);
     
     if (selectedDate) {
+      // When a specific date is selected, we still need to sort by time within that day
       return sortedData.filter(entry => entry.date === selectedDate);
     }
     

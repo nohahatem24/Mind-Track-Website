@@ -30,8 +30,8 @@ const MoodData = ({ entries, showOnlyFavorites, selectedDate, children }: MoodDa
       ? entries.filter(entry => entry.date === selectedDate)
       : entries;
 
-  const chartData = [...entries]
-    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+  // Process entries for the chart, ensuring they're chronologically ordered
+  const chartData = entries
     .map(entry => ({
       date: entry.date,
       time: entry.time || "",
@@ -40,8 +40,9 @@ const MoodData = ({ entries, showOnlyFavorites, selectedDate, children }: MoodDa
       color: getMoodCategory(entry.mood).color,
       note: entry.note || "",
       fullTimestamp: entry.timestamp,
-      timestamp: new Date(entry.timestamp).getTime() // Add numeric timestamp for sorting
-    }));
+      timestamp: new Date(entry.timestamp).getTime() // Numeric timestamp for sorting
+    }))
+    .sort((a, b) => a.timestamp - b.timestamp); // Ensure chronological order
 
   return <>{children({ visibleEntries, chartData })}</>;
 
