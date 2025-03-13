@@ -14,6 +14,7 @@ import AddMoodButton from "./AddMoodButton";
 import DateFilter from "./DateFilter";
 import ViewToggle from "./ViewToggle";
 import MoodData from "./MoodData";
+import MoodInsights from "./MoodInsights";
 
 interface MoodTrackerProps {
   showOnlyFavorites?: boolean;
@@ -118,14 +119,18 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
           showOnlyFavorites={showFavoritesState} 
           selectedDate={selectedDate}
         >
-          {({ visibleEntries, chartData }) => (
+          {({ visibleEntries, chartData, moodInsights }) => (
             <>
               {entries.length > 0 && (
-                <MoodChart 
-                  chartData={chartData} 
-                  timeframe={timeframe}
-                  selectedDate={selectedDate}
-                />
+                <>
+                  <MoodChart 
+                    chartData={chartData} 
+                    timeframe={timeframe}
+                    selectedDate={selectedDate}
+                  />
+                  
+                  <MoodInsights insights={moodInsights} />
+                </>
               )}
 
               <div className="mindtrack-container">

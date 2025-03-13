@@ -4,7 +4,7 @@ import MoodTracker from "./mood-tracker/MoodTracker";
 import TriggerTracker from "./TriggerTracker";
 import GratitudeJournal from "./GratitudeJournal";
 import CBTTechniques from "./CBTTechniques";
-import GoalTracker from "./GoalTracker";
+import GoalTracker from "./goal-tracker/GoalTracker";
 
 interface MainContentProps {
   activeTab: string;

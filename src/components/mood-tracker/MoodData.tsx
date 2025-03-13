@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { MoodEntry } from './types';
 
 interface MoodDataHookResult {
@@ -14,6 +14,13 @@ interface MoodDataHookResult {
     fullTimestamp: string;
     timestamp: number;
   }>;
+  moodInsights: {
+    averageMood: number;
+    dominantMood: string;
+    trendDirection: 'improving' | 'declining' | 'stable';
+    consistency: 'consistent' | 'variable' | 'very variable';
+    suggestion: string;
+  };
 }
 
 interface MoodDataProps {
@@ -45,7 +52,76 @@ const MoodData = ({ entries, showOnlyFavorites, selectedDate, children }: MoodDa
     }))
     .sort((a, b) => a.timestamp - b.timestamp); // Ensure chronological order
 
-  return <>{children({ visibleEntries, chartData })}</>;
+  // AI-powered mood analysis and insights
+  const moodInsights = useMemo(() => {
+    // Default values in case there are no entries
+    if (chartData.length === 0) {
+      return {
+        averageMood: 0,
+        dominantMood: "Neutral",
+        trendDirection: 'stable' as const,
+        consistency: 'consistent' as const,
+        suggestion: "Start tracking your mood to get personalized insights."
+      };
+    }
+
+    // Calculate average mood
+    const moodSum = chartData.reduce((sum, item) => sum + item.mood, 0);
+    const averageMood = moodSum / chartData.length;
+
+    // Find dominant mood category
+    const moodCounts = chartData.reduce((acc, item) => {
+      acc[item.category] = (acc[item.category] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const dominantMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0][0];
+
+    // Analyze mood trend direction
+    let trendDirection: 'improving' | 'declining' | 'stable' = 'stable';
+    if (chartData.length >= 3) {
+      const recentMoods = chartData.slice(-3).map(item => item.mood);
+      const avgRecent = recentMoods.reduce((sum, mood) => sum + mood, 0) / recentMoods.length;
+      const olderMoods = chartData.slice(0, Math.max(chartData.length - 3, 1)).map(item => item.mood);
+      const avgOlder = olderMoods.reduce((sum, mood) => sum + mood, 0) / olderMoods.length;
+      
+      if (avgRecent > avgOlder + 1) trendDirection = 'improving';
+      else if (avgRecent < avgOlder - 1) trendDirection = 'declining';
+    }
+
+    // Analyze mood consistency
+    const moodVariance = chartData.reduce((variance, item) => {
+      return variance + Math.pow(item.mood - averageMood, 2);
+    }, 0) / chartData.length;
+    
+    let consistency: 'consistent' | 'variable' | 'very variable' = 'consistent';
+    if (moodVariance > 16) consistency = 'very variable';
+    else if (moodVariance > 4) consistency = 'variable';
+
+    // Generate personalized suggestion based on analysis
+    let suggestion = "";
+    if (trendDirection === 'declining') {
+      suggestion = "Your mood seems to be declining. Consider using CBT techniques or practicing gratitude to help improve your mood.";
+    } else if (consistency === 'very variable') {
+      suggestion = "Your mood seems quite variable. Tracking your triggers might help identify patterns causing these fluctuations.";
+    } else if (averageMood < -2) {
+      suggestion = "Your average mood is on the lower side. Consider reaching out to a friend or professional for support.";
+    } else if (averageMood > 2) {
+      suggestion = "Your mood is generally positive. Great job! Keep using strategies that are working for you.";
+    } else {
+      suggestion = "Your mood is relatively stable. Regular mood tracking can help maintain awareness of your emotional patterns.";
+    }
+
+    return {
+      averageMood: parseFloat(averageMood.toFixed(1)),
+      dominantMood,
+      trendDirection,
+      consistency,
+      suggestion
+    };
+  }, [chartData]);
+
+  return <>{children({ visibleEntries, chartData, moodInsights })}</>;
 
   function getMoodCategory(mood: number) {
     const categories = [

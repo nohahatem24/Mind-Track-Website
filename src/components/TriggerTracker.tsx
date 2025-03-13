@@ -1,7 +1,8 @@
 
 import { motion } from "framer-motion";
 import { AlertCircle, Heart, Pencil, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import TriggerCategoryAnalysis from "./trigger-tracker/TriggerCategoryAnalysis";
 
 interface Trigger {
   id: number;
@@ -11,16 +12,42 @@ interface Trigger {
   alternatives?: string;
   timestamp: string;
   isFavorite?: boolean;
+  category?: string;
 }
 
 interface TriggerTrackerProps {
   showOnlyFavorites?: boolean;
 }
 
+const STORAGE_KEY = 'mindtrack_triggers';
+
 const TriggerTracker = ({ showOnlyFavorites = false }: TriggerTrackerProps) => {
   const [triggers, setTriggers] = useState<Trigger[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [showFavoritesState, setShowFavoritesState] = useState(showOnlyFavorites);
+
+  // Load saved triggers from localStorage
+  useEffect(() => {
+    const savedTriggers = localStorage.getItem(STORAGE_KEY);
+    if (savedTriggers) {
+      try {
+        setTriggers(JSON.parse(savedTriggers));
+      } catch (e) {
+        console.error("Error parsing saved triggers:", e);
+      }
+    }
+  }, []);
+
+  // Save triggers to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(triggers));
+  }, [triggers]);
+
+  // Update showFavorites state when prop changes
+  useEffect(() => {
+    setShowFavoritesState(showOnlyFavorites);
+  }, [showOnlyFavorites]);
 
   const addTrigger = (trigger: Trigger) => {
     setTriggers([trigger, ...triggers]);
@@ -36,7 +63,15 @@ const TriggerTracker = ({ showOnlyFavorites = false }: TriggerTrackerProps) => {
     setTriggers(triggers.filter(trigger => trigger.id !== triggerId));
   };
 
-  const visibleTriggers = showOnlyFavorites 
+  const toggleFavorite = (triggerId: number) => {
+    setTriggers(triggers.map(trigger => 
+      trigger.id === triggerId 
+        ? { ...trigger, isFavorite: !trigger.isFavorite } 
+        : trigger
+    ));
+  };
+
+  const visibleTriggers = showFavoritesState 
     ? triggers.filter(trigger => trigger.isFavorite)
     : triggers;
 
@@ -55,6 +90,25 @@ const TriggerTracker = ({ showOnlyFavorites = false }: TriggerTrackerProps) => {
             Track your emotional experiences. Fill in any aspect that feels relevant - whether it's a specific trigger, your thoughts, feelings, or coping strategies.
           </p>
         </motion.div>
+
+        {triggers.length > 0 && (
+          <TriggerCategoryAnalysis triggers={triggers} />
+        )}
+
+        <div className="flex justify-between items-center mb-6">
+          <div></div>
+          <button
+            onClick={() => setShowFavoritesState(!showFavoritesState)}
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-md ${
+              showFavoritesState 
+                ? 'bg-mindtrack-sage text-white' 
+                : 'text-mindtrack-sage hover:bg-mindtrack-sage/5'
+            } transition-colors`}
+          >
+            <Heart className="w-4 h-4" />
+            <span className="text-sm">Favorites</span>
+          </button>
+        </div>
 
         <div className="space-y-6">
           {visibleTriggers.map((trigger, index) => (
@@ -79,12 +133,7 @@ const TriggerTracker = ({ showOnlyFavorites = false }: TriggerTrackerProps) => {
                     </div>
                     <div className="flex gap-2">
                       <button
-                        onClick={() => {
-                          const updatedTriggers = triggers.map(t => 
-                            t.id === trigger.id ? { ...t, isFavorite: !t.isFavorite } : t
-                          );
-                          setTriggers(updatedTriggers);
-                        }}
+                        onClick={() => toggleFavorite(trigger.id)}
                         className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
                       >
                         <Heart 
