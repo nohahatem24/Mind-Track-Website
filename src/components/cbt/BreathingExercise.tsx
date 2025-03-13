@@ -1,13 +1,8 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-
-interface ExerciseProps {
-  onComplete: (data: Record<string, any>) => void;
-  onCancel: () => void;
-  initialData?: Record<string, any>;
-  isEditing?: boolean;
-}
+import { ExerciseProps } from "./types";
+import { Clock, CheckCircle } from "lucide-react";
 
 const BreathingExercise = ({ 
   onComplete,
@@ -21,6 +16,11 @@ const BreathingExercise = ({
   const [cycles, setCycles] = useState(initialData?.cycles || 0);
   const [totalTime, setTotalTime] = useState(initialData?.totalTime || 0);
   const [sessionTime, setSessionTime] = useState(0);
+  const [breathingPattern, setBreathingPattern] = useState({
+    inhale: 4,
+    hold: 2,
+    exhale: 6
+  });
 
   // Start/stop the breathing exercise
   const toggleExercise = () => {
@@ -40,13 +40,15 @@ const BreathingExercise = ({
     if (isActive) {
       intervalId = setInterval(() => {
         setCount(prevCount => {
-          if (phase === "inhale" && prevCount >= 4) {
+          const { inhale, hold, exhale } = breathingPattern;
+          
+          if (phase === "inhale" && prevCount >= inhale - 1) {
             setPhase("hold");
             return 0;
-          } else if (phase === "hold" && prevCount >= 2) {
+          } else if (phase === "hold" && prevCount >= hold - 1) {
             setPhase("exhale");
             return 0;
-          } else if (phase === "exhale" && prevCount >= 6) {
+          } else if (phase === "exhale" && prevCount >= exhale - 1) {
             setPhase("inhale");
             setCycles(prev => prev + 1);
             return 0;
@@ -63,13 +65,14 @@ const BreathingExercise = ({
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [isActive, phase]);
+  }, [isActive, phase, breathingPattern]);
 
   const handleComplete = () => {
     onComplete({
       cycles,
       totalTime,
       sessionTime,
+      breathingPattern,
       date: new Date().toISOString()
     });
   };
@@ -79,6 +82,15 @@ const BreathingExercise = ({
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}m ${remainingSeconds}s`;
+  };
+
+  // Update breathing pattern
+  const updateBreathingPattern = (type: "inhale" | "hold" | "exhale", value: number) => {
+    if (isActive) return; // Don't allow changes during active exercise
+    setBreathingPattern(prev => ({
+      ...prev,
+      [type]: value
+    }));
   };
 
   return (
@@ -92,12 +104,51 @@ const BreathingExercise = ({
           Deep Breathing Exercise
         </h3>
         <p className="text-mindtrack-stone/80">
-          Follow the circle as it expands and contracts. Breathe in for 4 seconds, hold for 2 seconds, and exhale for 6 seconds.
+          Follow the circle as it expands and contracts. Customize your breathing pattern below.
         </p>
-        <div className="mt-2 text-sm text-mindtrack-sage">
-          Session time: {formatTime(sessionTime)}
+        <div className="flex items-center justify-center gap-2 mt-2 text-sm text-mindtrack-sage">
+          <Clock className="w-4 h-4" />
+          <span>Session time: {formatTime(sessionTime)}</span>
         </div>
       </div>
+
+      {!isActive && !isEditing && (
+        <div className="grid grid-cols-3 gap-4 p-4 bg-mindtrack-sage/5 rounded-lg">
+          <div>
+            <label className="block text-xs font-medium text-mindtrack-stone mb-1">Inhale (seconds)</label>
+            <input 
+              type="number" 
+              min="2" 
+              max="8" 
+              value={breathingPattern.inhale}
+              onChange={(e) => updateBreathingPattern("inhale", Math.max(2, Math.min(8, parseInt(e.target.value) || 4)))}
+              className="w-full p-2 border border-mindtrack-sage/20 rounded-md focus:outline-none focus:ring-1 focus:ring-mindtrack-sage"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-mindtrack-stone mb-1">Hold (seconds)</label>
+            <input 
+              type="number" 
+              min="1" 
+              max="6" 
+              value={breathingPattern.hold}
+              onChange={(e) => updateBreathingPattern("hold", Math.max(1, Math.min(6, parseInt(e.target.value) || 2)))}
+              className="w-full p-2 border border-mindtrack-sage/20 rounded-md focus:outline-none focus:ring-1 focus:ring-mindtrack-sage"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-mindtrack-stone mb-1">Exhale (seconds)</label>
+            <input 
+              type="number" 
+              min="3" 
+              max="10" 
+              value={breathingPattern.exhale}
+              onChange={(e) => updateBreathingPattern("exhale", Math.max(3, Math.min(10, parseInt(e.target.value) || 6)))}
+              className="w-full p-2 border border-mindtrack-sage/20 rounded-md focus:outline-none focus:ring-1 focus:ring-mindtrack-sage"
+            />
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col items-center justify-center">
         <div className="relative w-48 h-48 mb-6">
@@ -106,7 +157,7 @@ const BreathingExercise = ({
               scale: phase === "inhale" ? [1, 1.5] : phase === "hold" ? 1.5 : [1.5, 1],
             }}
             transition={{
-              duration: phase === "inhale" ? 4 : phase === "exhale" ? 6 : 2,
+              duration: phase === "inhale" ? breathingPattern.inhale : phase === "exhale" ? breathingPattern.exhale : breathingPattern.hold,
               ease: "easeInOut",
             }}
             className="absolute inset-0 bg-mindtrack-sage/20 rounded-full flex items-center justify-center"
@@ -120,12 +171,19 @@ const BreathingExercise = ({
         <div className="text-center mb-4">
           <p className="text-2xl font-bold text-mindtrack-stone">{count + 1}</p>
           <p className="text-sm text-mindtrack-stone/70">
-            {phase === "inhale" ? "Inhale: 4 counts" : phase === "hold" ? "Hold: 2 counts" : "Exhale: 6 counts"}
+            {phase === "inhale" 
+              ? `Inhale: ${breathingPattern.inhale} counts` 
+              : phase === "hold" 
+                ? `Hold: ${breathingPattern.hold} counts` 
+                : `Exhale: ${breathingPattern.exhale} counts`}
           </p>
         </div>
 
         <div className="text-center mb-6">
-          <p className="text-lg font-medium text-mindtrack-stone">Completed Cycles: {cycles}</p>
+          <div className="flex items-center justify-center gap-2">
+            <p className="text-lg font-medium text-mindtrack-stone">Completed Cycles: {cycles}</p>
+            {cycles > 0 && <CheckCircle className="w-5 h-5 text-green-500" />}
+          </div>
         </div>
 
         <div className="flex gap-4">
