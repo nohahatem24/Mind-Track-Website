@@ -1,16 +1,17 @@
 
 import { motion } from "framer-motion";
-import { AlertCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import TechniquesList from "./TechniquesList";
 import ExerciseHistory from "./ExerciseHistory";
 import CategoryFilter from "./CategoryFilter";
-import { CognitiveRestructuringExercise, GroundingExercise, BreathingExercise } from "../CBTExercise";
+import CognitiveRestructuringExercise from "./CognitiveRestructuringExercise";
+import GroundingExercise from "./GroundingExercise";
+import BreathingExercise from "./BreathingExercise";
 import ThoughtRecord from "../ThoughtRecord";
 import BehavioralActivation from "../BehavioralActivation";
 import ProgressiveMuscleRelaxationExercise from "./ProgressiveMuscleRelaxation";
 import { techniquesData } from "./techniqueData";
-import { CBTTechniquesProps, ExerciseData, FAVORITES_STORAGE_KEY, COMPLETED_STORAGE_KEY, HISTORY_STORAGE_KEY, DAILY_COUNTS_STORAGE_KEY } from "./types";
+import { CBTTechniquesProps, ExerciseData, ExerciseProps, FAVORITES_STORAGE_KEY, COMPLETED_STORAGE_KEY, HISTORY_STORAGE_KEY, DAILY_COUNTS_STORAGE_KEY } from "./types";
 
 const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
   const [techniques] = useState(techniquesData);

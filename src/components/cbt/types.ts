@@ -17,6 +17,14 @@ export interface ExerciseData {
   data: Record<string, any>; // To store all user inputs
 }
 
+// Common props for all exercise components
+export interface ExerciseProps {
+  onComplete: (data: Record<string, any>) => void;
+  onCancel: () => void;
+  initialData?: Record<string, any>;
+  isEditing?: boolean;
+}
+
 // Storage keys for localStorage
 export const FAVORITES_STORAGE_KEY = 'mindtrack_cbt_favorites';
 export const COMPLETED_STORAGE_KEY = 'mindtrack_cbt_completed';
