@@ -3,7 +3,7 @@ import React from "react";
 import MoodTracker from "./mood-tracker/MoodTracker";
 import TriggerTracker from "./TriggerTracker";
 import GratitudeJournal from "./GratitudeJournal";
-import CBTTechniques from "./CBTTechniques";
+import CBTTechniques from "./cbt/CBTTechniques";
 import GoalTracker from "./goal-tracker/GoalTracker";
 
 interface MainContentProps {
