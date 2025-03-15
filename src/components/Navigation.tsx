@@ -79,8 +79,14 @@ const Navigation = () => {
             <MobileNavLink sectionId="cbt" onClick={handleMobileNavClick}>
               CBT Techniques
             </MobileNavLink>
+            <MobileNavLink sectionId="dbt" onClick={handleMobileNavClick}>
+              DBT Techniques
+            </MobileNavLink>
             <MobileNavLink sectionId="goals" onClick={handleMobileNavClick}>
               Goal Tracker
+            </MobileNavLink>
+            <MobileNavLink sectionId="relationships" onClick={handleMobileNavClick}>
+              Relationships
             </MobileNavLink>
           </div>
         </motion.div>

@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { BookHeart, Heart, ScrollText, Sparkles, BarChart3, Target, Brain, Users } from "lucide-react";
+import { BookHeart, Heart, ScrollText, Sparkles, BarChart3, Target, Brain, Users, Layers } from "lucide-react";
 import React, { Dispatch, SetStateAction } from "react";
 import FeatureCard from "./FeatureCard";
 
@@ -64,10 +64,22 @@ const HeroSection = ({ showFavorites, setShowFavorites }: HeroSectionProps) => {
               onClick={() => {}} // This should be connected to handleTabChange("cbt") in a real implementation
             />
             <FeatureCard
+              icon={<Layers className="w-6 h-6" />}
+              title="DBT Techniques"
+              description="Learn dialectical behavior therapy skills for emotional regulation and mindfulness."
+              onClick={() => {}} // This should be connected to handleTabChange("dbt") in a real implementation
+            />
+            <FeatureCard
               icon={<Target className="w-6 h-6" />}
               title="Goal Setting"
               description="Set and track personal growth goals aligned with your mental health journey."
               onClick={() => {}} // This should be connected to handleTabChange("goals") in a real implementation
+            />
+            <FeatureCard
+              icon={<Users className="w-6 h-6" />}
+              title="Relationships"
+              description="Track and improve your interpersonal connections and communication patterns."
+              onClick={() => {}} // This should be connected to handleTabChange("relationships") in a real implementation
             />
             <FeatureCard
               icon={<Heart className="w-6 h-6" />}
