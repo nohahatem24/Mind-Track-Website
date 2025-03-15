@@ -1,104 +1,95 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useRef, useState } from "react";
+import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import DashboardTabs from "@/components/DashboardTabs";
-import FavoritesButton from "@/components/FavoritesButton";
-import MainContent from "@/components/MainContent";
 import Footer from "@/components/Footer";
+import MainContent from "@/components/MainContent";
 
 const Index = () => {
-  const [showFavorites, setShowFavorites] = useState(false);
   const [activeTab, setActiveTab] = useState("mood");
+  const [showFavorites, setShowFavorites] = useState(false);
   
-  // Refs for each section
   const moodRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
   const gratitudeRef = useRef<HTMLDivElement>(null);
   const cbtRef = useRef<HTMLDivElement>(null);
+  const dbtRef = useRef<HTMLDivElement>(null);
   const goalsRef = useRef<HTMLDivElement>(null);
+  const relationshipsRef = useRef<HTMLDivElement>(null);
 
-  // Get ref based on section ID
-  const getSectionRef = (sectionId: string) => {
-    switch (sectionId) {
-      case "mood": return moodRef;
-      case "trigger": return triggerRef;
-      case "gratitude": return gratitudeRef;
-      case "cbt": return cbtRef;
-      case "goals": return goalsRef;
-      default: return null;
-    }
-  };
-  
-  // This function will handle tab changes and scrolling
+  // Handle tab change and scroll to section
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
     
-    // Immediate scrolling to the selected section
-    scrollToSection(tabId);
-  };
-
-  // Function to scroll to a section
-  const scrollToSection = (sectionId: string) => {
-    const sectionRef = getSectionRef(sectionId);
+    // Scroll to the corresponding section
+    let ref = null;
+    switch (tabId) {
+      case "mood":
+        ref = moodRef;
+        break;
+      case "trigger":
+        ref = triggerRef;
+        break;
+      case "gratitude":
+        ref = gratitudeRef;
+        break;
+      case "cbt":
+        ref = cbtRef;
+        break;
+      case "dbt":
+        ref = dbtRef;
+        break;
+      case "goals":
+        ref = goalsRef;
+        break;
+      case "relationships":
+        ref = relationshipsRef;
+        break;
+      default:
+        break;
+    }
     
-    if (sectionRef && sectionRef.current) {
-      // Calculate offset to account for the fixed header
-      const headerOffset = 80; // Adjust based on your header height
-      const elementPosition = sectionRef.current.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-      
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
+    if (ref && ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth" });
     }
   };
-
-  // Toggle favorites
-  const toggleFavorites = () => {
-    setShowFavorites(!showFavorites);
-  };
-
-  // Handle initial scrolling if there's a hash in the URL
-  useEffect(() => {
-    const hash = window.location.hash.replace('#', '');
-    if (hash) {
-      const validSections = ['mood', 'trigger', 'gratitude', 'cbt', 'goals'];
-      if (validSections.includes(hash)) {
-        setActiveTab(hash);
-        // Use a small timeout to ensure the page is fully loaded
-        setTimeout(() => scrollToSection(hash), 100);
-      }
-    }
-  }, []);
 
   return (
-    <div className="min-h-screen">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="min-h-screen bg-mindtrack-cream"
+    >
       <Navigation />
-      
       <HeroSection 
-        handleTabChange={handleTabChange} 
-        toggleFavorites={toggleFavorites} 
         showFavorites={showFavorites} 
+        setShowFavorites={setShowFavorites}
       />
       
-      <DashboardTabs activeTab={activeTab} handleTabChange={handleTabChange} />
-      
-      <FavoritesButton showFavorites={showFavorites} toggleFavorites={toggleFavorites} />
-      
-      <MainContent 
-        activeTab={activeTab} 
-        showFavorites={showFavorites} 
-        moodRef={moodRef}
-        triggerRef={triggerRef}
-        gratitudeRef={gratitudeRef}
-        cbtRef={cbtRef}
-        goalsRef={goalsRef}
-      />
+      <main>
+        <DashboardTabs
+          activeTab={activeTab}
+          handleTabChange={handleTabChange}
+        />
+        
+        <MainContent 
+          activeTab={activeTab}
+          showFavorites={showFavorites}
+          moodRef={moodRef}
+          triggerRef={triggerRef}
+          gratitudeRef={gratitudeRef}
+          cbtRef={cbtRef}
+          dbtRef={dbtRef}
+          goalsRef={goalsRef}
+          relationshipsRef={relationshipsRef}
+        />
+      </main>
       
       <Footer />
-    </div>
+    </motion.div>
   );
 };
 

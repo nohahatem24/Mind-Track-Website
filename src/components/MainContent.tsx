@@ -4,7 +4,9 @@ import MoodTracker from "./mood-tracker/MoodTracker";
 import TriggerTracker from "./TriggerTracker";
 import GratitudeJournal from "./GratitudeJournal";
 import CBTTechniques from "./cbt/CBTTechniques";
+import DBTTechniques from "./dbt/DBTTechniques";
 import GoalTracker from "./goal-tracker/GoalTracker";
+import RelationshipTracker from "./RelationshipTracker";
 
 interface MainContentProps {
   activeTab: string;
@@ -13,7 +15,9 @@ interface MainContentProps {
   triggerRef: React.RefObject<HTMLDivElement>;
   gratitudeRef: React.RefObject<HTMLDivElement>;
   cbtRef: React.RefObject<HTMLDivElement>;
+  dbtRef: React.RefObject<HTMLDivElement>;
   goalsRef: React.RefObject<HTMLDivElement>;
+  relationshipsRef: React.RefObject<HTMLDivElement>;
 }
 
 const MainContent = ({ 
@@ -23,7 +27,9 @@ const MainContent = ({
   triggerRef, 
   gratitudeRef, 
   cbtRef, 
-  goalsRef 
+  dbtRef,
+  goalsRef,
+  relationshipsRef
 }: MainContentProps) => {
   return (
     <>
@@ -39,8 +45,14 @@ const MainContent = ({
       <div id="cbt" ref={cbtRef}>
         {activeTab === "cbt" && <CBTTechniques showOnlyFavorites={showFavorites} />}
       </div>
+      <div id="dbt" ref={dbtRef}>
+        {activeTab === "dbt" && <DBTTechniques showOnlyFavorites={showFavorites} />}
+      </div>
       <div id="goals" ref={goalsRef}>
         {activeTab === "goals" && <GoalTracker showOnlyFavorites={showFavorites} />}
+      </div>
+      <div id="relationships" ref={relationshipsRef}>
+        {activeTab === "relationships" && <RelationshipTracker showOnlyFavorites={showFavorites} />}
       </div>
     </>
   );

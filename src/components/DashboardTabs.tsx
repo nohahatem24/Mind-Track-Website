@@ -52,6 +52,16 @@ const DashboardTabs = ({ activeTab, handleTabChange }: DashboardTabsProps) => {
             CBT Techniques
           </button>
           <button
+            onClick={() => handleTabChange("dbt")}
+            className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
+              activeTab === "dbt"
+                ? "border-mindtrack-sage text-mindtrack-sage"
+                : "border-transparent text-mindtrack-stone/70 hover:text-mindtrack-stone"
+            }`}
+          >
+            DBT Techniques
+          </button>
+          <button
             onClick={() => handleTabChange("goals")}
             className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
               activeTab === "goals"
@@ -60,6 +70,16 @@ const DashboardTabs = ({ activeTab, handleTabChange }: DashboardTabsProps) => {
             }`}
           >
             Goal Tracker
+          </button>
+          <button
+            onClick={() => handleTabChange("relationships")}
+            className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
+              activeTab === "relationships"
+                ? "border-mindtrack-sage text-mindtrack-sage"
+                : "border-transparent text-mindtrack-stone/70 hover:text-mindtrack-stone"
+            }`}
+          >
+            Relationships
           </button>
         </div>
       </div>
