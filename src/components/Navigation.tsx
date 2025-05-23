@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { BookHeart, Menu } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthButton from "./auth/AuthButton";
 
 interface MobileNavLinkProps {
@@ -13,12 +13,13 @@ interface MobileNavLinkProps {
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleMobileNavClick = (sectionId: string) => {
     // Close the mobile menu
     setIsOpen(false);
     
-    // Scroll to the section
+    // Navigate to the section
     navigateToSection(sectionId);
   };
 
@@ -26,25 +27,41 @@ const Navigation = () => {
   const navigateToSection = (sectionId: string) => {
     // For links with specific pages, use direct navigation
     if (sectionId === "relationships") {
-      window.location.href = "/relationships";
+      navigate("/relationships");
       return;
     }
     
-    // For sections on the main page, scroll to them
-    const section = document.getElementById(sectionId);
-    if (section) {
-      // Calculate offset to account for the fixed header
-      const headerOffset = 80;
-      const elementPosition = section.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+    // For sections on the main page
+    // Check if we're already on the homepage
+    if (window.location.pathname === "/") {
+      // Select the tab first to ensure content is loaded
+      const tabButtons = document.querySelectorAll('[data-tab-id]');
+      const targetTab = Array.from(tabButtons).find(
+        button => (button as HTMLElement).dataset.tabId === sectionId
+      ) as HTMLElement | undefined;
       
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
+      if (targetTab) {
+        // Simulate click on the tab to activate it
+        targetTab.click();
+        
+        // Then scroll to the section with a short delay to ensure content is rendered
+        setTimeout(() => {
+          const section = document.getElementById(sectionId);
+          if (section) {
+            const headerOffset = 80;
+            const elementPosition = section.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+            
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+          }
+        }, 50);
+      }
     } else {
-      // If not found on current page, go to homepage with anchor
-      window.location.href = `/#${sectionId}`;
+      // If not on homepage, navigate there with anchor
+      navigate(`/?section=${sectionId}`);
     }
   };
 

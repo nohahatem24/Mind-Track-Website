@@ -12,6 +12,7 @@ const DashboardTabs = ({ activeTab, handleTabChange }: DashboardTabsProps) => {
       <div className="border-b border-mindtrack-sage/10">
         <div className="flex overflow-x-auto no-scrollbar">
           <button
+            data-tab-id="mood"
             onClick={() => handleTabChange("mood")}
             className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
               activeTab === "mood"
@@ -22,6 +23,7 @@ const DashboardTabs = ({ activeTab, handleTabChange }: DashboardTabsProps) => {
             Mood Tracking
           </button>
           <button
+            data-tab-id="trigger"
             onClick={() => handleTabChange("trigger")}
             className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
               activeTab === "trigger"
@@ -32,6 +34,7 @@ const DashboardTabs = ({ activeTab, handleTabChange }: DashboardTabsProps) => {
             Trigger Tracking
           </button>
           <button
+            data-tab-id="gratitude"
             onClick={() => handleTabChange("gratitude")}
             className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
               activeTab === "gratitude"
@@ -42,6 +45,7 @@ const DashboardTabs = ({ activeTab, handleTabChange }: DashboardTabsProps) => {
             Gratitude Journal
           </button>
           <button
+            data-tab-id="cbt"
             onClick={() => handleTabChange("cbt")}
             className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
               activeTab === "cbt"
@@ -52,6 +56,7 @@ const DashboardTabs = ({ activeTab, handleTabChange }: DashboardTabsProps) => {
             CBT Techniques
           </button>
           <button
+            data-tab-id="dbt"
             onClick={() => handleTabChange("dbt")}
             className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
               activeTab === "dbt"
@@ -62,6 +67,7 @@ const DashboardTabs = ({ activeTab, handleTabChange }: DashboardTabsProps) => {
             DBT Techniques
           </button>
           <button
+            data-tab-id="goals"
             onClick={() => handleTabChange("goals")}
             className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
               activeTab === "goals"
@@ -72,6 +78,7 @@ const DashboardTabs = ({ activeTab, handleTabChange }: DashboardTabsProps) => {
             Goal Tracker
           </button>
           <button
+            data-tab-id="relationships"
             onClick={() => handleTabChange("relationships")}
             className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
               activeTab === "relationships"

@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { User, Mail, Lock, UserPlus, LogIn } from "lucide-react";
+import { User, Mail, Lock, UserPlus, LogIn, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -90,9 +90,18 @@ const AuthComponent = ({ onClose }: AuthComponentProps) => {
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 mx-auto my-auto"
+        className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 mx-auto my-auto relative"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Close button */}
+        <button 
+          onClick={onClose}
+          className="absolute right-4 top-4 p-1 rounded-full hover:bg-gray-100 transition-colors"
+          aria-label="Close"
+        >
+          <X className="h-5 w-5 text-mindtrack-stone/70" />
+        </button>
+        
         <div className="text-center mb-6">
           <h2 className="text-2xl font-semibold text-mindtrack-stone">
             {isLogin ? "Welcome Back" : "Create an Account"}
