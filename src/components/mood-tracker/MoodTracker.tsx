@@ -149,7 +149,8 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
                   <MoodForm onSubmit={addEntry} onCancel={() => setIsAdding(false)} />
                 )}
 
-                {visibleEntries.map((entry, index) => (
+                {/* Display entries in reverse order (newest first) */}
+                {[...visibleEntries].reverse().map((entry, index) => (
                   <MoodEntryComponent
                     key={entry.id}
                     entry={entry}

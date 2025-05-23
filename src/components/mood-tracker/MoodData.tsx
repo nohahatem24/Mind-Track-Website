@@ -39,6 +39,7 @@ const MoodData = ({ entries, showOnlyFavorites, selectedDate, children }: MoodDa
       : entries;
 
   // Process entries for the chart, ensuring they're chronologically ordered
+  // Now sorting from oldest to newest for the chart display
   const chartData = entries
     .map(entry => ({
       date: entry.date,
@@ -50,7 +51,7 @@ const MoodData = ({ entries, showOnlyFavorites, selectedDate, children }: MoodDa
       fullTimestamp: entry.timestamp,
       timestamp: new Date(entry.timestamp).getTime() // Numeric timestamp for sorting
     }))
-    .sort((a, b) => a.timestamp - b.timestamp); // Ensure chronological order
+    .sort((a, b) => a.timestamp - b.timestamp); // Ensure chronological order (oldest first)
 
   // AI-powered mood analysis and insights
   const moodInsights = useMemo(() => {
