@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { BookHeart, Menu } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import AuthButton from "./auth/AuthButton";
 
 interface MobileNavLinkProps {
@@ -18,15 +19,22 @@ const Navigation = () => {
     setIsOpen(false);
     
     // Scroll to the section
-    scrollToSection(sectionId);
+    navigateToSection(sectionId);
   };
 
-  // Function to scroll to a section
-  const scrollToSection = (sectionId: string) => {
+  // Function to navigate to a section
+  const navigateToSection = (sectionId: string) => {
+    // For links with specific pages, use direct navigation
+    if (sectionId === "relationships") {
+      window.location.href = "/relationships";
+      return;
+    }
+    
+    // For sections on the main page, scroll to them
     const section = document.getElementById(sectionId);
     if (section) {
       // Calculate offset to account for the fixed header
-      const headerOffset = 80; // Adjust based on your header height
+      const headerOffset = 80;
       const elementPosition = section.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
       
@@ -34,6 +42,9 @@ const Navigation = () => {
         top: offsetPosition,
         behavior: 'smooth'
       });
+    } else {
+      // If not found on current page, go to homepage with anchor
+      window.location.href = `/#${sectionId}`;
     }
   };
 
@@ -47,19 +58,21 @@ const Navigation = () => {
             transition={{ duration: 0.5 }}
             className="flex items-center gap-2"
           >
-            <BookHeart className="w-6 h-6 text-mindtrack-sage" />
-            <span className="text-xl font-semibold text-mindtrack-stone">MindTrack</span>
+            <Link to="/" className="flex items-center gap-2">
+              <BookHeart className="w-6 h-6 text-mindtrack-sage" />
+              <span className="text-xl font-semibold text-mindtrack-stone">MindTrack</span>
+            </Link>
           </motion.div>
 
           <div className="hidden md:flex items-center space-x-6">
             <div className="flex space-x-4">
-              <NavLink sectionId="mood" onClick={scrollToSection}>Mood</NavLink>
-              <NavLink sectionId="trigger" onClick={scrollToSection}>Triggers</NavLink>
-              <NavLink sectionId="gratitude" onClick={scrollToSection}>Gratitude</NavLink>
-              <NavLink sectionId="cbt" onClick={scrollToSection}>CBT</NavLink>
-              <NavLink sectionId="dbt" onClick={scrollToSection}>DBT</NavLink>
-              <NavLink sectionId="goals" onClick={scrollToSection}>Goals</NavLink>
-              <NavLink sectionId="relationships" onClick={scrollToSection}>Relationships</NavLink>
+              <NavLink sectionId="mood" onClick={navigateToSection}>Mood</NavLink>
+              <NavLink sectionId="trigger" onClick={navigateToSection}>Triggers</NavLink>
+              <NavLink sectionId="gratitude" onClick={navigateToSection}>Gratitude</NavLink>
+              <NavLink sectionId="cbt" onClick={navigateToSection}>CBT</NavLink>
+              <NavLink sectionId="dbt" onClick={navigateToSection}>DBT</NavLink>
+              <NavLink sectionId="goals" onClick={navigateToSection}>Goals</NavLink>
+              <NavLink sectionId="relationships" onClick={navigateToSection}>Relationships</NavLink>
             </div>
             
             <AuthButton />

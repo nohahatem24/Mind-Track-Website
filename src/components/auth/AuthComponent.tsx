@@ -90,7 +90,7 @@ const AuthComponent = ({ onClose }: AuthComponentProps) => {
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-lg shadow-xl max-w-md w-full p-6"
+        className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 mx-auto my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-center mb-6">
