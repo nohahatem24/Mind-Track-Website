@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { BookHeart, Menu } from "lucide-react";
 import { useState } from "react";
+import AuthButton from "./auth/AuthButton";
 
 interface MobileNavLinkProps {
   sectionId: string;
@@ -50,12 +51,29 @@ const Navigation = () => {
             <span className="text-xl font-semibold text-mindtrack-stone">MindTrack</span>
           </motion.div>
 
-          <button 
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 hover:bg-mindtrack-sage/5 rounded-lg"
-          >
-            <Menu className="w-6 h-6 text-mindtrack-stone" />
-          </button>
+          <div className="hidden md:flex items-center space-x-6">
+            <div className="flex space-x-4">
+              <NavLink sectionId="mood" onClick={scrollToSection}>Mood</NavLink>
+              <NavLink sectionId="trigger" onClick={scrollToSection}>Triggers</NavLink>
+              <NavLink sectionId="gratitude" onClick={scrollToSection}>Gratitude</NavLink>
+              <NavLink sectionId="cbt" onClick={scrollToSection}>CBT</NavLink>
+              <NavLink sectionId="dbt" onClick={scrollToSection}>DBT</NavLink>
+              <NavLink sectionId="goals" onClick={scrollToSection}>Goals</NavLink>
+              <NavLink sectionId="relationships" onClick={scrollToSection}>Relationships</NavLink>
+            </div>
+            
+            <AuthButton />
+          </div>
+
+          <div className="md:hidden flex items-center gap-2">
+            <AuthButton />
+            <button 
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 hover:bg-mindtrack-sage/5 rounded-lg"
+            >
+              <Menu className="w-6 h-6 text-mindtrack-stone" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -94,6 +112,23 @@ const Navigation = () => {
     </nav>
   );
 };
+
+const NavLink = ({ 
+  sectionId, 
+  children, 
+  onClick 
+}: { 
+  sectionId: string;
+  children: React.ReactNode;
+  onClick: (sectionId: string) => void;
+}) => (
+  <button
+    onClick={() => onClick(sectionId)}
+    className="text-mindtrack-stone hover:text-mindtrack-sage transition-colors py-2"
+  >
+    {children}
+  </button>
+);
 
 const MobileNavLink = ({ 
   sectionId, 

@@ -15,6 +15,22 @@ const HeroSection = ({ showFavorites, setShowFavorites }: HeroSectionProps) => {
     setShowFavorites(prev => !prev);
   };
 
+  // Function to scroll to a section
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      // Calculate offset to account for the fixed header
+      const headerOffset = 80;
+      const elementPosition = section.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <section className="pt-32 pb-16">
       <div className="mindtrack-container">
@@ -43,43 +59,43 @@ const HeroSection = ({ showFavorites, setShowFavorites }: HeroSectionProps) => {
               icon={<BarChart3 className="w-6 h-6" />}
               title="Mood Tracking"
               description="Track your daily moods from -10 to +10 and visualize changes over time."
-              onClick={() => {}} // This should be connected to handleTabChange("mood") in a real implementation
+              onClick={() => scrollToSection('mood')}
             />
             <FeatureCard
               icon={<ScrollText className="w-6 h-6" />}
               title="Trigger Tracking"
               description="Document and understand your emotional triggers to develop healthier coping mechanisms."
-              onClick={() => {}} // This should be connected to handleTabChange("trigger") in a real implementation
+              onClick={() => scrollToSection('trigger')}
             />
             <FeatureCard
               icon={<Sparkles className="w-6 h-6" />}
               title="Gratitude Journal"
               description="Cultivate positivity by recording daily moments of gratitude and appreciation."
-              onClick={() => {}} // This should be connected to handleTabChange("gratitude") in a real implementation
+              onClick={() => scrollToSection('gratitude')}
             />
             <FeatureCard
               icon={<Brain className="w-6 h-6" />}
               title="CBT Techniques"
               description="Access proven cognitive behavioral therapy exercises to improve your mental wellbeing."
-              onClick={() => {}} // This should be connected to handleTabChange("cbt") in a real implementation
+              onClick={() => scrollToSection('cbt')}
             />
             <FeatureCard
               icon={<Layers className="w-6 h-6" />}
               title="DBT Techniques"
               description="Learn dialectical behavior therapy skills for emotional regulation and mindfulness."
-              onClick={() => {}} // This should be connected to handleTabChange("dbt") in a real implementation
+              onClick={() => scrollToSection('dbt')}
             />
             <FeatureCard
               icon={<Target className="w-6 h-6" />}
               title="Goal Setting"
               description="Set and track personal growth goals aligned with your mental health journey."
-              onClick={() => {}} // This should be connected to handleTabChange("goals") in a real implementation
+              onClick={() => scrollToSection('goals')}
             />
             <FeatureCard
               icon={<Users className="w-6 h-6" />}
               title="Relationships"
               description="Track and improve your interpersonal connections and communication patterns."
-              onClick={() => {}} // This should be connected to handleTabChange("relationships") in a real implementation
+              onClick={() => scrollToSection('relationships')}
             />
             <FeatureCard
               icon={<Heart className="w-6 h-6" />}

@@ -1,5 +1,5 @@
 
-import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps, Dot } from 'recharts';
+import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps, Dot, Area, ReferenceLine } from 'recharts';
 import { LineChart } from "lucide-react";
 import { motion } from "framer-motion";
 import { moodCategories } from "./types";
@@ -79,42 +79,10 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
     if (chartData.length === 0) return [];
     
     // Sort data chronologically by timestamp to ensure correct left-to-right flow
-    const sortedData = [...chartData].sort((a, b) => a.timestamp - b.timestamp);
-    
-    if (selectedDate) {
-      // When a specific date is selected, we still need to sort by time within that day
-      return sortedData.filter(entry => entry.date === selectedDate);
-    }
-    
-    const now = new Date();
-    const cutoffDate = new Date();
-    
-    switch (timeframe) {
-      case 'week':
-        cutoffDate.setDate(now.getDate() - 7);
-        break;
-      case 'month':
-        cutoffDate.setMonth(now.getMonth() - 1);
-        break;
-      case 'year':
-        cutoffDate.setFullYear(now.getFullYear() - 1);
-        break;
-      default:
-        cutoffDate.setDate(now.getDate() - 1);
-    }
-    
-    return sortedData.filter(entry => new Date(entry.fullTimestamp).getTime() >= cutoffDate.getTime());
+    return [...chartData].sort((a, b) => a.timestamp - b.timestamp);
   };
 
   const filteredData = getFilteredData();
-
-  const getTickCount = () => {
-    if (filteredData.length <= 5) return filteredData.length;
-    if (timeframe === 'day') return 6;
-    if (timeframe === 'week') return 7;
-    if (timeframe === 'month') return 10;
-    return 12;
-  };
 
   // Always use monotone curve type for smoothness unless there's only 1 point
   const getCurveType = () => {
@@ -139,12 +107,24 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
               data={filteredData} 
               margin={{ top: 5, right: 20, bottom: 20, left: 20 }}
             >
+              <defs>
+                <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
+                  <line x1="0" y1="0" x2="0" y2="4" style={{ stroke: '#8A9A5B', strokeWidth: 1 }} />
+                </pattern>
+                <linearGradient id="positiveGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8A9A5B" stopOpacity={0.2} />
+                  <stop offset="100%" stopColor="#8A9A5B" stopOpacity={0.05} />
+                </linearGradient>
+                <linearGradient id="negativeGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#f97316" stopOpacity={0.05} />
+                  <stop offset="100%" stopColor="#f97316" stopOpacity={0.2} />
+                </linearGradient>
+              </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f1" />
               <XAxis 
                 dataKey="date" 
                 tickFormatter={formatXAxis} 
                 interval="preserveStartEnd"
-                tickCount={getTickCount()}
                 minTickGap={10}
               />
               <YAxis 
@@ -153,6 +133,45 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
                 padding={{ top: 10, bottom: 10 }}
               />
               <Tooltip content={<CustomTooltip />} />
+              
+              {/* Reference line at y=0 */}
+              <ReferenceLine y={0} stroke="#ccc" strokeWidth={1.5} />
+              
+              {/* Area for positive values, above zero line */}
+              <Area 
+                type={getCurveType()} 
+                dataKey="mood" 
+                fill="url(#positiveGradient)"
+                stroke="transparent"
+                activeDot={false}
+                baseLine={0}
+                fillOpacity={1}
+                legendType="none"
+                isAnimationActive={true}
+                connectNulls={true}
+                animationDuration={1000}
+                animationEasing="ease-in-out"
+                baseValue={0}
+              />
+              
+              {/* Area for negative values, below zero line */}
+              <Area 
+                type={getCurveType()} 
+                dataKey="mood" 
+                fill="url(#negativeGradient)"
+                stroke="transparent"
+                activeDot={false}
+                baseLine={0}
+                fillOpacity={1}
+                legendType="none"
+                isAnimationActive={true}
+                connectNulls={true}
+                animationDuration={1000}
+                animationEasing="ease-in-out"
+                baseValue={0}
+              />
+              
+              {/* Main line that shows the actual mood values */}
               <Line 
                 type={getCurveType()}
                 dataKey="mood" 
@@ -170,7 +189,7 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
         </div>
       ) : (
         <div className="h-64 w-full flex items-center justify-center text-mindtrack-stone/70">
-          No mood data available for the selected timeframe.
+          No mood data available yet. Add your first mood entry to see your chart!
         </div>
       )}
       

@@ -7,7 +7,6 @@ import MoodForm from "./MoodForm";
 import MoodChart from "./MoodChart";
 import MoodEntryComponent from "./MoodEntry";
 import CalendarView from "./CalendarView";
-import TimeframeSelector from "./TimeframeSelector";
 import FavoritesToggle from "./FavoritesToggle";
 import EmptyState from "./EmptyState";
 import AddMoodButton from "./AddMoodButton";
@@ -26,8 +25,10 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [calendarView, setCalendarView] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month' | 'year'>('week');
   const [showFavoritesState, setShowFavoritesState] = useState(showOnlyFavorites);
+  
+  // Always use 'day' timeframe for consistent display
+  const timeframe = 'day';
   
   useEffect(() => {
     const savedEntries = localStorage.getItem(STORAGE_KEY);
@@ -94,23 +95,20 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
             setCalendarView={setCalendarView} 
           />
           
-          <DateFilter 
-            selectedDate={selectedDate} 
-            clearDateFilter={() => setSelectedDate(null)} 
-          />
+          {selectedDate && (
+            <DateFilter 
+              selectedDate={selectedDate} 
+              clearDateFilter={() => setSelectedDate(null)} 
+            />
+          )}
         </div>
 
-        <CalendarView 
-          uniqueDates={uniqueDates} 
-          entries={entries} 
-          selectedDate={selectedDate} 
-          onSelectDate={setSelectedDate} 
-        />
-
-        {entries.length > 0 && (
-          <TimeframeSelector 
-            timeframe={timeframe} 
-            setTimeframe={setTimeframe}
+        {calendarView && (
+          <CalendarView 
+            uniqueDates={uniqueDates} 
+            entries={entries} 
+            selectedDate={selectedDate} 
+            onSelectDate={setSelectedDate} 
           />
         )}
 
@@ -134,17 +132,19 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
               )}
 
               <div className="mindtrack-container">
-                <FavoritesToggle 
-                  showOnlyFavorites={showFavoritesState} 
-                  setShowOnlyFavorites={setShowFavoritesState}
-                />
+                <div className="flex justify-between items-center">
+                  <FavoritesToggle 
+                    showOnlyFavorites={showFavoritesState} 
+                    setShowOnlyFavorites={setShowFavoritesState}
+                  />
+                  
+                  {!isAdding && (
+                    <AddMoodButton onClick={() => setIsAdding(true)} />
+                  )}
+                </div>
               </div>
 
-              <div className="space-y-6">
-                {!isAdding && (
-                  <AddMoodButton onClick={() => setIsAdding(true)} />
-                )}
-
+              <div className="space-y-6 mt-6">
                 {isAdding && (
                   <MoodForm onSubmit={addEntry} onCancel={() => setIsAdding(false)} />
                 )}
