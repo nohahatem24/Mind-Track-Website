@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -12,7 +12,7 @@ const AuthButton = () => {
   const { toast } = useToast();
 
   // Check if user is logged in
-  useState(() => {
+  useEffect(() => {
     const checkUser = async () => {
       const { data } = await supabase.auth.getSession();
       if (data && data.session) {

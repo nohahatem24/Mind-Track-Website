@@ -38,7 +38,7 @@ const AuthComponent = ({ onClose }: AuthComponentProps) => {
         onClose();
       } else {
         // Handle signup
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -50,17 +50,19 @@ const AuthComponent = ({ onClose }: AuthComponentProps) => {
 
         if (error) throw error;
 
-        // Create a profile record
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            { 
-              email: email,
+        // Only create a profile if we have a user id
+        if (data && data.user) {
+          // Create a profile record
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              id: data.user.id,
               full_name: fullName,
-            },
-          ]);
+              email: email,
+            });
 
-        if (profileError) throw profileError;
+          if (profileError) throw profileError;
+        }
         
         toast({
           title: "Account created!",
