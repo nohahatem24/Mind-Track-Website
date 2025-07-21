@@ -1,69 +1,48 @@
-# Welcome to your Lovable project
+# 🧠 MindTrack – A Mental Health Companion
 
-## Project info
+**MindTrack** is a digital mental health companion designed to provide users with a safe space for self-reflection, mood tracking, and emotional support. Whether you're dealing with anxiety, stress, depression, or simply want to monitor your emotional well-being, MindTrack helps you understand and care for your mental health through interactive features, mood journaling, coping resources, and AI-powered insights.
 
-**URL**: https://lovable.dev/projects/fa230d07-f641-4887-a0cf-05e8e1b77b40
+## MindTrack Project Link
 
-## How can I edit this code?
+**URL**: https://gratitude-trigger-map.lovable.app/
+---
 
-There are several ways of editing your application.
+## 🌟 Key Features
 
-**Use Lovable**
+### ✅ Core Functionalities:
+- **Digital SafeBox**  
+  A secure space where users can store thoughts, emotions, or memories. Encrypted and protected by user-defined passwords.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/fa230d07-f641-4887-a0cf-05e8e1b77b40) and start prompting.
+- **Mood Tracker with History**
+  Users log their emotions daily, see patterns, and reflect on emotional trends through data visualization.
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Coping Suggestions Engine**  
+  Based on the current mood, the app offers personalized advice, CBT/DBT tips, calming activities, and journaling prompts.
 
-**Use your preferred IDE**
+- **Interactive Mind Maps**
+  Visual, intuitive navigation to help users explore resources based on feelings, topics, or thought patterns.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **AI-Powered Self-Help Assistant** *(Optional)*  
+  An optional assistant that uses natural language processing to respond supportively to journal entries or distress signals.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 🌍 Accessibility & Usability:
+- **Multi-language Support**  
+  Currently supports English and Arabic with RTL compatibility. Future support for additional languages planned.
 
-Follow these steps:
+- **Search & Filter System**  
+  Users can search entries or resources by:
+  - Emotion
+  - Thought pattern
+  - Age group
+  - Geographical trends (based on common disorders in the area)
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- **User Emotion Dashboard**
+  - Timeline of all past moods and reflections.
+  - Visualizations like mood graphs and word clouds.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- **Lightweight & Fast**  
+  Optimized for performance using lightweight frameworks to ensure accessibility on low-bandwidth networks.
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
 
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/fa230d07-f641-4887-a0cf-05e8e1b77b40) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
