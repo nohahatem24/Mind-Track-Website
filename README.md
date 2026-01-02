@@ -4,7 +4,7 @@
 
 ## MindTrack Project Link
 
-**URL**: https://gratitude-trigger-map.lovable.app/
+**URL**: https://mind-track-website-lcl4m147m-nohas-projects-cf33771a.vercel.app/
 ---
 
 ## 🌟 Key Features

@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Brain, Check, ChevronDown, Heart, X } from "lucide-react";
 import { Technique } from "./types";
@@ -46,6 +45,8 @@ const TechniquesList = ({
     <div className="space-y-4">
       {techniques.map((technique, index) => {
         const todayCount = getTodayCompletionCount(technique.id);
+        const isFavorite = favorites.includes(technique.id);
+        const isExpanded = expandedId === technique.id;
         
         return (
           <motion.div
@@ -73,17 +74,22 @@ const TechniquesList = ({
                 <button
                   onClick={() => toggleFavorite(technique.id)}
                   className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                  aria-label={isFavorite ? `Remove ${technique.title} from favorites` : `Add ${technique.title} to favorites`}
                 >
                   <Heart 
-                    className={`w-4 h-4 ${favorites.includes(technique.id) ? 'fill-mindtrack-sage text-mindtrack-sage' : 'text-mindtrack-sage'}`} 
+                    className={`w-4 h-4 ${isFavorite ? 'fill-mindtrack-sage text-mindtrack-sage' : 'text-mindtrack-sage'}`}
+                    aria-hidden="true"
                   />
                 </button>
                 <button
-                  onClick={() => setExpandedId(expandedId === technique.id ? null : technique.id)}
+                  onClick={() => setExpandedId(isExpanded ? null : technique.id)}
                   className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                  aria-label={isExpanded ? `Collapse ${technique.title} details` : `Expand ${technique.title} details`}
+                  aria-expanded={String(isExpanded)? "true" : "false"}
                 >
                   <ChevronDown 
-                    className={`w-4 h-4 text-mindtrack-sage transform transition-transform ${expandedId === technique.id ? 'rotate-180' : ''}`} 
+                    className={`w-4 h-4 text-mindtrack-sage transform transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                    aria-hidden="true"
                   />
                 </button>
               </div>
@@ -100,7 +106,7 @@ const TechniquesList = ({
               )}
             </div>
             
-            {expandedId === technique.id && (
+            {isExpanded && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}

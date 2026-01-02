@@ -1,4 +1,3 @@
-
 export interface Technique {
   id: string;
   title: string;
@@ -14,14 +13,14 @@ export interface ExerciseData {
   techniqueId: string;
   date: string;
   notes?: string;
-  data: Record<string, any>; // To store all user inputs
+  data: Record<string, unknown>; // To store all user inputs
 }
 
 // Common props for all exercise components
 export interface ExerciseProps {
-  onComplete: (data: Record<string, any>) => void;
+  onComplete: (data: Record<string, unknown>) => void;
   onCancel: () => void;
-  initialData?: Record<string, any>;
+  initialData?: Record<string, unknown>;
   isEditing?: boolean;
 }
 
