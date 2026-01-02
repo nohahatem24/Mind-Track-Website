@@ -132,7 +132,7 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
               )}
 
               <div className="mindtrack-container">
-                <div className="flex justify-between items-center">
+                <div className=" align-middle justify-between items-center gap-4">
                   <FavoritesToggle 
                     showOnlyFavorites={showFavoritesState} 
                     setShowOnlyFavorites={setShowFavoritesState}

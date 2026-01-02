@@ -1,7 +1,6 @@
-
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Lightbulb, Moon, Sun, Waves } from "lucide-react";
+import { ArrowLeft, Lightbulb, Moon, Sun, Waves, LucideIcon } from "lucide-react";
 import CognitiveRestructuringExercise from "./cbt/CognitiveRestructuringExercise";
 import BreathingExercise from "./cbt/BreathingExercise";
 import GroundingExercise from "./cbt/GroundingExercise";
@@ -11,8 +10,8 @@ interface Exercise {
   id: string;
   name: string;
   description: string;
-  component: React.ComponentType<any>;
-  icon: React.ComponentType<any>;
+  component: React.ComponentType;
+  icon: LucideIcon;
 }
 
 const exercises: Exercise[] = [

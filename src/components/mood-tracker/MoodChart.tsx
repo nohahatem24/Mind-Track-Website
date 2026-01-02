@@ -45,7 +45,13 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
   return null;
 };
 
-const CustomDot = (props: any) => {
+interface CustomDotProps {
+  cx?: number;
+  cy?: number;
+  payload?: ChartDataPoint;
+}
+
+const CustomDot = (props: CustomDotProps) => {
   const { cx, cy, payload } = props;
   
   // Make sure we have all required properties
@@ -79,7 +85,7 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
     if (chartData.length === 0) return [];
     
     // Sort data chronologically by timestamp to ensure correct left-to-right flow
-    return [...chartData].sort((a, b) => a.timestamp - b.timestamp);
+    return [...chartData].sort((a, b) => b.timestamp - a.timestamp);
   };
 
   const filteredData = getFilteredData();

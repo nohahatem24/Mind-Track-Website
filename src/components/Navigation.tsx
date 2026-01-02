@@ -100,6 +100,7 @@ const Navigation = () => {
             <button 
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 hover:bg-mindtrack-sage/5 rounded-lg"
+              aria-label="Toggle navigation menu"
             >
               <Menu className="w-6 h-6 text-mindtrack-stone" />
             </button>
