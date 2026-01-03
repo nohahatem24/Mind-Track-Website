@@ -189,6 +189,8 @@ const GoalForm = ({ onSubmit, onCancel, initialData }: GoalFormProps) => {
               type="button"
               onClick={addStep}
               className="p-2 rounded-md bg-mindtrack-sage text-white hover:bg-mindtrack-sage/90 transition-colors"
+              aria-label="Add step to goal"
+              title="Add step to goal"
             >
               <Plus className="w-5 h-5" />
             </button>
@@ -202,6 +204,8 @@ const GoalForm = ({ onSubmit, onCancel, initialData }: GoalFormProps) => {
                   type="button"
                   onClick={() => removeStep(step.id)}
                   className="p-1 hover:bg-red-50 rounded-full transition-colors"
+                  aria-label="Remove step"
+                  title="Remove step"
                 >
                   <X className="w-4 h-4 text-red-500" />
                 </button>

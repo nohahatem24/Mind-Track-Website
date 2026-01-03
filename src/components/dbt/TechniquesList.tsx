@@ -56,15 +56,22 @@ const TechniquesList: React.FC<TechniquesListProps> = ({
             key={technique.id}
             className="mindtrack-card"
           >
-            <div
-              className="flex justify-between items-start cursor-pointer"
-              onClick={() => setExpandedId(isExpanded ? null : technique.id)}
-            >
+            <div className="flex justify-between items-start gap-4">
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-mindtrack-stone mb-1">
                   {technique.title}
                 </h3>
-                <p className="text-mindtrack-stone/70">{technique.description}</p>
+                <p className="text-mindtrack-stone/70 mb-3">{technique.description}</p>
+                
+                {!isExpanded && (
+                  <button
+                    type="button"
+                    onClick={() => setExpandedId(technique.id)}
+                    className="w-full py-2 text-center text-sm font-medium text-mindtrack-sage hover:bg-mindtrack-sage/5 rounded-md transition-colors border border-mindtrack-sage/20 hover:border-mindtrack-sage/40"
+                  >
+                    Show more
+                  </button>
+                )}
               </div>
               <div className="flex items-center gap-2 ml-4">
                 <button
@@ -73,6 +80,8 @@ const TechniquesList: React.FC<TechniquesListProps> = ({
                     toggleFavorite(technique.id);
                   }}
                   className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                  aria-label={isFavorite ? `Remove ${technique.title} from favorites` : `Add ${technique.title} to favorites`}
+                  title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                 >
                   <Heart
                     className={`w-4 h-4 ${
@@ -82,13 +91,19 @@ const TechniquesList: React.FC<TechniquesListProps> = ({
                     }`}
                   />
                 </button>
-                <div className="flex items-center justify-center w-6 h-6">
+                <button
+                  type="button"
+                  onClick={() => setExpandedId(isExpanded ? null : technique.id)}
+                  className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                  aria-label={isExpanded ? `Collapse ${technique.title} details` : `Expand ${technique.title} details`}
+                  title={isExpanded ? 'Collapse' : 'Expand'}
+                >
                   {isExpanded ? (
                     <ChevronUp className="w-5 h-5 text-mindtrack-sage" />
                   ) : (
                     <ChevronDown className="w-5 h-5 text-mindtrack-sage" />
                   )}
-                </div>
+                </button>
               </div>
             </div>
 

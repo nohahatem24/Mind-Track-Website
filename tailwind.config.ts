@@ -81,6 +81,32 @@ export default {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [
+    tailwindcssAnimate,
+    // Custom scrollbar styling
+    function({ addUtilities }: { addUtilities: (utilities: Record<string, Record<string, string | Record<string, string>>>) => void }) {
+      addUtilities({
+        '.scrollbar-thin': {
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgba(138, 154, 91, 0.3) rgba(138, 154, 91, 0.05)',
+        } as Record<string, string>,
+        // WebKit browsers (Chrome, Safari, Edge)
+        '.scrollbar-thin::-webkit-scrollbar': {
+          width: '6px',
+          height: '6px',
+        } as Record<string, string>,
+        '.scrollbar-thin::-webkit-scrollbar-track': {
+          background: 'rgba(138, 154, 91, 0.05)',
+        } as Record<string, string>,
+        '.scrollbar-thin::-webkit-scrollbar-thumb': {
+          background: 'rgba(138, 154, 91, 0.3)',
+          borderRadius: '3px',
+        } as Record<string, string>,
+        '.scrollbar-thin::-webkit-scrollbar-thumb:hover': {
+          background: 'rgba(138, 154, 91, 0.5)',
+        } as Record<string, string>,
+      });
+    }
+  ],
 
 } satisfies Config;

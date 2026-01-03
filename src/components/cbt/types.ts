@@ -24,6 +24,22 @@ export interface ExerciseProps {
   isEditing?: boolean;
 }
 
+// Breathing Exercise specific types
+export interface BreathingPatternData {
+  inhale: number;
+  holdAfterInhale: number;
+  exhale: number;
+  holdAfterExhale: number;
+}
+
+export interface BreathingExerciseData {
+  breathingPattern: BreathingPatternData;
+  cycles: number;
+  totalTime: number;
+  sessionTime?: number;
+  date: string;
+}
+
 // Storage keys for localStorage
 export const FAVORITES_STORAGE_KEY = 'mindtrack_cbt_favorites';
 export const COMPLETED_STORAGE_KEY = 'mindtrack_cbt_completed';

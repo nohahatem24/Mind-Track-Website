@@ -31,23 +31,25 @@ const GratitudeEntryList = ({
   }
 
   return (
-    <div className="space-y-4">
-      {entries.map((entry, index) => (
-        <motion.div
-          key={entry.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1 }}
-          className="mindtrack-card"
-        >
-          <GratitudeEntryItem
-            entry={entry}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            onToggleFavorite={onToggleFavorite}
-          />
-        </motion.div>
-      ))}
+    <div className="max-h-[600px] overflow-y-auto border border-mindtrack-sage/10 rounded-lg bg-mindtrack-cream/30">
+      <div className="space-y-4 p-6">
+        {entries.map((entry, index) => (
+          <motion.div
+            key={entry.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="mindtrack-card"
+          >
+            <GratitudeEntryItem
+              entry={entry}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onToggleFavorite={onToggleFavorite}
+            />
+          </motion.div>
+        ))}
+      </div>
     </div>
   );
 };

@@ -1,9 +1,10 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import ActivityItem from "./ActivityItem";
 import AddActivityForm from "./AddActivityForm";
-import { Activity, BehavioralActivationProps, NewActivityState } from "./types";
+import PendingActivityItem from "./PendingActivityItem";
+import CompletedActivityItem from "./CompletedActivityItem";
+import { Activity, BehavioralActivationProps, BehavioralActivationData, NewActivityState } from "./types";
 
 const BehavioralActivation = ({ 
   onComplete, 
@@ -12,17 +13,7 @@ const BehavioralActivation = ({
   isEditing = false
 }: BehavioralActivationProps) => {
   const [activities, setActivities] = useState<Activity[]>(
-    initialData?.activities || [
-      {
-        id: 1,
-        name: "",
-        enjoyment: 5,
-        scheduled: "",
-        moodBefore: undefined,
-        moodAfter: undefined,
-        completed: false
-      }
-    ]
+    initialData?.activities || []
   );
 
   const [newActivity, setNewActivity] = useState<NewActivityState>({
@@ -41,7 +32,7 @@ const BehavioralActivation = ({
         name: newActivity.name,
         enjoyment: newActivity.enjoyment,
         scheduled: newActivity.scheduled,
-        completed: false
+        status: 'pending'
       }
     ]);
     
@@ -52,23 +43,28 @@ const BehavioralActivation = ({
     });
   };
 
-  const updateActivity = (id: number, field: string, value: any) => {
+  const removeActivity = (id: number) => {
+    setActivities(activities.filter(activity => activity.id !== id));
+  };
+
+  const markActivityDone = (id: number) => {
     setActivities(activities.map(activity => {
       if (activity.id === id) {
-        return { ...activity, [field]: value };
+        return { ...activity, status: 'completing' };
       }
       return activity;
     }));
   };
 
-  const removeActivity = (id: number) => {
-    setActivities(activities.filter(activity => activity.id !== id));
-  };
-
-  const toggleCompleted = (id: number) => {
+  const completeActivityWithMoods = (id: number, moodBefore: number, moodAfter: number) => {
     setActivities(activities.map(activity => {
       if (activity.id === id) {
-        return { ...activity, completed: !activity.completed };
+        return { 
+          ...activity, 
+          status: 'completed',
+          moodBefore,
+          moodAfter
+        };
       }
       return activity;
     }));
@@ -76,16 +72,18 @@ const BehavioralActivation = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onComplete({
+    const data: BehavioralActivationData = {
       activities,
       date: new Date().toISOString()
-    });
+    };
+    onComplete(data);
   };
 
+  const pendingActivities = activities.filter(a => a.status === 'pending' || a.status === 'completing');
+  const completedActivities = activities.filter(a => a.status === 'completed');
+
   const isFormValid = () => {
-    return activities.length > 0 && activities.every(activity => 
-      activity.name.trim() !== "" && activity.scheduled !== ""
-    );
+    return activities.length > 0 && completedActivities.length > 0;
   };
 
   return (
@@ -95,28 +93,62 @@ const BehavioralActivation = ({
       className="space-y-6"
       onSubmit={handleSubmit}
     >
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium text-mindtrack-stone">Planned Activities</h3>
-        
-        {activities.map((activity, index) => (
-          <ActivityItem
-            key={activity.id}
-            activity={activity}
-            index={index}
-            onUpdate={updateActivity}
-            onRemove={removeActivity}
-            onToggleComplete={toggleCompleted}
-          />
-        ))}
-      </div>
-
+      {/* Add New Activity Form */}
       <AddActivityForm
         newActivity={newActivity}
         setNewActivity={setNewActivity}
         onAdd={addActivity}
       />
 
-      <div className="flex justify-end gap-3">
+      {/* Pending/To-Do Activities Section */}
+      {pendingActivities.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-4 p-4 rounded-lg bg-amber-50 border-2 border-amber-200"
+        >
+          <h3 className="text-lg font-semibold text-amber-900">To-Do Activities</h3>
+          <p className="text-sm text-amber-800">Complete these planned activities and rate your mood before and after.</p>
+          
+          <div className="space-y-3">
+            {pendingActivities.map((activity) => (
+              <PendingActivityItem
+                key={activity.id}
+                activity={activity}
+                onMarkDone={markActivityDone}
+                onRemove={removeActivity}
+                onCompleteMoods={completeActivityWithMoods}
+              />
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Completed Activities Section */}
+      {completedActivities.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-4 p-4 rounded-lg bg-green-50 border-2 border-green-200"
+        >
+          <h3 className="text-lg font-semibold text-green-900">✓ Completed Activities</h3>
+          <p className="text-sm text-green-800">Activities you have finished with mood ratings.</p>
+          
+          <div className="space-y-3">
+            {completedActivities.map((activity, index) => (
+              <CompletedActivityItem
+                key={activity.id}
+                activity={activity}
+                index={index}
+                onRemove={removeActivity}
+              />
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Submit Section */}
+      <div className="flex justify-end gap-3 pt-4 border-t border-mindtrack-sage/10">
         <button
           type="button"
           onClick={onCancel}

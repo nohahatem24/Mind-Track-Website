@@ -9,6 +9,7 @@ import useDBTTechniques from "./hooks/useDBTTechniques";
 import { DBTTechniquesProps } from "./types";
 
 const DBTTechniques = ({ showOnlyFavorites = false }: DBTTechniquesProps) => {
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const {
     expandedId,
     setExpandedId,
@@ -37,6 +38,11 @@ const DBTTechniques = ({ showOnlyFavorites = false }: DBTTechniquesProps) => {
     techniques
   } = useDBTTechniques(showOnlyFavorites);
 
+  // Filter by favorites if toggled
+  const displayTechniques = showFavoritesOnly 
+    ? filteredTechniques.filter(t => favorites.includes(t.id))
+    : filteredTechniques;
+
   return (
     <section id="dbt" className="py-16 bg-mindtrack-cream/30">
       <div className="mindtrack-container">
@@ -45,6 +51,8 @@ const DBTTechniques = ({ showOnlyFavorites = false }: DBTTechniquesProps) => {
           setSelectedCategory={setSelectedCategory}
           showHistory={showHistory}
           setShowHistory={setShowHistory}
+          showFavoritesOnly={showFavoritesOnly}
+          setShowFavoritesOnly={setShowFavoritesOnly}
         />
 
         {/* Exercise History with search */}
@@ -84,7 +92,7 @@ const DBTTechniques = ({ showOnlyFavorites = false }: DBTTechniquesProps) => {
 
         {!activeExercise && (
           <TechniquesList
-            techniques={filteredTechniques}
+            techniques={displayTechniques}
             expandedId={expandedId}
             favorites={favorites}
             completedExercises={completedExercises}

@@ -1,17 +1,25 @@
-
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Check, Target, Clock, Percent } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import { Check, Target, Clock, Percent, AlertCircle } from "lucide-react";
 
 interface GoalProgressProps {
   completedCount: number;
   inProgressCount: number;
   totalCount: number;
   averageProgress: number;
+  pastDueCount?: number;
 }
 
-const GoalProgress = ({ completedCount, inProgressCount, totalCount, averageProgress }: GoalProgressProps) => {
-  const safeAverageProgress = isNaN(averageProgress) ? 0 : Math.round(averageProgress);
+const GoalProgress = ({
+  completedCount,
+  inProgressCount,
+  totalCount,
+  averageProgress,
+  pastDueCount = 0,
+}: GoalProgressProps) => {
+  const safeAverageProgress = isNaN(averageProgress)
+    ? 0
+    : Math.round(averageProgress);
   const notStartedCount = totalCount - completedCount - inProgressCount;
 
   return (
@@ -25,15 +33,17 @@ const GoalProgress = ({ completedCount, inProgressCount, totalCount, averageProg
         Goal Progress Overview
       </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <div className="p-4 bg-mindtrack-sage/5 rounded-lg">
-          <div className="text-sm text-mindtrack-stone/70 mb-1">Total Goals</div>
+          <div className="text-sm text-mindtrack-stone/70 mb-1">
+            Total Goals
+          </div>
           <div className="text-2xl font-bold text-mindtrack-stone flex items-center gap-2">
             {totalCount}
             <Target className="w-5 h-5 text-mindtrack-sage" />
           </div>
         </div>
-        
+
         <div className="p-4 bg-green-50 rounded-lg">
           <div className="text-sm text-mindtrack-stone/70 mb-1">Completed</div>
           <div className="text-2xl font-bold text-green-600 flex items-center gap-2">
@@ -41,17 +51,45 @@ const GoalProgress = ({ completedCount, inProgressCount, totalCount, averageProg
             <Check className="w-5 h-5 text-green-600" />
           </div>
         </div>
-        
+
         <div className="p-4 bg-blue-50 rounded-lg">
-          <div className="text-sm text-mindtrack-stone/70 mb-1">In Progress</div>
+          <div className="text-sm text-mindtrack-stone/70 mb-1">
+            In Progress
+          </div>
           <div className="text-2xl font-bold text-blue-600 flex items-center gap-2">
             {inProgressCount}
             <Clock className="w-5 h-5 text-blue-600" />
           </div>
         </div>
-        
+
+        <div
+          className={`p-4 rounded-lg ${
+            pastDueCount > 0
+              ? "bg-amber-50 border border-amber-200"
+              : "bg-gray-50 border border-gray-200"
+          }`}
+        >
+          <div className="text-sm text-mindtrack-stone/70 mb-1">
+            Deadline Passed
+          </div>
+          <div
+            className={`text-2xl font-bold flex items-center gap-2 ${
+              pastDueCount > 0 ? "text-amber-700" : "text-gray-500"
+            }`}
+          >
+            {pastDueCount}
+            <AlertCircle
+              className={`w-5 h-5 ${
+                pastDueCount > 0 ? "text-amber-600" : "text-gray-400"
+              }`}
+            />
+          </div>
+        </div>
+
         <div className="p-4 bg-mindtrack-sage/5 rounded-lg">
-          <div className="text-sm text-mindtrack-stone/70 mb-1">Average Progress</div>
+          <div className="text-sm text-mindtrack-stone/70 mb-1">
+            Average Progress
+          </div>
           <div className="text-2xl font-bold text-mindtrack-stone flex items-center gap-2">
             {safeAverageProgress}%
             <Percent className="w-5 h-5 text-mindtrack-sage" />

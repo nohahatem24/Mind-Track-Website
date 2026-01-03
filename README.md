@@ -46,3 +46,191 @@
 ---
 
 
+
+```
+gratitude-trigger-map
+├─ .hintrc
+├─ bun.lockb
+├─ components.json
+├─ eslint.config.js
+├─ index.html
+├─ package-lock.json
+├─ package.json
+├─ postcss.config.js
+├─ public
+│  ├─ logo.png
+│  └─ placeholder.svg
+├─ README.md
+├─ src
+│  ├─ App.css
+│  ├─ App.tsx
+│  ├─ components
+│  │  ├─ auth
+│  │  │  ├─ AuthButton.tsx
+│  │  │  └─ AuthComponent.tsx
+│  │  ├─ behavioral-activation
+│  │  │  ├─ ActivityItem.tsx
+│  │  │  ├─ AddActivityForm.tsx
+│  │  │  ├─ BehavioralActivation.tsx
+│  │  │  └─ types.ts
+│  │  ├─ BehavioralActivation.tsx
+│  │  ├─ cbt
+│  │  │  ├─ BreathingExercise.tsx
+│  │  │  ├─ CategoryFilter.tsx
+│  │  │  ├─ CBTTechniqueHeader.tsx
+│  │  │  ├─ CBTTechniques.tsx
+│  │  │  ├─ CognitiveRestructuringExercise.tsx
+│  │  │  ├─ ExerciseHistory.tsx
+│  │  │  ├─ ExerciseRenderer.tsx
+│  │  │  ├─ GroundingExercise.tsx
+│  │  │  ├─ HistoryRenderer.tsx
+│  │  │  ├─ hooks
+│  │  │  │  └─ useCBTTechniques.tsx
+│  │  │  ├─ progressive-relaxation
+│  │  │  │  ├─ ControlButtons.tsx
+│  │  │  │  ├─ ExerciseCompleted.tsx
+│  │  │  │  ├─ Instructions.tsx
+│  │  │  │  ├─ MuscleGroupItem.tsx
+│  │  │  │  ├─ MuscleGroupsList.tsx
+│  │  │  │  ├─ ProgressiveMuscleRelaxation.tsx
+│  │  │  │  ├─ TimerDisplay.tsx
+│  │  │  │  ├─ types.ts
+│  │  │  │  └─ utils.ts
+│  │  │  ├─ ProgressiveMuscleRelaxation.tsx
+│  │  │  ├─ techniqueData.ts
+│  │  │  ├─ TechniquesList.tsx
+│  │  │  └─ types.ts
+│  │  ├─ CBTTechniques.tsx
+│  │  ├─ CustomTooltip.tsx
+│  │  ├─ DashboardTabs.tsx
+│  │  ├─ dbt
+│  │  │  ├─ DBTTechniqueHeader.tsx
+│  │  │  ├─ DBTTechniques.tsx
+│  │  │  ├─ ExerciseHistory.tsx
+│  │  │  ├─ ExerciseRenderer.tsx
+│  │  │  ├─ exercises
+│  │  │  │  ├─ EmotionRegulationExercise.tsx
+│  │  │  │  ├─ InterpersonalEffectivenessExercise.tsx
+│  │  │  │  ├─ StopSkillExercise.tsx
+│  │  │  │  └─ WiseMindExercise.tsx
+│  │  │  ├─ hooks
+│  │  │  │  └─ useDBTTechniques.tsx
+│  │  │  ├─ techniqueData.ts
+│  │  │  ├─ TechniquesList.tsx
+│  │  │  └─ types.ts
+│  │  ├─ FavoritesButton.tsx
+│  │  ├─ FeatureCard.tsx
+│  │  ├─ Footer.tsx
+│  │  ├─ goal-tracker
+│  │  │  ├─ GoalData.tsx
+│  │  │  ├─ GoalForm.tsx
+│  │  │  ├─ GoalItem.tsx
+│  │  │  ├─ GoalProgress.tsx
+│  │  │  └─ GoalTracker.tsx
+│  │  ├─ GoalTracker.tsx
+│  │  ├─ gratitude
+│  │  │  ├─ FavoritesToggle.tsx
+│  │  │  ├─ GratitudeEntryItem.tsx
+│  │  │  ├─ GratitudeEntryList.tsx
+│  │  │  ├─ GratitudeForm.tsx
+│  │  │  ├─ GratitudeHeader.tsx
+│  │  │  └─ types.ts
+│  │  ├─ GratitudeJournal.tsx
+│  │  ├─ HeroSection.tsx
+│  │  ├─ MainContent.tsx
+│  │  ├─ mood-tracker
+│  │  │  ├─ AddMoodButton.tsx
+│  │  │  ├─ CalendarView.tsx
+│  │  │  ├─ DateFilter.tsx
+│  │  │  ├─ EmptyState.tsx
+│  │  │  ├─ FavoritesToggle.tsx
+│  │  │  ├─ MoodChart.tsx
+│  │  │  ├─ MoodData.tsx
+│  │  │  ├─ MoodEntry.tsx
+│  │  │  ├─ MoodForm.tsx
+│  │  │  ├─ MoodInsights.tsx
+│  │  │  ├─ MoodTracker.tsx
+│  │  │  ├─ TimeframeSelector.tsx
+│  │  │  ├─ types.ts
+│  │  │  └─ ViewToggle.tsx
+│  │  ├─ Navigation.tsx
+│  │  ├─ RelationshipTracker.tsx
+│  │  ├─ ThoughtRecord.tsx
+│  │  ├─ trigger-tracker
+│  │  │  └─ TriggerCategoryAnalysis.tsx
+│  │  ├─ TriggerTracker.tsx
+│  │  └─ ui
+│  │     ├─ accordion.tsx
+│  │     ├─ alert-dialog.tsx
+│  │     ├─ alert.tsx
+│  │     ├─ aspect-ratio.tsx
+│  │     ├─ avatar.tsx
+│  │     ├─ badge.tsx
+│  │     ├─ breadcrumb.tsx
+│  │     ├─ button.tsx
+│  │     ├─ calendar.tsx
+│  │     ├─ card.tsx
+│  │     ├─ carousel.tsx
+│  │     ├─ chart.tsx
+│  │     ├─ checkbox.tsx
+│  │     ├─ collapsible.tsx
+│  │     ├─ command.tsx
+│  │     ├─ context-menu.tsx
+│  │     ├─ dialog.tsx
+│  │     ├─ drawer.tsx
+│  │     ├─ dropdown-menu.tsx
+│  │     ├─ form.tsx
+│  │     ├─ hover-card.tsx
+│  │     ├─ input-otp.tsx
+│  │     ├─ input.tsx
+│  │     ├─ label.tsx
+│  │     ├─ menubar.tsx
+│  │     ├─ navigation-menu.tsx
+│  │     ├─ pagination.tsx
+│  │     ├─ popover.tsx
+│  │     ├─ progress.tsx
+│  │     ├─ radio-group.tsx
+│  │     ├─ resizable.tsx
+│  │     ├─ scroll-area.tsx
+│  │     ├─ select.tsx
+│  │     ├─ separator.tsx
+│  │     ├─ sheet.tsx
+│  │     ├─ sidebar.tsx
+│  │     ├─ skeleton.tsx
+│  │     ├─ slider.tsx
+│  │     ├─ sonner.tsx
+│  │     ├─ switch.tsx
+│  │     ├─ table.tsx
+│  │     ├─ tabs.tsx
+│  │     ├─ textarea.tsx
+│  │     ├─ toast.tsx
+│  │     ├─ toaster.tsx
+│  │     ├─ toggle-group.tsx
+│  │     ├─ toggle.tsx
+│  │     ├─ tooltip.tsx
+│  │     └─ use-toast.ts
+│  ├─ hooks
+│  │  ├─ use-mobile.tsx
+│  │  ├─ use-toast.ts
+│  │  └─ useGratitudeJournal.ts
+│  ├─ index.css
+│  ├─ integrations
+│  │  └─ supabase
+│  │     ├─ client.ts
+│  │     └─ types.ts
+│  ├─ lib
+│  │  └─ utils.ts
+│  ├─ main.tsx
+│  ├─ pages
+│  │  ├─ Index.tsx
+│  │  └─ NotFound.tsx
+│  └─ vite-env.d.ts
+├─ supabase
+│  └─ config.toml
+├─ tailwind.config.ts
+├─ tsconfig.app.json
+├─ tsconfig.json
+├─ tsconfig.node.json
+└─ vite.config.ts
+
+```

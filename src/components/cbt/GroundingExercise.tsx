@@ -2,10 +2,22 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
+interface GroundingInputs {
+  see: string[];
+  touch: string[];
+  hear: string[];
+  smell: string[];
+  taste: string[];
+}
+
+interface GroundingData extends GroundingInputs {
+  date: string;
+}
+
 interface ExerciseProps {
-  onComplete: (data: Record<string, any>) => void;
+  onComplete: (data: GroundingData) => void;
   onCancel: () => void;
-  initialData?: Record<string, any>;
+  initialData?: GroundingData;
   isEditing?: boolean;
 }
 
@@ -57,7 +69,7 @@ const GroundingExercise = ({
       onSubmit={handleSubmit}
     >
       <div>
-        <label className="block text-sm font-medium text-mindtrack-stone mb-2">
+        <label className="block text-sm font-medium text-green-600 mb-2">
           5 things you can see
         </label>
         <div className="space-y-2">
@@ -76,7 +88,7 @@ const GroundingExercise = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-mindtrack-stone mb-2">
+        <label className="block text-sm font-medium text-green-600 mb-2">
           4 things you can touch/feel
         </label>
         <div className="space-y-2">
@@ -95,7 +107,7 @@ const GroundingExercise = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-mindtrack-stone mb-2">
+        <label className="block text-sm font-medium text-green-600 mb-2">
           3 things you can hear
         </label>
         <div className="space-y-2">
@@ -114,7 +126,7 @@ const GroundingExercise = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-mindtrack-stone mb-2">
+        <label className="block text-sm font-medium text-green-600 mb-2">
           2 things you can smell
         </label>
         <div className="space-y-2">
@@ -133,7 +145,7 @@ const GroundingExercise = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-mindtrack-stone mb-2">
+        <label className="block text-sm font-medium text-green-600 mb-2">
           1 thing you can taste
         </label>
         <input

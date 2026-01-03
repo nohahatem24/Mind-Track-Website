@@ -9,10 +9,21 @@ interface CognitiveDistortion {
   description: string;
 }
 
+interface CognitiveRestructuringData {
+  negativeThought?: string;
+  selectedDistortions?: string[];
+  evidence?: {
+    supporting: string;
+    contradicting: string;
+  };
+  balancedThought?: string;
+  date?: string;
+}
+
 interface ExerciseProps {
-  onComplete: (data: Record<string, any>) => void;
+  onComplete: (data: CognitiveRestructuringData) => void;
   onCancel: () => void;
-  initialData?: Record<string, any>;
+  initialData?: CognitiveRestructuringData;
   isEditing?: boolean;
 }
 

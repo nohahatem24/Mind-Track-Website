@@ -72,6 +72,7 @@ const TechniquesList = ({
               </div>
               <div className="flex gap-2">
                 <button
+                  type="button"
                   onClick={() => toggleFavorite(technique.id)}
                   className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
                   aria-label={isFavorite ? `Remove ${technique.title} from favorites` : `Add ${technique.title} to favorites`}
@@ -82,10 +83,11 @@ const TechniquesList = ({
                   />
                 </button>
                 <button
+                  type="button"
                   onClick={() => setExpandedId(isExpanded ? null : technique.id)}
                   className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
                   aria-label={isExpanded ? `Collapse ${technique.title} details` : `Expand ${technique.title} details`}
-                  aria-expanded={String(isExpanded)? "true" : "false"}
+                  aria-expanded={isExpanded ? "true" : "false"}
                 >
                   <ChevronDown 
                     className={`w-4 h-4 text-mindtrack-sage transform transition-transform ${isExpanded ? 'rotate-180' : ''}`}
@@ -95,7 +97,7 @@ const TechniquesList = ({
               </div>
             </div>
             <p className="text-mindtrack-stone/80 mb-2">{technique.description}</p>
-            <div className="flex gap-2 text-xs">
+            <div className="flex gap-2 text-xs mb-4">
               <span className="px-2 py-1 bg-mindtrack-sage/10 text-mindtrack-sage rounded-full">
                 {technique.category}
               </span>
@@ -105,6 +107,16 @@ const TechniquesList = ({
                 </span>
               )}
             </div>
+            
+            {!isExpanded && (
+              <button
+                type="button"
+                onClick={() => setExpandedId(technique.id)}
+                className="w-full py-2 text-center text-sm font-medium text-mindtrack-sage hover:bg-mindtrack-sage/5 rounded-md transition-colors border border-mindtrack-sage/20 hover:border-mindtrack-sage/40"
+              >
+                Show more
+              </button>
+            )}
             
             {isExpanded && (
               <motion.div
@@ -120,6 +132,7 @@ const TechniquesList = ({
                 </ol>
                 <div className="flex flex-wrap gap-3">
                   <button
+                    type="button"
                     onClick={() => startExercise(technique.id)}
                     className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-mindtrack-sage text-white rounded-md hover:bg-mindtrack-sage/90 transition-colors"
                   >
@@ -128,6 +141,7 @@ const TechniquesList = ({
                   </button>
                   {!completedExercises.includes(technique.id) ? (
                     <button
+                      type="button"
                       onClick={() => markAsCompleted(technique.id)}
                       className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-white border border-mindtrack-sage text-mindtrack-sage rounded-md hover:bg-mindtrack-sage/5 transition-colors"
                     >
@@ -136,6 +150,7 @@ const TechniquesList = ({
                     </button>
                   ) : (
                     <button
+                      type="button"
                       onClick={() => unmarkAsCompleted(technique.id)}
                       className="inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-mindtrack-sage text-mindtrack-sage rounded-md hover:bg-mindtrack-sage/5 transition-colors"
                     >

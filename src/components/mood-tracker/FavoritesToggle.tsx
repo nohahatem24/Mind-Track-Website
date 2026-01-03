@@ -14,7 +14,7 @@ const FavoritesToggle = ({ showOnlyFavorites, setShowOnlyFavorites }: FavoritesT
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
-      className="mb-8 inline-flex items-center gap-2 px-4 py-2 bg-white border border-mindtrack-sage/10 rounded-lg shadow-sm hover:bg-mindtrack-sage/5 transition-colors"
+      className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-mindtrack-sage/10 rounded-lg shadow-sm hover:bg-mindtrack-sage/5 transition-colors"
     >
       <Heart className={`w-4 h-4 ${showOnlyFavorites ? 'fill-mindtrack-sage text-mindtrack-sage' : 'text-mindtrack-sage'}`} />
       {showOnlyFavorites ? 'Show All Entries' : 'Show Favorites'}

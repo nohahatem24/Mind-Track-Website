@@ -1,8 +1,15 @@
 
+export interface ProgressiveMuscleRelaxationData {
+  completedGroups: Record<string, boolean>;
+  totalTime: number;
+  sessionTime: number;
+  date: string;
+}
+
 export interface ProgressiveMuscleRelaxationProps { 
-  onComplete: (data: Record<string, any>) => void;
+  onComplete: (data: ProgressiveMuscleRelaxationData) => void;
   onCancel: () => void;
-  initialData?: Record<string, any>;
+  initialData?: ProgressiveMuscleRelaxationData;
   isEditing?: boolean;
 }
 
@@ -36,16 +43,31 @@ export interface ExerciseCompletedProps {
   isEditing: boolean;
 }
 
-export const muscleGroups = [
-  "Feet and toes",
-  "Calves",
-  "Thighs",
-  "Buttocks",
-  "Abdomen",
-  "Chest",
-  "Back",
-  "Arms and hands",
-  "Shoulders",
-  "Neck",
-  "Face"
+export interface MuscleGroupData {
+  name: string;
+  imageUrl?: string;
+  youtubeVideoId?: string;
+}
+
+export const muscleGroups: MuscleGroupData[] = [
+  { name: "Feet and Toes", 
+    imageUrl: "/feet-toes.png"
+  },
+  { name: "Calves",
+    imageUrl: "/calves.png"
+  },
+  { name: "Thighs", 
+    imageUrl: "/thighs.png"
+  },
+  { name: "Buttocks",
+    imageUrl: "/buttocks.png"
+  },
+  { name: "Abdomen" },
+  { name: "Chest" },
+  { name: "Back" },
+  { name: "Arms and hands" },
+  { name: "Shoulders" },
+  { name: "Neck" },
+  { name: "Face" }
 ];
+

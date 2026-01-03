@@ -1,5 +1,6 @@
 
 import { motion } from "framer-motion";
+import { useState, useRef } from "react";
 import ExerciseHistory from "./ExerciseHistory";
 import TechniquesList from "./TechniquesList";
 import CBTTechniqueHeader from "./CBTTechniqueHeader";
@@ -8,6 +9,8 @@ import useCBTTechniques from "./hooks/useCBTTechniques";
 import { CBTTechniquesProps } from "./types";
 
 const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const exerciseFormRef = useRef<HTMLDivElement>(null);
   const {
     expandedId,
     setExpandedId,
@@ -36,6 +39,11 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
     techniques
   } = useCBTTechniques(showOnlyFavorites);
 
+  // Filter by favorites if toggled
+  const displayTechniques = showFavoritesOnly 
+    ? filteredTechniques.filter(t => favorites.includes(t.id))
+    : filteredTechniques;
+
   return (
     <section id="cbt" className="py-16 bg-mindtrack-cream/30">
       <div className="mindtrack-container">
@@ -44,6 +52,8 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
           setSelectedCategory={setSelectedCategory}
           showHistory={showHistory}
           setShowHistory={setShowHistory}
+          showFavoritesOnly={showFavoritesOnly}
+          setShowFavoritesOnly={setShowFavoritesOnly}
         />
 
         {/* Exercise History with search */}
@@ -55,11 +65,13 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
             deleteHistoryEntry={deleteHistoryEntry}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
+            exerciseFormRef={exerciseFormRef}
           />
         )}
 
         {activeExercise && (
           <motion.div
+            ref={exerciseFormRef}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mindtrack-card mb-6"
@@ -83,7 +95,7 @@ const CBTTechniques = ({ showOnlyFavorites = false }: CBTTechniquesProps) => {
 
         {!activeExercise && (
           <TechniquesList
-            techniques={filteredTechniques}
+            techniques={displayTechniques}
             expandedId={expandedId}
             favorites={favorites}
             completedExercises={completedExercises}

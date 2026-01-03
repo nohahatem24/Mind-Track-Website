@@ -1,11 +1,10 @@
-
 export interface MoodEntry {
   id: number;
   mood: number;
   note?: string;
   timestamp: string;
-  date: string; // For chart grouping
-  time?: string; // For detailed display
+  date: string; // Format: "Jan 2, 2026"
+  time?: string;
   isFavorite?: boolean;
 }
 
@@ -18,6 +17,11 @@ export interface MoodCategory {
 
 export interface MoodTrackerProps {
   showOnlyFavorites?: boolean;
+}
+
+export interface DateRange {
+  startDate: string | null;
+  endDate: string | null;
 }
 
 export const STORAGE_KEY = 'mindtrack_mood_entries';

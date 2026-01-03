@@ -32,6 +32,15 @@ const GoalItem = ({
 }: GoalItemProps) => {
   const [showDetails, setShowDetails] = useState(false);
 
+  const isPastDue = () => {
+    if (!goal.targetDate || goal.completed) return false;
+    const targetDate = new Date(goal.targetDate);
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    targetDate.setHours(0, 0, 0, 0);
+    return targetDate < now;
+  };
+
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
       personal: 'bg-purple-100 text-purple-800',
@@ -76,7 +85,9 @@ const GoalItem = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="mindtrack-card"
+      id={`goal-${goal.id}`}
+      className="mindtrack-card cursor-pointer hover:shadow-md transition-shadow"
+      onClick={() => setShowDetails(!showDetails)}
     >
       <div className="flex justify-between items-start mb-2">
         <div className="flex items-center gap-3">
@@ -95,9 +106,14 @@ const GoalItem = ({
                 {goal.priority} priority
               </span>
               {goal.targetDate && (
-                <span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs flex items-center gap-1">
+                <span className={`px-2 py-0.5 rounded-full text-xs flex items-center gap-1 ${
+                  isPastDue() 
+                    ? 'bg-amber-100 text-amber-800 font-medium' 
+                    : 'bg-blue-100 text-blue-800'
+                }`}>
                   <Clock className="w-3 h-3" />
                   {new Date(goal.targetDate).toLocaleDateString()}
+                  {isPastDue() && <span className="ml-1">⚠ Deadline Passed</span>}
                 </span>
               )}
             </div>
@@ -105,28 +121,48 @@ const GoalItem = ({
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => onToggleFavorite(goal.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite(goal.id);
+            }}
             className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+            aria-label={goal.isFavorite ? "Remove from favorites" : "Add to favorites"}
+            title={goal.isFavorite ? "Remove from favorites" : "Add to favorites"}
           >
             <Heart 
               className={`w-4 h-4 ${goal.isFavorite ? 'fill-mindtrack-sage text-mindtrack-sage' : 'text-mindtrack-sage'}`} 
             />
           </button>
           <button
-            onClick={() => onEdit(goal.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(goal.id);
+            }}
             className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+            aria-label="Edit goal"
+            title="Edit goal"
           >
             <Pencil className="w-4 h-4 text-mindtrack-sage" />
           </button>
           <button
-            onClick={() => onDelete(goal.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(goal.id);
+            }}
             className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+            aria-label="Delete goal"
+            title="Delete goal"
           >
             <Trash2 className="w-4 h-4 text-red-500" />
           </button>
           <button
-            onClick={() => setShowDetails(!showDetails)}
-            className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDetails(!showDetails);
+            }}
+            className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors ml-auto"
+            aria-label={showDetails ? "Collapse goal details" : "Expand goal details"}
+            title={showDetails ? "Collapse goal details" : "Expand goal details"}
           >
             {showDetails ? (
               <ChevronUp className="w-4 h-4 text-mindtrack-sage" />
@@ -146,8 +182,14 @@ const GoalItem = ({
             max="100"
             step="5"
             value={goal.progress}
-            onChange={(e) => onUpdateProgress(goal.id, parseInt(e.target.value))}
+            onChange={(e) => {
+              e.stopPropagation();
+              onUpdateProgress(goal.id, parseInt(e.target.value));
+            }}
+            onClick={(e) => e.stopPropagation()}
             className="w-24 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            aria-label="Update goal progress"
+            title="Drag to update progress"
           />
         </div>
         <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -179,15 +221,31 @@ const GoalItem = ({
                 {goal.steps.map(step => (
                   <div 
                     key={step.id}
-                    className="flex items-center gap-2 p-2 bg-mindtrack-sage/5 rounded-md"
+                    className="flex items-center gap-2 p-2 bg-mindtrack-sage/5 rounded-md cursor-pointer hover:bg-mindtrack-sage/10 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleStep(goal.id, step.id);
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={step.completed ? `Unmark step as complete: ${step.description}` : `Mark step as complete: ${step.description}`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        onToggleStep(goal.id, step.id);
+                      }
+                    }}
                   >
-                    <button
-                      onClick={() => onToggleStep(goal.id, step.id)}
-                      className={`p-1 rounded-full ${step.completed ? 'bg-green-100' : 'hover:bg-mindtrack-sage/10'}`}
+                    <div 
+                      className={`p-1 rounded-full flex-shrink-0 ${step.completed ? 'bg-green-100' : 'hover:bg-mindtrack-sage/10'}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
                     >
                       <Check className={`w-4 h-4 ${step.completed ? 'text-green-600' : 'text-mindtrack-sage/50'}`} />
-                    </button>
-                    <span className={`text-sm ${step.completed ? 'line-through text-mindtrack-stone/50' : 'text-mindtrack-stone'}`}>
+                    </div>
+                    <span className={`text-sm flex-1 ${step.completed ? 'line-through text-mindtrack-stone/50' : 'text-mindtrack-stone'}`}>
                       {step.description}
                     </span>
                   </div>

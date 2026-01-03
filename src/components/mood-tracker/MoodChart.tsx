@@ -1,5 +1,4 @@
-
-import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps, Dot, Area, ReferenceLine } from 'recharts';
+import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps, Dot, Area, ReferenceLine, AreaChart, ComposedChart, Bar } from 'recharts';
 import { LineChart } from "lucide-react";
 import { motion } from "framer-motion";
 import { moodCategories } from "./types";
@@ -24,18 +23,18 @@ interface MoodChartProps {
 const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-3 border border-mindtrack-sage/10 rounded-md shadow-sm">
-        <p className="text-sm font-medium">{label}</p>
+      <div className="bg-white p-4 border border-mindtrack-sage/20 rounded-lg shadow-lg">
+        <p className="text-sm font-semibold text-mindtrack-stone mb-1">{label}</p>
         {payload[0].payload.time && (
-          <p className="text-sm text-mindtrack-stone/70">{payload[0].payload.time}</p>
+          <p className="text-xs text-mindtrack-stone/60 mb-2">{payload[0].payload.time}</p>
         )}
-        <p className="text-sm text-mindtrack-stone">
-          Mood: <span className="font-medium">{payload[0].value}</span>
+        <p className="text-sm text-mindtrack-stone mb-1">
+          Mood: <span className="font-semibold" style={{ color: payload[0].payload.color }}>{payload[0].value}</span>
         </p>
-        <p className="text-sm text-mindtrack-stone/70">{payload[0].payload.category}</p>
+        <p className="text-sm text-mindtrack-stone/70 mb-2">{payload[0].payload.category}</p>
         {payload[0].payload.note && (
-          <p className="text-sm text-mindtrack-stone/70 mt-1">
-            Note: {payload[0].payload.note.length > 50 ? payload[0].payload.note.substring(0, 50) + '...' : payload[0].payload.note}
+          <p className="text-xs text-mindtrack-stone/70 mt-2 pt-2 border-t border-mindtrack-sage/10">
+            {payload[0].payload.note.length > 60 ? payload[0].payload.note.substring(0, 60) + '...' : payload[0].payload.note}
           </p>
         )}
       </div>
@@ -54,7 +53,6 @@ interface CustomDotProps {
 const CustomDot = (props: CustomDotProps) => {
   const { cx, cy, payload } = props;
   
-  // Make sure we have all required properties
   if (!cx || !cy || !payload) return null;
   
   return (
@@ -73,24 +71,23 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
   const formatXAxis = (value: string) => {
     if (!value) return '';
     
+    // For day view, show time
     if (timeframe === 'day') {
       return value.split(' ')[1] || value;
-    } else if (timeframe === 'week' || timeframe === 'month') {
-      return value.split(' ')[0] || value;
+    } 
+    // For week/month, show date without year
+    else if (timeframe === 'week' || timeframe === 'month') {
+      const parts = value.split(',');
+      return parts[0] || value;
     }
+    // For year, show month
     return value;
   };
 
-  const getFilteredData = () => {
-    if (chartData.length === 0) return [];
-    
-    // Sort data chronologically by timestamp to ensure correct left-to-right flow
-    return [...chartData].sort((a, b) => b.timestamp - a.timestamp);
-  };
+  // Data is already sorted oldest to newest from MoodData component
+  const filteredData = chartData;
 
-  const filteredData = getFilteredData();
-
-  // Always use monotone curve type for smoothness unless there's only 1 point
+  // Use monotone curve for smooth lines
   const getCurveType = () => {
     return filteredData.length <= 1 ? "linear" : "monotone";
   };
@@ -107,103 +104,103 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
       </h3>
       
       {filteredData.length > 0 ? (
-        <div className="h-64 w-full">
+        <div className="h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <RechartsLineChart 
+            <ComposedChart 
               data={filteredData} 
-              margin={{ top: 5, right: 20, bottom: 20, left: 20 }}
+              margin={{ top: 20, right: 30, bottom: 30, left: 10 }}
             >
               <defs>
-                <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
-                  <line x1="0" y1="0" x2="0" y2="4" style={{ stroke: '#8A9A5B', strokeWidth: 1 }} />
-                </pattern>
+                {/* Gradient for positive mood area - GREEN */}
                 <linearGradient id="positiveGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8A9A5B" stopOpacity={0.2} />
-                  <stop offset="100%" stopColor="#8A9A5B" stopOpacity={0.05} />
+                  <stop offset="0%" stopColor="#A3ED82" stopOpacity={0.2} />
+                  <stop offset="100%" stopColor="#A3ED82" stopOpacity={0.09} />
                 </linearGradient>
+                
+                {/* Gradient for negative mood area - RED */}
                 <linearGradient id="negativeGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#f97316" stopOpacity={0.05} />
-                  <stop offset="100%" stopColor="#f97316" stopOpacity={0.2} />
+                  <stop offset="0%" stopColor="#E36344" stopOpacity={0.02} />
+                  <stop offset="100%" stopColor="#E36344" stopOpacity={0.9} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f1" />
+              
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f1" vertical={false} />
+              
               <XAxis 
                 dataKey="date" 
                 tickFormatter={formatXAxis} 
                 interval="preserveStartEnd"
-                minTickGap={10}
+                minTickGap={30}
+                tick={{ fill: '#6b7280', fontSize: 12 }}
+                axisLine={{ stroke: '#e5e7eb' }}
               />
+              
               <YAxis 
                 domain={[-10, 10]} 
-                ticks={[-10, -5, 0, 5, 10]} 
-                padding={{ top: 10, bottom: 10 }}
+                ticks={[-10, -5, 0, 5, 10]}
+                tick={{ fill: '#6b7280', fontSize: 12 }}
+                axisLine={{ stroke: '#e5e7eb' }}
+                label={{ value: 'Mood', angle: -90, position: 'insideLeft', style: { fill: '#6b7280', fontSize: 12 } }}
               />
+              
               <Tooltip content={<CustomTooltip />} />
               
-              {/* Reference line at y=0 */}
-              <ReferenceLine y={0} stroke="#ccc" strokeWidth={1.5} />
+              {/* Reference line at y=0 (neutral baseline) - clear visual anchor */}
+              <ReferenceLine 
+                y={0} 
+                stroke="#d1d5db" 
+                strokeWidth={2}
+                label={{ value: 'Neutral', position: 'right', fill: '#9ca3af', fontSize: 11, offset: 8 }}
+              />
               
-              {/* Area for positive values, above zero line */}
+              {/* Area with split gradient - RED for negative moods, GREEN for positive moods */}
               <Area 
                 type={getCurveType()} 
                 dataKey="mood" 
                 fill="url(#positiveGradient)"
                 stroke="transparent"
-                activeDot={false}
-                baseLine={0}
                 fillOpacity={1}
-                legendType="none"
                 isAnimationActive={true}
-                connectNulls={true}
                 animationDuration={1000}
                 animationEasing="ease-in-out"
-                baseValue={0}
-              />
-              
-              {/* Area for negative values, below zero line */}
-              <Area 
-                type={getCurveType()} 
-                dataKey="mood" 
-                fill="url(#negativeGradient)"
-                stroke="transparent"
-                activeDot={false}
                 baseLine={0}
-                fillOpacity={1}
-                legendType="none"
-                isAnimationActive={true}
-                connectNulls={true}
-                animationDuration={1000}
-                animationEasing="ease-in-out"
-                baseValue={0}
               />
               
-              {/* Main line that shows the actual mood values */}
+              {/* Main mood line - smooth curve for clear mood tracking */}
               <Line 
                 type={getCurveType()}
                 dataKey="mood" 
                 stroke="#8A9A5B" 
-                strokeWidth={2}
+                strokeWidth={3}
                 dot={<CustomDot />}
                 isAnimationActive={true}
-                activeDot={{ r: 6, stroke: "#8A9A5B", strokeWidth: 2 }}
+                activeDot={{ r: 7, stroke: "#8A9A5B", strokeWidth: 3, fill: "#fff" }}
                 connectNulls={true}
                 animationDuration={1000}
                 animationEasing="ease-in-out"
               />
-            </RechartsLineChart>
+            </ComposedChart>
           </ResponsiveContainer>
         </div>
       ) : (
-        <div className="h-64 w-full flex items-center justify-center text-mindtrack-stone/70">
-          No mood data available yet. Add your first mood entry to see your chart!
+        <div className="h-80 w-full flex flex-col items-center justify-center text-mindtrack-stone/70 bg-mindtrack-sage/5 rounded-lg">
+          <LineChart className="w-12 h-12 text-mindtrack-sage/30 mb-3" />
+          <p className="text-center px-6">
+            No mood data available yet. Add your first mood entry to see your chart!
+          </p>
         </div>
       )}
       
-      <div className="flex flex-wrap justify-center gap-4 mt-6">
+      <div className="flex flex-wrap justify-center gap-4 mt-8 pt-6 border-t border-mindtrack-sage/10">
         {moodCategories.map((category) => (
           <div key={category.label} className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color }}></div>
-            <span className="text-sm text-mindtrack-stone">{category.label} ({category.range[0]} to {category.range[1]})</span>
+            <div 
+              className="w-3 h-3 rounded-full" 
+              style={{ backgroundColor: category.color }}
+            ></div>
+            <span className="text-xs text-mindtrack-stone/70">
+              {category.label} <span className="text-mindtrack-stone/50">({category.range[0]} to {category.range[1]})</span>
+            </span>
           </div>
         ))}
       </div>

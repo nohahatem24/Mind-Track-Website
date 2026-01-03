@@ -91,9 +91,19 @@ const Index = () => {
         break;
     }
     
-    if (ref && ref.current) {
-      ref.current.scrollIntoView({ behavior: "smooth" });
-    }
+    // Use setTimeout to ensure state update and rendering happens first
+    setTimeout(() => {
+      if (ref && ref.current) {
+        const headerOffset = 80;
+        const elementPosition = ref.current.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    }, 50);
   };
 
   return (

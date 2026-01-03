@@ -1,5 +1,5 @@
 
-import { Star } from "lucide-react";
+import { Heart } from "lucide-react";
 
 interface FavoritesToggleProps {
   showOnlyFavorites: boolean;
@@ -19,7 +19,7 @@ const FavoritesToggle = ({
           : "bg-mindtrack-sage/10 text-mindtrack-sage hover:bg-mindtrack-sage/20"
       }`}
     >
-      <Star size={16} className={showOnlyFavorites ? "fill-white text-white" : ""} />
+      <Heart size={16} className={showOnlyFavorites ? "fill-white text-white" : ""} />
       {showOnlyFavorites ? "Showing Favorites" : "Show Favorites"}
     </button>
   );

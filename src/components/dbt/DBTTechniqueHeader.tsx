@@ -1,19 +1,24 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import { Heart } from "lucide-react";
 
 interface DBTTechniqueHeaderProps {
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
   showHistory: boolean;
   setShowHistory: (show: boolean) => void;
+  showFavoritesOnly?: boolean;
+  setShowFavoritesOnly?: (show: boolean) => void;
 }
 
 const DBTTechniqueHeader: React.FC<DBTTechniqueHeaderProps> = ({
   selectedCategory,
   setSelectedCategory,
   showHistory,
-  setShowHistory
+  setShowHistory,
+  showFavoritesOnly = false,
+  setShowFavoritesOnly = () => {}
 }) => {
   return (
     <motion.div
@@ -34,12 +39,27 @@ const DBTTechniqueHeader: React.FC<DBTTechniqueHeaderProps> = ({
           setSelectedCategory={setSelectedCategory} 
         />
         
-        <button
-          onClick={() => setShowHistory(!showHistory)}
-          className="px-4 py-2 border border-mindtrack-sage text-mindtrack-sage rounded-md hover:bg-mindtrack-sage/5"
-        >
-          {showHistory ? "Hide History" : "View History"}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
+              showFavoritesOnly
+                ? "bg-mindtrack-sage text-white"
+                : "border border-mindtrack-sage text-mindtrack-sage hover:bg-mindtrack-sage/5"
+            }`}
+            title={showFavoritesOnly ? "Show all techniques" : "Show only favorites"}
+          >
+            <Heart className={`w-4 h-4 ${showFavoritesOnly ? 'fill-white' : ''}`} />
+            Favorites
+          </button>
+
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className="px-4 py-2 border border-mindtrack-sage text-mindtrack-sage rounded-md hover:bg-mindtrack-sage/5 transition-colors"
+          >
+            {showHistory ? "Hide History" : "View History"}
+          </button>
+        </div>
       </div>
     </motion.div>
   );

@@ -36,6 +36,8 @@ const AddActivityForm = ({
               value={newActivity.enjoyment}
               onChange={(e) => setNewActivity({ ...newActivity, enjoyment: parseInt(e.target.value) })}
               className="w-full h-2 bg-mindtrack-sage/20 rounded-lg appearance-none cursor-pointer"
+              aria-label="Expected enjoyment level"
+              title="Expected enjoyment level"
             />
             <span className="w-8 text-center font-medium">{newActivity.enjoyment}</span>
           </div>
@@ -49,6 +51,8 @@ const AddActivityForm = ({
             value={newActivity.scheduled}
             onChange={(e) => setNewActivity({ ...newActivity, scheduled: e.target.value })}
             className="w-full p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20"
+            aria-label="Scheduled date and time"
+            title="Scheduled date and time"
           />
         </div>
       </div>

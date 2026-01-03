@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { MoodEntry } from './types';
 
@@ -27,36 +26,98 @@ interface MoodDataProps {
   entries: MoodEntry[];
   showOnlyFavorites: boolean;
   selectedDate: string | null;
+  dateRange: { startDate: string | null; endDate: string | null };
   children: (data: MoodDataHookResult) => React.ReactNode;
 }
 
-const MoodData = ({ entries, showOnlyFavorites, selectedDate, children }: MoodDataProps) => {
-  // Filter entries based on favorites toggle and selected date
-  const visibleEntries = showOnlyFavorites
-    ? entries.filter(entry => entry.isFavorite)
-    : selectedDate 
-      ? entries.filter(entry => entry.date === selectedDate)
-      : entries;
+const MoodData = ({ entries, showOnlyFavorites, selectedDate, dateRange, children }: MoodDataProps) => {
+  // Filter entries based on favorites toggle, selected date, and date range
+  const visibleEntries = useMemo(() => {
+    let filtered = entries;
+
+    // Apply favorites filter
+    if (showOnlyFavorites) {
+      filtered = filtered.filter(entry => entry.isFavorite);
+    }
+
+    // Apply selected date filter (takes priority over default today filter)
+    if (selectedDate) {
+      filtered = filtered.filter(entry => entry.date === selectedDate);
+    } 
+    // Apply date range filter
+    else if (dateRange.startDate || dateRange.endDate) {
+      filtered = filtered.filter(entry => {
+        const entryDate = new Date(entry.date);
+        const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
+        const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
+
+        if (start && end) {
+          return entryDate >= start && entryDate <= end;
+        } else if (start) {
+          return entryDate >= start;
+        } else if (end) {
+          return entryDate <= end;
+        }
+        return true;
+      });
+    }
+    // Default: Show only today's entries if no filters are applied
+    else {
+      const today = new Date().toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      });
+      filtered = filtered.filter(entry => entry.date === today);
+    }
+
+    return filtered;
+  }, [entries, showOnlyFavorites, selectedDate, dateRange]);
 
   // Process entries for the chart, ensuring they're chronologically ordered
-  // Now sorting from oldest to newest for the chart display
-  const chartData = entries
-    .map(entry => ({
-      date: entry.date,
-      time: entry.time || "",
-      mood: entry.mood,
-      category: getMoodCategory(entry.mood).label,
-      color: getMoodCategory(entry.mood).color,
-      note: entry.note || "",
-      fullTimestamp: entry.timestamp,
-      timestamp: new Date(entry.timestamp).getTime() // Numeric timestamp for sorting
-    }))
-    .sort((a, b) => a.timestamp - b.timestamp); // Ensure chronological order (oldest first)
+  // Sorting from oldest to newest (left to right on graph)
+  const chartData = useMemo(() => {
+    let dataToChart = entries;
+
+    // Apply date range filter to chart data
+    if (dateRange.startDate || dateRange.endDate) {
+      dataToChart = dataToChart.filter(entry => {
+        const entryDate = new Date(entry.date);
+        const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
+        const end = dateRange.endDate ? new Date(dateRange.endDate) : null;
+
+        if (start && end) {
+          return entryDate >= start && entryDate <= end;
+        } else if (start) {
+          return entryDate >= start;
+        } else if (end) {
+          return entryDate <= end;
+        }
+        return true;
+      });
+    }
+
+    return dataToChart
+      .map(entry => ({
+        date: entry.date,
+        time: entry.time || "",
+        mood: entry.mood,
+        category: getMoodCategory(entry.mood).label,
+        color: getMoodCategory(entry.mood).color,
+        note: entry.note || "",
+        fullTimestamp: entry.timestamp,
+        timestamp: new Date(entry.timestamp).getTime()
+      }))
+      .sort((a, b) => a.timestamp - b.timestamp); // Oldest first for left-to-right flow
+  }, [entries, dateRange]);
 
   // AI-powered mood analysis and insights
   const moodInsights = useMemo(() => {
+    // Use visible entries for insights to match what user sees
+    const dataForInsights = visibleEntries.length > 0 ? visibleEntries : entries;
+
     // Default values in case there are no entries
-    if (chartData.length === 0) {
+    if (dataForInsights.length === 0) {
       return {
         averageMood: 0,
         dominantMood: "Neutral",
@@ -67,23 +128,29 @@ const MoodData = ({ entries, showOnlyFavorites, selectedDate, children }: MoodDa
     }
 
     // Calculate average mood
-    const moodSum = chartData.reduce((sum, item) => sum + item.mood, 0);
-    const averageMood = moodSum / chartData.length;
+    const moodSum = dataForInsights.reduce((sum, item) => sum + item.mood, 0);
+    const averageMood = moodSum / dataForInsights.length;
 
     // Find dominant mood category
-    const moodCounts = chartData.reduce((acc, item) => {
-      acc[item.category] = (acc[item.category] || 0) + 1;
+    const moodCounts = dataForInsights.reduce((acc, item) => {
+      const category = getMoodCategory(item.mood).label;
+      acc[category] = (acc[category] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
     
-    const dominantMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0][0];
+    const dominantMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "Neutral";
 
     // Analyze mood trend direction
     let trendDirection: 'improving' | 'declining' | 'stable' = 'stable';
-    if (chartData.length >= 3) {
-      const recentMoods = chartData.slice(-3).map(item => item.mood);
+    if (dataForInsights.length >= 3) {
+      // Sort by timestamp to ensure chronological order
+      const sortedEntries = [...dataForInsights].sort((a, b) => 
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
+      
+      const recentMoods = sortedEntries.slice(-3).map(item => item.mood);
       const avgRecent = recentMoods.reduce((sum, mood) => sum + mood, 0) / recentMoods.length;
-      const olderMoods = chartData.slice(0, Math.max(chartData.length - 3, 1)).map(item => item.mood);
+      const olderMoods = sortedEntries.slice(0, Math.max(sortedEntries.length - 3, 1)).map(item => item.mood);
       const avgOlder = olderMoods.reduce((sum, mood) => sum + mood, 0) / olderMoods.length;
       
       if (avgRecent > avgOlder + 1) trendDirection = 'improving';
@@ -91,9 +158,9 @@ const MoodData = ({ entries, showOnlyFavorites, selectedDate, children }: MoodDa
     }
 
     // Analyze mood consistency
-    const moodVariance = chartData.reduce((variance, item) => {
+    const moodVariance = dataForInsights.reduce((variance, item) => {
       return variance + Math.pow(item.mood - averageMood, 2);
-    }, 0) / chartData.length;
+    }, 0) / dataForInsights.length;
     
     let consistency: 'consistent' | 'variable' | 'very variable' = 'consistent';
     if (moodVariance > 16) consistency = 'very variable';
@@ -120,7 +187,7 @@ const MoodData = ({ entries, showOnlyFavorites, selectedDate, children }: MoodDa
       consistency,
       suggestion
     };
-  }, [chartData]);
+  }, [visibleEntries, entries]);
 
   return <>{children({ visibleEntries, chartData, moodInsights })}</>;
 

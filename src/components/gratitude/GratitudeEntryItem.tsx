@@ -39,6 +39,8 @@ const GratitudeEntryItem = ({
             <textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
+              placeholder="Edit your gratitude entry..."
+              aria-label="Edit gratitude entry"
               className="w-full p-3 min-h-[100px] rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20 resize-none"
             />
             <div className="flex justify-end gap-2">
@@ -64,6 +66,8 @@ const GratitudeEntryItem = ({
                 <button
                   onClick={() => onToggleFavorite(entry)}
                   className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                  aria-label={entry.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                  title={entry.isFavorite ? "Remove from favorites" : "Add to favorites"}
                 >
                   <Heart 
                     className={`w-4 h-4 ${entry.isFavorite ? 'fill-mindtrack-sage text-mindtrack-sage' : 'text-mindtrack-sage'}`} 
@@ -72,12 +76,16 @@ const GratitudeEntryItem = ({
                 <button
                   onClick={startEditing}
                   className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                  aria-label="Edit this entry"
+                  title="Edit this entry"
                 >
                   <Pencil className="w-4 h-4 text-mindtrack-sage" />
                 </button>
                 <button
                   onClick={() => onDelete(entry.id)}
                   className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                  aria-label="Delete this entry"
+                  title="Delete this entry"
                 >
                   <Trash2 className="w-4 h-4 text-red-500" />
                 </button>

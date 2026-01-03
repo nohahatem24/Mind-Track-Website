@@ -50,6 +50,8 @@ const MoodEntryComponent = ({
               <button
                 onClick={() => onToggleFavorite(entry.id)}
                 className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                title={entry.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                aria-label={entry.isFavorite ? "Remove from favorites" : "Add to favorites"}
               >
                 <Heart 
                   className={`w-4 h-4 ${entry.isFavorite ? 'fill-mindtrack-sage text-mindtrack-sage' : 'text-mindtrack-sage'}`} 
@@ -58,12 +60,16 @@ const MoodEntryComponent = ({
               <button
                 onClick={() => onEdit(entry.id)}
                 className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                title="Edit this entry"
+                aria-label="Edit this entry"
               >
                 <Pencil className="w-4 h-4 text-mindtrack-sage" />
               </button>
               <button
                 onClick={() => onDelete(entry.id)}
                 className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                title="Delete this entry"
+                aria-label="Delete this entry"
               >
                 <Trash2 className="w-4 h-4 text-red-500" />
               </button>

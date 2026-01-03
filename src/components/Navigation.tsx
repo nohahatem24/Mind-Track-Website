@@ -25,13 +25,9 @@ const Navigation = () => {
 
   // Function to navigate to a section
   const navigateToSection = (sectionId: string) => {
-    // For links with specific pages, use direct navigation
-    if (sectionId === "relationships") {
-      navigate("/relationships");
-      return;
-    }
+    // Close mobile menu if open
+    setIsOpen(false);
     
-    // For sections on the main page
     // Check if we're already on the homepage
     if (window.location.pathname === "/") {
       // Select the tab first to ensure content is loaded

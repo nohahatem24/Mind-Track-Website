@@ -1,6 +1,7 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
+import { Play, X } from "lucide-react";
 import MuscleGroupsList from "./MuscleGroupsList";
 import TimerDisplay from "./TimerDisplay";
 import Instructions from "./Instructions";
@@ -15,6 +16,7 @@ const ProgressiveMuscleRelaxationExercise = ({
   initialData,
   isEditing = false
 }: ProgressiveMuscleRelaxationProps) => {
+  const exerciseRef = useRef<HTMLDivElement>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [completedGroups, setCompletedGroups] = useState<Record<string, boolean>>(
     initialData?.completedGroups || {}
@@ -24,6 +26,25 @@ const ProgressiveMuscleRelaxationExercise = ({
   const [relaxing, setRelaxing] = useState(false);
   const [totalTime, setTotalTime] = useState(initialData?.totalTime || 0);
   const [sessionTimer, setSessionTimer] = useState(0);
+  const [showVideo, setShowVideo] = useState(false);
+  
+  const completeCurrentStep = useCallback(() => {
+    setCurrentStep(prev => {
+      const groupName = muscleGroups[prev].name;
+      setCompletedGroups(groups => ({
+        ...groups,
+        [groupName]: true
+      }));
+      
+      setTimerActive(false);
+      
+      // Move to next step if not at the end
+      if (prev < muscleGroups.length - 1) {
+        return prev + 1;
+      }
+      return prev;
+    });
+  }, []);
   
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -57,7 +78,16 @@ const ProgressiveMuscleRelaxationExercise = ({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [timerActive, relaxing]);
+  }, [timerActive, relaxing, completeCurrentStep]);
+
+  // Scroll to exercise when component mounts
+  useEffect(() => {
+    if (exerciseRef.current) {
+      setTimeout(() => {
+        exerciseRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, []);
   
   const startMuscleGroup = () => {
     setTimerActive(true);
@@ -68,20 +98,6 @@ const ProgressiveMuscleRelaxationExercise = ({
   const switchToRelaxation = () => {
     setTimerSeconds(0);
     setRelaxing(true);
-  };
-  
-  const completeCurrentStep = () => {
-    // Mark the current muscle group as completed
-    const updatedGroups = { ...completedGroups };
-    updatedGroups[muscleGroups[currentStep]] = true;
-    setCompletedGroups(updatedGroups);
-    
-    setTimerActive(false);
-    
-    // Move to next step if not at the end
-    if (currentStep < muscleGroups.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
   };
   
   const resetExercise = () => {
@@ -103,9 +119,12 @@ const ProgressiveMuscleRelaxationExercise = ({
   };
   
   const isExerciseComplete = Object.keys(completedGroups).length === muscleGroups.length;
+  const currentMuscleGroup = muscleGroups[currentStep];
+  const groupName = currentMuscleGroup.name;
   
   return (
     <motion.div
+      ref={exerciseRef}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="space-y-6"
@@ -133,15 +152,11 @@ const ProgressiveMuscleRelaxationExercise = ({
         <div className="space-y-6">
           <div className="p-6 border border-mindtrack-sage/20 rounded-lg bg-mindtrack-sage/5">
             <h4 className="font-medium text-mindtrack-stone mb-4">
-              {currentStep < muscleGroups.length ? `Current: ${muscleGroups[currentStep]}` : "Exercise Complete!"}
+              {currentStep < muscleGroups.length ? `Current: ${groupName}` : "Exercise Complete!"}
             </h4>
             
             {!isExerciseComplete && (
               <>
-                {timerActive && (
-                  <TimerDisplay seconds={timerSeconds} isRelaxing={relaxing} />
-                )}
-                
                 <ControlButtons
                   timerActive={timerActive}
                   relaxing={relaxing}
@@ -150,7 +165,60 @@ const ProgressiveMuscleRelaxationExercise = ({
                   completeCurrentStep={completeCurrentStep}
                 />
                 
+                {/* Muscle Group Image - Display if available */}
+                {currentMuscleGroup.imageUrl && (
+                  <div className="mb-6">
+                    <img
+                      src={currentMuscleGroup.imageUrl}
+                      alt={`${groupName} muscle group`}
+                      className="w-full h-auto rounded-lg object-cover shadow-md"
+                    />
+                  </div>
+                )}
+
+                {timerActive && (
+                  <TimerDisplay seconds={timerSeconds} isRelaxing={relaxing} />
+                )}
+                
                 <Instructions isRelaxing={relaxing} />
+
+                {/* YouTube Video Section - Display if video ID available */}
+                {currentMuscleGroup.youtubeVideoId && (
+                  <div className="mt-6 pt-6 border-t border-mindtrack-sage/20">
+                    {!showVideo ? (
+                      <button
+                        onClick={() => setShowVideo(true)}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-mindtrack-sage text-white rounded-lg hover:bg-mindtrack-sage/90 transition-colors"
+                      >
+                        <Play className="w-4 h-4" />
+                        Watch how to do this exercise
+                      </button>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-sm font-medium text-mindtrack-stone">Video Guide</p>
+                          <button
+                            onClick={() => setShowVideo(false)}
+                            className="text-mindtrack-stone/60 hover:text-mindtrack-stone transition-colors"
+                            title="Close video"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
+                        <div className="relative w-full pt-[56.25%] bg-black rounded-lg overflow-hidden shadow-lg">
+                          <iframe
+                            className="absolute inset-0 w-full h-full"
+                            src={`https://www.youtube.com/embed/${currentMuscleGroup.youtubeVideoId}?modestbranding=1`}
+                            title={`${groupName} guide video`}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </>
             )}
             
