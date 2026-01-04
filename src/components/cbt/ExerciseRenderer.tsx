@@ -7,12 +7,18 @@ import ThoughtRecord from "../ThoughtRecord";
 import BehavioralActivation from "../BehavioralActivation";
 import ProgressiveMuscleRelaxation from "./ProgressiveMuscleRelaxation";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ExerciseData = Record<string, any>;
+
 interface ExerciseRendererProps {
   techniqueId: string;
   editingHistoryEntry: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   completeExercise: (id: string, data: Record<string, any>) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateExercise: (entryId: string, data: Record<string, any>) => void;
   cancelExercise: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialData?: Record<string, any>;
 }
 
@@ -54,7 +60,8 @@ const ExerciseRenderer: React.FC<ExerciseRendererProps> = ({
             ? updateExercise(editingHistoryEntry, data) 
             : completeExercise(techniqueId, data)}
           onCancel={cancelExercise}
-          initialData={initialData}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          initialData={initialData as any}
           isEditing={!!editingHistoryEntry}
         />
       );
@@ -65,7 +72,8 @@ const ExerciseRenderer: React.FC<ExerciseRendererProps> = ({
             ? updateExercise(editingHistoryEntry, data) 
             : completeExercise(techniqueId, data)}
           onCancel={cancelExercise}
-          initialData={initialData}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          initialData={initialData as any}
           isEditing={!!editingHistoryEntry}
         />
       );
@@ -87,7 +95,8 @@ const ExerciseRenderer: React.FC<ExerciseRendererProps> = ({
             ? updateExercise(editingHistoryEntry, data) 
             : completeExercise(techniqueId, data)}
           onCancel={cancelExercise}
-          initialData={initialData}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          initialData={initialData as any}
           isEditing={!!editingHistoryEntry}
         />
       );

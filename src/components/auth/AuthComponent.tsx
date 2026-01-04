@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { User, Mail, Lock, UserPlus, LogIn, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,14 @@ const AuthComponent = ({ onClose }: AuthComponentProps) => {
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+
+  // Handle body overflow when modal is open
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,15 +61,21 @@ const AuthComponent = ({ onClose }: AuthComponentProps) => {
         // Only create a profile if we have a user id
         if (data && data.user) {
           // Create a profile record
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              id: data.user.id,
-              full_name: fullName,
-              email: email,
-            });
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error: profileError } = await (supabase as any)
+              .from('profiles')
+              .insert({
+                id: data.user.id,
+                full_name: fullName,
+                email: email,
+              });
 
-          if (profileError) throw profileError;
+            if (profileError) throw profileError;
+          } catch (profileError) {
+            console.error("Error creating profile:", profileError);
+            // Don't throw - profile creation is optional, user can still use the app
+          }
         }
         
         toast({
@@ -70,11 +84,12 @@ const AuthComponent = ({ onClose }: AuthComponentProps) => {
         });
         onClose();
       }
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred during authentication";
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "An error occurred during authentication",
+        description: errorMessage,
       });
     } finally {
       setLoading(false);
@@ -86,11 +101,11 @@ const AuthComponent = ({ onClose }: AuthComponentProps) => {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-[999999] p-4 pointer-events-auto"
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 mx-auto my-auto relative"
+        className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6 mx-auto my-auto relative z-[999999] pointer-events-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}

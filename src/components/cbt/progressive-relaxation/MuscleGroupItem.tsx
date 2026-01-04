@@ -7,10 +7,10 @@ const MuscleGroupItem = ({ group, isCurrent, isCompleted, index }: MuscleGroupIt
     <div 
       key={index}
       className={`p-3 border rounded-md ${
-        isCurrent 
-          ? "border-mindtrack-sage bg-mindtrack-sage/5" 
-          : isCompleted
-            ? "border-green-300 bg-green-50"
+        isCompleted
+          ? "border-green-300 bg-green-50"
+          : isCurrent 
+            ? "border-mindtrack-sage bg-mindtrack-sage/5" 
             : "border-gray-200"
       }`}
     >

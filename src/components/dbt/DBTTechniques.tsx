@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import DBTTechniqueHeader from "./DBTTechniqueHeader";
 import TechniquesList from "./TechniquesList";
 import ExerciseRenderer from "./ExerciseRenderer";
@@ -10,6 +10,7 @@ import { DBTTechniquesProps } from "./types";
 
 const DBTTechniques = ({ showOnlyFavorites = false }: DBTTechniquesProps) => {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const exerciseFormRef = useRef<HTMLDivElement>(null);
   const {
     expandedId,
     setExpandedId,
@@ -64,11 +65,13 @@ const DBTTechniques = ({ showOnlyFavorites = false }: DBTTechniquesProps) => {
             deleteHistoryEntry={deleteHistoryEntry}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
+            exerciseFormRef={exerciseFormRef}
           />
         )}
 
         {activeExercise && (
           <motion.div
+            ref={exerciseFormRef}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mindtrack-card mb-6"
@@ -98,8 +101,6 @@ const DBTTechniques = ({ showOnlyFavorites = false }: DBTTechniquesProps) => {
             completedExercises={completedExercises}
             toggleFavorite={toggleFavorite}
             setExpandedId={setExpandedId}
-            markAsCompleted={markAsCompleted}
-            unmarkAsCompleted={unmarkAsCompleted}
             startExercise={startExercise}
             getTodayCompletionCount={getTodayCompletionCount}
           />

@@ -220,7 +220,7 @@ const PendingActivitiesCard = ({
               const moodImprovement = (activity.moodAfter || 0) - (activity.moodBefore || 0);
 
               return (
-                <div key={activity.id} className="bg-white rounded-md border-2 border-green-100 p-3">
+                <div key={activity.id} className="bg-white rounded-md border-2 border-green-300 p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
                       <h4 className="font-semibold text-green-900">{activity.name}</h4>

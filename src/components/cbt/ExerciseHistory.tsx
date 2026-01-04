@@ -134,7 +134,7 @@ const ExerciseHistory = ({
             
             // Check if behavioral activation entry has pending activities
             const hasPendingActivities = entry.techniqueId === 'behav-activation' && 
-              ((entry.data?.activities as any[]) || []).some((a: any) => a.status === 'pending');
+              ((entry.data?.activities as Array<{ status: string }>) || []).some((a) => a.status === 'pending');
             
             return (
               <motion.div 
@@ -218,7 +218,7 @@ const ExerciseHistory = ({
                     className="bg-white border-t border-mindtrack-sage/10 p-4"
                   >
                     {entry.techniqueId === 'behav-activation' ? (
-                      <BehavioralActivationHistoryRenderer entry={entry} data={entry.data} />
+                      <BehavioralActivationHistoryRenderer entry={entry} />
                     ) : (
                       <HistoryRenderer entry={entry} />
                     )}

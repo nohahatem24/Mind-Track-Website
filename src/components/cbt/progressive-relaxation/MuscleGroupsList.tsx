@@ -12,16 +12,20 @@ const MuscleGroupsList = ({ currentStep, completedGroups }: MuscleGroupsListProp
   return (
     <div className="space-y-4">
       <h4 className="font-medium text-mindtrack-stone">Muscle Groups</h4>
-      <div className="space-y-2 max-h-[400px] overflow-y-auto p-1">
-        {muscleGroups.map((muscleGroup, index) => (
-          <MuscleGroupItem
-            key={index}
-            group={muscleGroup.name}
-            isCurrent={currentStep === index}
-            isCompleted={completedGroups[muscleGroup.name] || false}
-            index={index}
-          />
-        ))}
+      <div className="space-y-2 p-1">
+        {muscleGroups.map((muscleGroup, index) => {
+          // Handle both old format (with trailing space) and new format for backward compatibility
+          const isCompleted = completedGroups[muscleGroup.name] || completedGroups[`${muscleGroup.name} `] || false;
+          return (
+            <MuscleGroupItem
+              key={index}
+              group={muscleGroup.name}
+              isCurrent={currentStep === index}
+              isCompleted={isCompleted}
+              index={index}
+            />
+          );
+        })}
       </div>
     </div>
   );

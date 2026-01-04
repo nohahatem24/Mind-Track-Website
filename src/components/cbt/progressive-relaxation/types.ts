@@ -62,12 +62,26 @@ export const muscleGroups: MuscleGroupData[] = [
   { name: "Buttocks",
     imageUrl: "/buttocks.png"
   },
-  { name: "Abdomen" },
-  { name: "Chest" },
-  { name: "Back" },
-  { name: "Arms and hands" },
-  { name: "Shoulders" },
-  { name: "Neck" },
-  { name: "Face" }
+  { name: "Abdomen", 
+    imageUrl: "/abdomen.png"
+  },
+  { name: "Chest", 
+    imageUrl: "/chest.png"
+  },
+  { name: "Back", 
+    imageUrl: "/back.png"
+  },
+  { name: "Arms and hands", 
+    imageUrl: "/arms-hands.png"
+  },
+  { name: "Shoulders", 
+    imageUrl: "/shoulders.png"
+  },
+  { name: "Neck", 
+    imageUrl: "/neck.png"
+  },
+  { name: "Face",
+    imageUrl: "/face.png"
+  }
 ];
 

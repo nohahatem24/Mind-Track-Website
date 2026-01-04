@@ -1,4 +1,3 @@
-
 import React from "react";
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
@@ -18,7 +17,7 @@ const DBTTechniqueHeader: React.FC<DBTTechniqueHeaderProps> = ({
   showHistory,
   setShowHistory,
   showFavoritesOnly = false,
-  setShowFavoritesOnly = () => {}
+  setShowFavoritesOnly = () => {},
 }) => {
   return (
     <motion.div
@@ -30,15 +29,17 @@ const DBTTechniqueHeader: React.FC<DBTTechniqueHeaderProps> = ({
     >
       <h2 className="section-title">DBT Techniques & Exercises</h2>
       <p className="text-mindtrack-stone/80 max-w-2xl mb-6">
-        Evidence-based dialectical behavior therapy exercises to help regulate emotions, improve interpersonal effectiveness, increase distress tolerance, and enhance mindfulness.
+        Evidence-based dialectical behavior therapy exercises to help regulate
+        emotions, improve interpersonal effectiveness, increase distress
+        tolerance, and enhance mindfulness.
       </p>
-      
+
       <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-        <CategoryFilter 
-          selectedCategory={selectedCategory} 
-          setSelectedCategory={setSelectedCategory} 
+        <CategoryFilter
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
         />
-        
+
         <div className="flex gap-2">
           <button
             onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
@@ -47,15 +48,23 @@ const DBTTechniqueHeader: React.FC<DBTTechniqueHeaderProps> = ({
                 ? "bg-mindtrack-sage text-white"
                 : "border border-mindtrack-sage text-mindtrack-sage hover:bg-mindtrack-sage/5"
             }`}
-            title={showFavoritesOnly ? "Show all techniques" : "Show only favorites"}
+            title={
+              showFavoritesOnly ? "Show all techniques" : "Show only favorites"
+            }
           >
-            <Heart className={`w-4 h-4 ${showFavoritesOnly ? 'fill-white' : ''}`} />
+            <Heart
+              className={`w-4 h-4 ${showFavoritesOnly ? "fill-white" : ""}`}
+            />
             Favorites
           </button>
 
           <button
             onClick={() => setShowHistory(!showHistory)}
-            className="px-4 py-2 border border-mindtrack-sage text-mindtrack-sage rounded-md hover:bg-mindtrack-sage/5 transition-colors"
+            className={`px-4 py-2 rounded-md transition-colors flex items-center justify-center ${
+              showHistory
+                ? "bg-mindtrack-sage text-white" // Active: green bg, white text
+                : "border border-mindtrack-sage text-mindtrack-sage hover:bg-mindtrack-sage/5" // Inactive: bordered
+            }`}
           >
             {showHistory ? "Hide History" : "View History"}
           </button>
@@ -66,12 +75,12 @@ const DBTTechniqueHeader: React.FC<DBTTechniqueHeaderProps> = ({
 };
 
 // Using a local import to avoid circular dependencies
-const CategoryFilter = ({ 
-  selectedCategory, 
-  setSelectedCategory 
-}: { 
-  selectedCategory: string, 
-  setSelectedCategory: (category: string) => void 
+const CategoryFilter = ({
+  selectedCategory,
+  setSelectedCategory,
+}: {
+  selectedCategory: string;
+  setSelectedCategory: (category: string) => void;
 }) => {
   return (
     <div className="flex flex-wrap gap-2">

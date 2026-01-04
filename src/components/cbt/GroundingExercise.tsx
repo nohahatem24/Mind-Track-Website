@@ -10,7 +10,7 @@ interface GroundingInputs {
   taste: string[];
 }
 
-interface GroundingData extends GroundingInputs {
+export interface GroundingData extends GroundingInputs {
   date: string;
 }
 

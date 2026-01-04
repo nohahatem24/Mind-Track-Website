@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Calendar } from 'lucide-react';
 
 interface ViewToggleProps {
   calendarView: boolean;
@@ -8,17 +7,9 @@ interface ViewToggleProps {
 }
 
 const ViewToggle = ({ calendarView, setCalendarView }: ViewToggleProps) => {
-  return (
-    <div className="flex gap-2">
-      <button
-        onClick={() => setCalendarView(true)}
-        className="px-4 py-2 rounded-md bg-mindtrack-sage text-white hover:bg-mindtrack-sage/90 transition-colors"
-      >
-        <Calendar className="w-4 h-4 inline mr-1" />
-        Calendar View
-      </button>
-    </div>
-  );
+  // This component is kept for compatibility but no longer renders the button
+  // Calendar view is now always enabled
+  return null;
 };
 
 export default ViewToggle;

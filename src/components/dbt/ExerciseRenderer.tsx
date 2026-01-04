@@ -4,13 +4,20 @@ import WiseMindExercise from "./exercises/WiseMindExercise";
 import StopSkillExercise from "./exercises/StopSkillExercise";
 import EmotionRegulationExercise from "./exercises/EmotionRegulationExercise";
 import InterpersonalEffectivenessExercise from "./exercises/InterpersonalEffectivenessExercise";
+import SelfSootheExercise from "./exercises/SelfSootheExercise";
+import OppositeActionExercise from "./exercises/OppositeActionExercise";
+import OneMinuteMindfulnessExercise from "./exercises/OneMinuteMindfulnessExercise";
+import RadicalAcceptanceExercise from "./exercises/RadicalAcceptanceExercise";
 
 interface ExerciseRendererProps {
   techniqueId: string;
   editingHistoryEntry: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   completeExercise: (id: string, data: Record<string, any>) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateExercise: (entryId: string, data: Record<string, any>) => void;
   cancelExercise: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialData?: Record<string, any>;
 }
 
@@ -59,6 +66,50 @@ const ExerciseRenderer: React.FC<ExerciseRendererProps> = ({
     case "interpersonal-effectiveness":
       return (
         <InterpersonalEffectivenessExercise 
+          onComplete={(data) => editingHistoryEntry 
+            ? updateExercise(editingHistoryEntry, data) 
+            : completeExercise(techniqueId, data)}
+          onCancel={cancelExercise}
+          initialData={initialData}
+          isEditing={!!editingHistoryEntry}
+        />
+      );
+    case "self-soothe":
+      return (
+        <SelfSootheExercise 
+          onComplete={(data) => editingHistoryEntry 
+            ? updateExercise(editingHistoryEntry, data) 
+            : completeExercise(techniqueId, data)}
+          onCancel={cancelExercise}
+          initialData={initialData}
+          isEditing={!!editingHistoryEntry}
+        />
+      );
+    case "opposite-action":
+      return (
+        <OppositeActionExercise 
+          onComplete={(data) => editingHistoryEntry 
+            ? updateExercise(editingHistoryEntry, data) 
+            : completeExercise(techniqueId, data)}
+          onCancel={cancelExercise}
+          initialData={initialData}
+          isEditing={!!editingHistoryEntry}
+        />
+      );
+    case "mindfulness-practice":
+      return (
+        <OneMinuteMindfulnessExercise 
+          onComplete={(data) => editingHistoryEntry 
+            ? updateExercise(editingHistoryEntry, data) 
+            : completeExercise(techniqueId, data)}
+          onCancel={cancelExercise}
+          initialData={initialData}
+          isEditing={!!editingHistoryEntry}
+        />
+      );
+    case "radical-acceptance":
+      return (
+        <RadicalAcceptanceExercise 
           onComplete={(data) => editingHistoryEntry 
             ? updateExercise(editingHistoryEntry, data) 
             : completeExercise(techniqueId, data)}

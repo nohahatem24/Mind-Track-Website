@@ -319,45 +319,76 @@ const RelationshipTracker = ({ showOnlyFavorites = false }: RelationshipTrackerP
               <TrendingUp className="w-5 h-5 text-mindtrack-sage" />
               <h3 className="text-lg font-semibold text-mindtrack-stone">Relationship Trends</h3>
             </div>
-            <div className="h-64 w-full">
+            <div className="w-full overflow-x-auto">
               <ApexCharts
                 type="bar"
-                height={250}
+                height={500}
                 options={{
                   chart: {
                     id: 'relationship-bar',
                     toolbar: { show: false },
-                    animations: { enabled: true, speed: 700 }
+                    animations: { enabled: true, speed: 700 },
+                    type: 'bar'
                   },
                   plotOptions: {
                     bar: {
                       horizontal: false,
-                      columnWidth: '55%',
-                      borderRadius: 6,
-                      distributed: true
+                      columnWidth: '65%',
+                      borderRadius: 8,
+                      distributed: true,
+                      barHeight: '85%'
                     }
                   },
-                  dataLabels: { enabled: false },
+                  dataLabels: { 
+                    enabled: true,
+                    formatter: function(val) {
+                      return typeof val === 'number' ? val.toFixed(1) : String(val);
+                    },
+                    style: {
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      colors: ['#2d3728']
+                    }
+                  },
                   xaxis: {
                     categories: relationships
                       .slice()
                       .sort((a, b) => getAverageScore(b) - getAverageScore(a))
                       .map(r => r.name),
-                    labels: { style: { colors: '#8a9a5b', fontSize: '13px' } }
+                    labels: { 
+                      style: { 
+                        colors: '#8a9a5b', 
+                        fontSize: '14px',
+                        fontWeight: '500'
+                      },
+                      offsetY: 5,
+                      hideOverlappingLabels: false
+                    }
                   },
                   yaxis: {
                     min: -10,
                     max: 10,
-                    labels: { style: { colors: '#8a9a5b', fontSize: '13px' } }
+                    tickAmount: 20,
+                    labels: { 
+                      style: { 
+                        colors: '#8a9a5b', 
+                        fontSize: '12px'
+                      },
+                      formatter: (val) => {
+                        return val.toFixed(0);
+                      }
+                    }
                   },
                   grid: {
                     show: true,
-                    borderColor: '#f0f0f0',
+                    borderColor: '#e8ede3',
                     xaxis: { lines: { show: false } },
                     yaxis: {
-                      lines: { show: true }
+                      lines: { 
+                        show: true
+                      }
                     },
-                    padding: { top: 10, right: 10, bottom: 10, left: 0 }
+                    padding: { top: 20, right: 20, bottom: 20, left: 10 }
                   },
                   tooltip: {
                     custom: ({ series, seriesIndex, dataPointIndex, w }) => {
@@ -370,9 +401,22 @@ const RelationshipTracker = ({ showOnlyFavorites = false }: RelationshipTrackerP
                   colors: relationships
                     .slice()
                     .sort((a, b) => getAverageScore(b) - getAverageScore(a))
-                    .map((r, idx) => {
-                      const colors = ['#6fcf97', '#eb5757', '#f2c94c', '#a67c52', '#4a90e2', '#7b68ee', '#ff6b6b', '#45b7d1'];
-                      return colors[idx % colors.length];
+                    .map((r) => {
+                      const score = getAverageScore(r);
+                      if (score > 0) {
+                        // Green for positive: lighter at low values, darker at high values
+                        const intensity = score / 10; // 0.1 to 1.0
+                        const greenValues = [144, 238, 144, 34, 139, 34, 0, 100, 0]; // Light green to dark green
+                        const lightGreen = Math.floor(144 + (34 - 144) * intensity);
+                        const darkGreen = Math.floor(238 + (139 - 238) * intensity);
+                        return `rgb(${lightGreen}, ${darkGreen}, ${lightGreen})`;
+                      } else {
+                        // Red for negative: lighter at values near 0, darker at -10
+                        const intensity = Math.abs(score) / 10; // 0 to 1.0
+                        const redValue = Math.floor(255 - (255 - 139) * intensity);
+                        const greenBlueValue = Math.floor(182 * (1 - intensity));
+                        return `rgb(${redValue}, ${greenBlueValue}, ${greenBlueValue})`;
+                      }
                     })
                 }}
                 series={[{
@@ -382,10 +426,7 @@ const RelationshipTracker = ({ showOnlyFavorites = false }: RelationshipTrackerP
                     .sort((a, b) => getAverageScore(b) - getAverageScore(a))
                     .map(r => getAverageScore(r))
                 }]}
-              >
-                {/* Zero line reference */}
-                <rect x="0" y="50%" width="100%" height="2" fill="#2d3728" opacity="0.8" />
-              </ApexCharts>
+              />
             </div>
           </motion.div>
         )}

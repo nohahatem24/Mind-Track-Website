@@ -92,6 +92,18 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
     return filteredData.length <= 1 ? "linear" : "monotone";
   };
 
+  // Get today's date in the same format as stored entries
+  const getTodayDate = () => {
+    return new Date().toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+  };
+
+  // Determine which date to display: selectedDate or today
+  const displayDate = selectedDate || getTodayDate();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -100,7 +112,7 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
     >
       <h3 className="text-xl font-semibold text-mindtrack-stone mb-6 flex items-center gap-2">
         <LineChart className="w-5 h-5 text-mindtrack-sage" />
-        Your Mood Over Time
+        Your Mood on {displayDate}
       </h3>
       
       {filteredData.length > 0 ? (

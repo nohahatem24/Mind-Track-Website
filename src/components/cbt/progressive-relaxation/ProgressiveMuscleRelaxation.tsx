@@ -152,7 +152,7 @@ const ProgressiveMuscleRelaxationExercise = ({
         <div className="space-y-6">
           <div className="p-6 border border-mindtrack-sage/20 rounded-lg bg-mindtrack-sage/5">
             <h4 className="font-medium text-mindtrack-stone mb-4">
-              {currentStep < muscleGroups.length ? `Current: ${groupName}` : "Exercise Complete!"}
+              {isExerciseComplete ? "Exercise Complete!" : `Current: ${groupName}`}
             </h4>
             
             {!isExerciseComplete && (

@@ -121,11 +121,6 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
         {/* Filters and View Controls */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div className="flex flex-wrap items-center gap-3">
-            <ViewToggle 
-              calendarView={calendarView} 
-              setCalendarView={setCalendarView} 
-            />
-            
             <FavoritesToggle 
               showOnlyFavorites={showFavoritesState} 
               setShowOnlyFavorites={setShowFavoritesState}
@@ -156,8 +151,8 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
           </div>
         </div>
 
-        {/* Calendar View */}
-        {calendarView && entries.length > 0 && (
+        {/* Calendar View - Always Visible */}
+        {entries.length > 0 && (
           <CalendarView 
             uniqueDates={uniqueDates} 
             entries={entries} 

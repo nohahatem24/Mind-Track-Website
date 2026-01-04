@@ -4,75 +4,94 @@ import { User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AuthComponent from "./AuthComponent";
+import ProfileMenu from "./ProfileMenu";
+
+interface AuthUser {
+  id: string;
+  email: string | undefined;
+  user_metadata?: {
+    full_name?: string;
+  };
+}
 
 const AuthButton = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [fullName, setFullName] = useState<string | undefined>();
   const { toast } = useToast();
 
-  // Check if user is logged in
+  // Check if user is logged in and fetch their profile
   useEffect(() => {
     const checkUser = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data && data.session) {
-        setUser(data.session.user);
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data && data.session?.user) {
+          const authUser = data.session.user;
+          setUser({
+            id: authUser.id,
+            email: authUser.email,
+            user_metadata: authUser.user_metadata,
+          });
+
+          // Fetch full name from profiles table if available
+          if (authUser.id) {
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const { data: profileData, error } = await (supabase as any)
+                .from("profiles")
+                .select("full_name")
+                .eq("id", authUser.id)
+                .single();
+
+              if (!error && profileData && profileData.full_name) {
+                setFullName(profileData.full_name);
+              } else if (authUser.user_metadata?.full_name) {
+                setFullName(authUser.user_metadata.full_name);
+              }
+            } catch (profileError) {
+              // If profile fetch fails, fall back to user metadata
+              if (authUser.user_metadata?.full_name) {
+                setFullName(authUser.user_metadata.full_name);
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
       }
-      
+
       // Subscribe to auth changes
       const { data: authListener } = supabase.auth.onAuthStateChange(
         (event, session) => {
-          if (event === 'SIGNED_IN' && session?.user) {
-            setUser(session.user);
-          } else if (event === 'SIGNED_OUT') {
+          if (event === "SIGNED_IN" && session?.user) {
+            const authUser = session.user;
+            setUser({
+              id: authUser.id,
+              email: authUser.email,
+              user_metadata: authUser.user_metadata,
+            });
+            if (authUser.user_metadata?.full_name) {
+              setFullName(authUser.user_metadata.full_name);
+            }
+          } else if (event === "SIGNED_OUT") {
             setUser(null);
+            setFullName(undefined);
           }
         }
       );
-      
+
       return () => {
-        authListener.subscription.unsubscribe();
+        authListener?.subscription.unsubscribe();
       };
     };
-    
+
     checkUser();
   }, []);
-
-  const handleLogout = async () => {
-    setIsLoading(true);
-    try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Logged out",
-        description: "You have been successfully logged out.",
-      });
-      setUser(null);
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to log out",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <>
       {user ? (
-        <div className="flex items-center gap-3">
-          <div className="hidden md:block text-sm text-mindtrack-stone">
-            {user.email}
-          </div>
-          <button
-            onClick={handleLogout}
-            disabled={isLoading}
-            className="px-4 py-2 border border-mindtrack-sage/30 rounded-lg text-mindtrack-sage hover:bg-mindtrack-sage/5 transition-colors"
-          >
-            {isLoading ? "Logging out..." : "Log out"}
-          </button>
-        </div>
+        <ProfileMenu user={user} fullName={fullName} />
       ) : (
         <button
           onClick={() => setShowAuthModal(true)}

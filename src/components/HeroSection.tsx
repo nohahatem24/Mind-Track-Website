@@ -1,8 +1,20 @@
 
 import { motion } from "framer-motion";
 import { BookHeart, Heart, ScrollText, Sparkles, BarChart3, Target, Brain, Users, Layers } from "lucide-react";
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useState, useEffect } from "react";
+import { User } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import FeatureCard from "./FeatureCard";
+import AuthComponent from "./auth/AuthComponent";
+import ProfileMenu from "./auth/ProfileMenu";
+
+interface AuthUser {
+  id: string;
+  email: string | undefined;
+  user_metadata?: {
+    full_name?: string;
+  };
+}
 
 interface HeroSectionProps {
   showFavorites: boolean;
@@ -10,10 +22,61 @@ interface HeroSectionProps {
 }
 
 const HeroSection = ({ showFavorites, setShowFavorites }: HeroSectionProps) => {
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [fullName, setFullName] = useState<string | undefined>();
+
   // Toggle favorites function to use with the Favorites feature card
   const toggleFavorites = () => {
     setShowFavorites(prev => !prev);
   };
+
+  // Check if user is logged in
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data?.session?.user) {
+          const authUser = data.session.user;
+          setUser({
+            id: authUser.id,
+            email: authUser.email,
+            user_metadata: authUser.user_metadata,
+          });
+
+          if (authUser.user_metadata?.full_name) {
+            setFullName(authUser.user_metadata.full_name);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+
+      const { data: authListener } = supabase.auth.onAuthStateChange(
+        (event, session) => {
+          if (event === "SIGNED_IN" && session?.user) {
+            setUser({
+              id: session.user.id,
+              email: session.user.email,
+              user_metadata: session.user.user_metadata,
+            });
+            if (session.user.user_metadata?.full_name) {
+              setFullName(session.user.user_metadata.full_name);
+            }
+          } else if (event === "SIGNED_OUT") {
+            setUser(null);
+            setFullName(undefined);
+          }
+        }
+      );
+
+      return () => {
+        authListener?.subscription.unsubscribe();
+      };
+    };
+
+    checkUser();
+  }, []);
 
   // Function to scroll to a section
   const scrollToSection = (sectionId: string) => {
@@ -52,6 +115,28 @@ const HeroSection = ({ showFavorites, setShowFavorites }: HeroSectionProps) => {
             <p className="text-xl text-mindtrack-stone/70 max-w-2xl mx-auto leading-relaxed">
               MindTrack is a compassionate companion for understanding your emotions, tracking your mood patterns, and discovering tools that help you thrive. Built with care for your mental wellbeing.
             </p>
+
+            {/* Sign Up / Login or Profile Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="mt-8 flex justify-center"
+            >
+              {user ? (
+                <div className="w-full md:w-auto flex justify-center">
+                  <ProfileMenu user={user} fullName={fullName} />
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className="flex items-center gap-2 px-6 py-3 bg-mindtrack-sage text-white rounded-lg hover:bg-mindtrack-sage/90 transition-colors font-medium shadow-md hover:shadow-lg"
+                >
+                  <User className="w-5 h-5" />
+                  <span>Start Your Journey</span>
+                </button>
+              )}
+            </motion.div>
           </motion.div>
 
           <motion.div
@@ -111,6 +196,9 @@ const HeroSection = ({ showFavorites, setShowFavorites }: HeroSectionProps) => {
           </motion.div>
         </div>
       </div>
+
+      {/* Auth Modal */}
+      {showAuthModal && <AuthComponent onClose={() => setShowAuthModal(false)} />}
     </section>
   );
 };

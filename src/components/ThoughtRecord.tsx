@@ -4,8 +4,10 @@ import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface ThoughtRecordProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onComplete: (data: Record<string, any>) => void;
   onCancel: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialData?: Record<string, any>;
   isEditing?: boolean;
 }
@@ -156,6 +158,7 @@ const ThoughtRecord = ({
               value={formData.beforeRating}
               onChange={handleChange}
               className="w-full h-2 bg-mindtrack-sage/20 rounded-lg appearance-none cursor-pointer"
+              aria-label="Emotional Intensity Before (0-10)"
             />
             <span className="w-8 text-center font-medium">{formData.beforeRating}</span>
           </div>
@@ -173,6 +176,7 @@ const ThoughtRecord = ({
               value={formData.afterRating}
               onChange={handleChange}
               className="w-full h-2 bg-mindtrack-sage/20 rounded-lg appearance-none cursor-pointer"
+              aria-label="Emotional Intensity After (0-10)"
             />
             <span className="w-8 text-center font-medium">{formData.afterRating}</span>
           </div>

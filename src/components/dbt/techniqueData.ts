@@ -99,32 +99,32 @@ const techniqueData: Technique[] = [
   {
     id: "radical-acceptance",
     title: "Radical Acceptance",
-    description: "Fully accepting reality as it is, without fighting against it.",
+    description: "Ending the fight with reality as it is — not approval, but acknowledgment. A guided body + mind practice.",
     steps: [
-      "Observe when you're fighting reality",
-      "Remind yourself that reality can't be changed",
-      "Consider the causes of the current reality",
-      "Practice accepting with mind, body, and spirit",
-      "Allow yourself to feel the natural emotions"
+      "Name the reality you're struggling with",
+      "Notice how you're fighting or resisting it",
+      "Practice acceptance with your body (grounding practice)",
+      "Choose an acceptance statement that feels true for you",
+      "Allow the emotions that come"
     ],
     benefits: [
-      "Reduced suffering",
-      "More effective problem-solving",
-      "Freedom from being stuck in denial or anger"
+      "Reduces suffering caused by fighting reality",
+      "Loosens the grip of rumination and anger",
+      "Builds resilience through acceptance, not avoidance"
     ],
     category: "distress-tolerance",
-    interactive: false
+    interactive: true
   },
   {
     id: "mindfulness-practice",
     title: "One-Minute Mindfulness",
-    description: "Brief mindfulness practices to center yourself throughout the day.",
+    description: "A timed one-minute mindfulness practice to center yourself. Focus on your breath with guided pacing.",
     steps: [
-      "Set a timer for one minute",
+      "Start the timer (1 minute)",
       "Focus completely on your breath",
       "Notice when your mind wanders",
       "Gently bring attention back to breath",
-      "Repeat throughout the day"
+      "You can pause, resume, or mark as interrupted anytime"
     ],
     benefits: [
       "Increased present-moment awareness",
@@ -132,17 +132,18 @@ const techniqueData: Technique[] = [
       "Improved focus and concentration"
     ],
     category: "mindfulness",
-    interactive: false
+    interactive: true
   },
   {
     id: "opposite-action",
     title: "Opposite Action",
-    description: "Acting opposite to emotional urges to change unwanted emotions.",
+    description: "Act opposite to emotional urges to change unwanted emotions. Identify if your emotion fits the facts.",
     steps: [
       "Identify the emotion and action urge",
       "Determine if the emotion fits the facts",
       "If not, identify an opposite action",
-      "Practice the opposite action wholeheartedly"
+      "Practice the opposite action wholeheartedly",
+      "Partial practice still counts as progress"
     ],
     benefits: [
       "Changes emotional patterns",
@@ -150,7 +151,7 @@ const techniqueData: Technique[] = [
       "Increases behavioral flexibility"
     ],
     category: "emotion-regulation",
-    interactive: false
+    interactive: true
   }
 ];
 

@@ -1,9 +1,19 @@
 
 import { motion } from "framer-motion";
 import { BookHeart, Menu } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthButton from "./auth/AuthButton";
+import ProfileMenu from "./auth/ProfileMenu";
+import { supabase } from "@/integrations/supabase/client";
+
+interface AuthUser {
+  id: string;
+  email: string | undefined;
+  user_metadata?: {
+    full_name?: string;
+  };
+}
 
 interface MobileNavLinkProps {
   sectionId: string;
@@ -13,7 +23,56 @@ interface MobileNavLinkProps {
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [fullName, setFullName] = useState<string | undefined>();
   const navigate = useNavigate();
+
+  // Check user login status
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data?.session?.user) {
+          const authUser = data.session.user;
+          setUser({
+            id: authUser.id,
+            email: authUser.email,
+            user_metadata: authUser.user_metadata,
+          });
+
+          if (authUser.user_metadata?.full_name) {
+            setFullName(authUser.user_metadata.full_name);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+
+      const { data: authListener } = supabase.auth.onAuthStateChange(
+        (event, session) => {
+          if (event === "SIGNED_IN" && session?.user) {
+            setUser({
+              id: session.user.id,
+              email: session.user.email,
+              user_metadata: session.user.user_metadata,
+            });
+            if (session.user.user_metadata?.full_name) {
+              setFullName(session.user.user_metadata.full_name);
+            }
+          } else if (event === "SIGNED_OUT") {
+            setUser(null);
+            setFullName(undefined);
+          }
+        }
+      );
+
+      return () => {
+        authListener?.subscription.unsubscribe();
+      };
+    };
+
+    checkUser();
+  }, []);
 
   const handleMobileNavClick = (sectionId: string) => {
     // Close the mobile menu
@@ -133,6 +192,18 @@ const Navigation = () => {
             <MobileNavLink sectionId="relationships" onClick={handleMobileNavClick}>
               Relationships
             </MobileNavLink>
+
+            {/* Divider */}
+            <div className="my-3 border-t border-mindtrack-sage/10"></div>
+
+            {/* Auth Section - Compact Profile Menu or Login Button */}
+            <div className="px-4 py-3">
+              {user ? (
+                <ProfileMenu user={user} fullName={fullName} isCompact={true} />
+              ) : (
+                <AuthButton />
+              )}
+            </div>
           </div>
         </motion.div>
       )}

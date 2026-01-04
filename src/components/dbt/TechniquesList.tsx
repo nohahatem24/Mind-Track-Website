@@ -2,7 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Technique } from "./types";
-import { ChevronDown, ChevronUp, Heart, BookOpen, CheckCircle, XCircle } from "lucide-react";
+import { ChevronDown, ChevronUp, Heart, BookOpen } from "lucide-react";
 
 interface TechniquesListProps {
   techniques: Technique[];
@@ -11,8 +11,6 @@ interface TechniquesListProps {
   completedExercises: Record<string, number>;
   toggleFavorite: (id: string) => void;
   setExpandedId: (id: string | null) => void;
-  markAsCompleted: (id: string) => void;
-  unmarkAsCompleted: (id: string) => void;
   startExercise: (id: string) => void;
   getTodayCompletionCount: (id: string) => number;
 }
@@ -24,8 +22,6 @@ const TechniquesList: React.FC<TechniquesListProps> = ({
   completedExercises,
   toggleFavorite,
   setExpandedId,
-  markAsCompleted,
-  unmarkAsCompleted,
   startExercise,
   getTodayCompletionCount
 }) => {
@@ -155,34 +151,13 @@ const TechniquesList: React.FC<TechniquesListProps> = ({
                       </span>
                     </div>
 
-                    <div className="flex gap-2 mt-2 sm:mt-0">
-                      {!technique.interactive ? (
-                        <>
-                          <button
-                            onClick={() => markAsCompleted(technique.id)}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-mindtrack-sage/10 hover:bg-mindtrack-sage/20 text-mindtrack-sage rounded-md text-xs font-medium transition-colors"
-                          >
-                            <CheckCircle className="w-3.5 h-3.5" />
-                            Mark Done
-                          </button>
-                          <button
-                            onClick={() => unmarkAsCompleted(technique.id)}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-md text-xs font-medium transition-colors"
-                          >
-                            <XCircle className="w-3.5 h-3.5" />
-                            Undo
-                          </button>
-                        </>
-                      ) : (
-                        <button
-                          onClick={() => startExercise(technique.id)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-mindtrack-sage text-white rounded-md text-xs font-medium hover:bg-mindtrack-sage/90 transition-colors"
-                        >
-                          <BookOpen className="w-3.5 h-3.5" />
-                          Start Exercise
-                        </button>
-                      )}
-                    </div>
+                    <button
+                      onClick={() => startExercise(technique.id)}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-mindtrack-sage text-white rounded-md text-xs font-medium hover:bg-mindtrack-sage/90 transition-colors"
+                    >
+                      <BookOpen className="w-3.5 h-3.5" />
+                      Start Exercise
+                    </button>
                   </div>
                 </div>
               </motion.div>

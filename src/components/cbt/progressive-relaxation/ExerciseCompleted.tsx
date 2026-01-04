@@ -5,7 +5,7 @@ const ExerciseCompleted = ({ resetExercise, handleComplete, isEditing }: Exercis
   return (
     <div className="text-center space-y-4">
       <p className="text-mindtrack-stone/80">
-        Great job! You've completed the full progressive muscle relaxation exercise.
+        Congratulations! You've completed the full progressive muscle relaxation exercise.
       </p>
       <div className="flex gap-4 justify-center">
         <button

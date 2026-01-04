@@ -79,8 +79,12 @@ const MoodData = ({ entries, showOnlyFavorites, selectedDate, dateRange, childre
   const chartData = useMemo(() => {
     let dataToChart = entries;
 
+    // Apply selected date filter to chart data (shows only that day's curve)
+    if (selectedDate) {
+      dataToChart = dataToChart.filter(entry => entry.date === selectedDate);
+    }
     // Apply date range filter to chart data
-    if (dateRange.startDate || dateRange.endDate) {
+    else if (dateRange.startDate || dateRange.endDate) {
       dataToChart = dataToChart.filter(entry => {
         const entryDate = new Date(entry.date);
         const start = dateRange.startDate ? new Date(dateRange.startDate) : null;
@@ -96,6 +100,15 @@ const MoodData = ({ entries, showOnlyFavorites, selectedDate, dateRange, childre
         return true;
       });
     }
+    // Default: Show only today's entries for the chart
+    else {
+      const today = new Date().toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      });
+      dataToChart = dataToChart.filter(entry => entry.date === today);
+    }
 
     return dataToChart
       .map(entry => ({
@@ -109,7 +122,7 @@ const MoodData = ({ entries, showOnlyFavorites, selectedDate, dateRange, childre
         timestamp: new Date(entry.timestamp).getTime()
       }))
       .sort((a, b) => a.timestamp - b.timestamp); // Oldest first for left-to-right flow
-  }, [entries, dateRange]);
+  }, [entries, selectedDate, dateRange]);
 
   // AI-powered mood analysis and insights
   const moodInsights = useMemo(() => {
