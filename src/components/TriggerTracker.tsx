@@ -158,7 +158,7 @@ const TriggerTracker = ({ showOnlyFavorites = false }: TriggerTrackerProps) => {
         </motion.div>
 
         {/* Add Entry Button - TOP */}
-        {!isAdding && triggers.length > 0 && (
+        {!isAdding && (
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
