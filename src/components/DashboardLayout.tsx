@@ -12,6 +12,8 @@ import {
   Menu,
   X,
   Home,
+  Shield,
+  AlertTriangle,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
@@ -87,6 +89,12 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
     label: "Relationships",
     icon: <Users className="w-5 h-5" />,
     section: "relationships",
+  },
+  {
+    id: "crisis",
+    label: "Crisis Resources",
+    icon: <AlertTriangle className="w-5 h-5" />,
+    section: "crisis",
   },
 ];
 

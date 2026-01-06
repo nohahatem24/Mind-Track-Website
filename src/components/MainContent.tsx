@@ -7,6 +7,7 @@ import CBTTechniques from "./cbt/CBTTechniques";
 import DBTTechniques from "./dbt/DBTTechniques";
 import GoalTracker from "./goal-tracker/GoalTracker";
 import RelationshipTracker from "./RelationshipTracker";
+import CrisisResources from "./crisis/CrisisResources";
 
 interface MainContentProps {
   activeTab: string;
@@ -18,6 +19,9 @@ interface MainContentProps {
   dbtRef: React.RefObject<HTMLDivElement>;
   goalsRef: React.RefObject<HTMLDivElement>;
   relationshipsRef: React.RefObject<HTMLDivElement>;
+  crisisRef: React.RefObject<HTMLDivElement>;
+  crisisOpen?: boolean;
+  onCloseCrisis?: () => void;
 }
 
 const MainContent = ({ 
@@ -29,7 +33,10 @@ const MainContent = ({
   cbtRef, 
   dbtRef,
   goalsRef,
-  relationshipsRef
+  relationshipsRef,
+  crisisRef,
+  crisisOpen = false,
+  onCloseCrisis = () => {}
 }: MainContentProps) => {
   return (
     <>
@@ -53,6 +60,9 @@ const MainContent = ({
       </div>
       <div id="relationships" ref={relationshipsRef}>
         {activeTab === "relationships" && <RelationshipTracker showOnlyFavorites={showFavorites} />}
+      </div>
+      <div id="crisis" ref={crisisRef}>
+        {activeTab === "crisis" && <CrisisResources isOpen={crisisOpen || activeTab === "crisis"} onClose={onCloseCrisis} />}
       </div>
     </>
   );

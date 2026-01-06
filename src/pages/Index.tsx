@@ -10,8 +10,7 @@ import GratitudeJournal from "@/components/GratitudeJournal";
 import CBTTechniques from "@/components/cbt/CBTTechniques";
 import DBTTechniques from "@/components/dbt/DBTTechniques";
 import GoalTracker from "@/components/goal-tracker/GoalTracker";
-import RelationshipTracker from "@/components/RelationshipTracker";
-import Footer from "@/components/Footer";
+import RelationshipTracker from "@/components/RelationshipTracker";import CrisisResources from "@/components/crisis/CrisisResources";import Footer from "@/components/Footer";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -49,6 +48,8 @@ const Index = () => {
         return <GoalTracker showOnlyFavorites={showFavorites} />;
       case "relationships":
         return <RelationshipTracker showOnlyFavorites={showFavorites} />;
+      case "crisis":
+        return <CrisisResources isOpen={true} onClose={() => setActiveSection("dashboard")} />;
       default:
         return (
           <Dashboard

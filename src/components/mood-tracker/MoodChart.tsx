@@ -85,7 +85,7 @@ const MoodChart = ({ chartData, timeframe, selectedDate }: MoodChartProps) => {
   };
 
   // Data is already sorted oldest to newest from MoodData component
-  const filteredData = chartData;
+  const filteredData = chartData.reverse();
 
   // Use monotone curve for smooth lines
   const getCurveType = () => {

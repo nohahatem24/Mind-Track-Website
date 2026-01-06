@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { BarChart3, Zap, Heart, Brain, Target, Users, BookOpen, User, ArrowRight } from "lucide-react";
+import { BarChart3, Zap, Heart, Brain, Target, Users, BookOpen, User, ArrowRight, Shield, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import AuthComponent from "./auth/AuthComponent";
 import ProfileMenu from "./auth/ProfileMenu";
@@ -188,8 +188,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onFeatureClick }) => {
       title: "DBT Techniques",
       description: "Practice dialectical behavior therapy skills for emotional regulation and distress tolerance.",
       color: "border-blue-200 bg-blue-50 hover:border-blue-300",
-    },
-    {
+    },  
+    {      
       id: "goals",
       icon: <Target className="w-6 h-6 text-green-600" />,
       title: "Goal Tracker",
@@ -202,6 +202,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onFeatureClick }) => {
       title: "Relationships",
       description: "Explore and strengthen your connections with others.",
       color: "border-cyan-200 bg-cyan-50 hover:border-cyan-300",
+    },
+    {
+      id: "crisis",
+      icon: <AlertTriangle className="w-6 h-6 text-rose-600" />,
+      title: "Crisis Resources",
+      description: "Immediate support and resources for crisis moments - always available when you need help.",
+      color: "border-rose-300 bg-rose-50 hover:border-rose-400",
     },
   ];
 

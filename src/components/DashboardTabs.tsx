@@ -88,6 +88,17 @@ const DashboardTabs = ({ activeTab, handleTabChange }: DashboardTabsProps) => {
           >
             Relationships
           </button>
+          <button
+            data-tab-id="crisis"
+            onClick={() => handleTabChange("crisis")}
+            className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 ${
+              activeTab === "crisis"
+                ? "border-mindtrack-sage text-mindtrack-sage"
+                : "border-transparent text-mindtrack-stone/70 hover:text-mindtrack-stone"
+            }`}
+          >
+            Crisis Resources
+          </button>
         </div>
       </div>
     </div>
