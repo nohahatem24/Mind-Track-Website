@@ -99,10 +99,10 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
-          className="mb-12 text-center"
+          className="mb-12"
         >
           <h2 className="section-title">Mood Tracking</h2>
-          <p className="text-mindtrack-stone/80 max-w-2xl mx-auto">
+          <p className="text-mindtrack-stone/80 max-w-2xl">
             Track your daily mood on a scale from -10 (extremely low) to +10 (extremely high) to identify patterns and monitor your emotional well-being.
           </p>
         </motion.div>

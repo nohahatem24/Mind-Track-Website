@@ -151,7 +151,7 @@ const TriggerTracker = ({ showOnlyFavorites = false }: TriggerTrackerProps) => {
           viewport={{ once: true }}
           className="mb-8"
         >
-          <h2 className="section-title">Emotion Tracking</h2>
+          <h2 className="section-title">Trigger Tracking</h2>
           <p className="text-mindtrack-stone/80 max-w-2xl">
             Track your emotional experiences. Fill in any aspect that feels relevant — whether it's a specific trigger, your thoughts, feelings, or coping strategies. Your reflections help you understand patterns at your own pace.
           </p>
