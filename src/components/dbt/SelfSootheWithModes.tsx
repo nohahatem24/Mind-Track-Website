@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import SelfSootheExercise from './exercises/SelfSootheExercise';
-import { InteractionModeProvider } from '../act/context/InteractionModeContext';
+import { useInteractionMode, InteractionModeProvider } from '../act/context/InteractionModeContext';
 import InteractionModeSelector from '../act/context/InteractionModeSelector';
-import { useInteractionMode } from '../act/context/InteractionModeContext';
 
 interface SelfSootheWithModesProps {
   onComplete: (data: Record<string, any>) => void;
@@ -30,6 +29,7 @@ const SelfSootheContent: React.FC<SelfSootheWithModesProps> = ({
       >
         <InteractionModeSelector />
         <motion.button
+          type="button"
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowModeSelector(false)}
           className="w-full px-6 py-4 bg-mindtrack-sage text-white rounded-lg font-semibold hover:bg-mindtrack-sage/90 transition-colors text-lg"
@@ -52,13 +52,14 @@ const SelfSootheContent: React.FC<SelfSootheWithModesProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-mindtrack-stone">Mode:</span>
             <span className="text-sm text-mindtrack-sage font-semibold capitalize">
-              {mode === 'type' && '⌨️ Typing'}
-              {mode === 'speak' && '🎤 Voice'}
-              {mode === 'tap' && '✋ Tap/Click'}
-              {mode === 'silent' && '🤐 Silent'}
+              {mode === 'observe' && '👁️ Observe'}
+              {mode === 'participate' && '🤝 Participate'}
+              {mode === 'mindfulness' && '🧘 Mindfulness'}
+              {mode === 'self-soothe' && '💆 Self-Soothe'}
             </span>
           </div>
           <button
+            type="button"
             onClick={() => setShowModeSelector(true)}
             className="text-sm text-mindtrack-sage hover:text-mindtrack-sage/80 font-semibold underline"
           >

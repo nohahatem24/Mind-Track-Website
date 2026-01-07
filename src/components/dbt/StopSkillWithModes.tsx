@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import StopSkillExercise from './exercises/StopSkillExercise';
-import { InteractionModeProvider } from '../act/context/InteractionModeContext';
-import InteractionModeSelector from '../act/context/InteractionModeSelector';
-import { useInteractionMode } from '../act/context/InteractionModeContext';
+import { useInteractionMode, InteractionModeProvider } from '../act/context/InteractionModeContext.tsx';
+import InteractionModeSelector from '../act/context/InteractionModeSelector.tsx';
 
 interface StopSkillWithModesProps {
   onComplete: (data: Record<string, any>) => void;
@@ -52,13 +51,14 @@ const StopSkillContent: React.FC<StopSkillWithModesProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-mindtrack-stone">Mode:</span>
             <span className="text-sm text-mindtrack-sage font-semibold capitalize">
-              {mode === 'type' && '⌨️ Typing'}
-              {mode === 'speak' && '🎤 Voice'}
-              {mode === 'tap' && '✋ Tap/Click'}
-              {mode === 'silent' && '🤐 Silent'}
+              {mode === 'observe' && '👁️ Observe'}
+              {mode === 'participate' && '🤝 Participate'}
+              {mode === 'mindfulness' && '🧘 Mindfulness'}
+              {mode === 'self-soothe' && '💆 Self-Soothe'}
             </span>
           </div>
           <button
+            type="button"
             onClick={() => setShowModeSelector(true)}
             className="text-sm text-mindtrack-sage hover:text-mindtrack-sage/80 font-semibold underline"
           >
