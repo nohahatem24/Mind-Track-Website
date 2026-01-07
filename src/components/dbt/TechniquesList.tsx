@@ -50,7 +50,7 @@ const TechniquesList: React.FC<TechniquesListProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             key={technique.id}
-            className="mindtrack-card"
+            className="mindtrack-card grid-cols-2"
           >
             <div className="flex justify-between items-start gap-4">
               <div className="flex-1">
