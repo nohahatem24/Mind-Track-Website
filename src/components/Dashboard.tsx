@@ -170,17 +170,17 @@ const Dashboard: React.FC<DashboardProps> = ({ onFeatureClick }) => {
     },
     {
       id: "gratitude",
-      icon: <Heart className="w-6 h-6 text-rose-600" />,
+      icon: <Heart className="w-6 h-6 text-purple-600" />,
       title: "Gratitude Journal",
       description: "Cultivate positivity by reflecting on what you're grateful for each day.",
-      color: "border-rose-200 bg-rose-50 hover:border-rose-300",
+      color: "border-purple-200 bg-purple-50 hover:border-purple-300",
     },
     {
       id: "cbt",
-      icon: <Brain className="w-6 h-6 text-purple-600" />,
+      icon: <Brain className="w-6 h-6 text-orange-600" />,
       title: "CBT Techniques",
       description: "Learn cognitive behavioral therapy skills to reshape unhelpful thought patterns.",
-      color: "border-purple-200 bg-purple-50 hover:border-purple-300",
+      color: "border-orange-200 bg-orange-50 hover:border-orange-300",
     },
     {
       id: "dbt",
