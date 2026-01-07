@@ -59,16 +59,9 @@ const TechniquesList: React.FC<TechniquesListProps> = ({
                 </h3>
                 <p className="text-mindtrack-stone/70 mb-3">{technique.description}</p>
                 
-                {!isExpanded && (
-                  <button
-                    type="button"
-                    onClick={() => setExpandedId(technique.id)}
-                    className="w-full py-2 text-center text-sm font-medium text-mindtrack-sage hover:bg-mindtrack-sage/5 rounded-md transition-colors border border-mindtrack-sage/20 hover:border-mindtrack-sage/40"
-                  >
-                    Show more
-                  </button>
-                )}
+                
               </div>
+              
               <div className="flex items-center gap-2 ml-4">
                 <button
                   onClick={(e) => {
@@ -101,7 +94,18 @@ const TechniquesList: React.FC<TechniquesListProps> = ({
                   )}
                 </button>
               </div>
+              
             </div>
+
+            {!isExpanded && (
+                  <button
+                    type="button"
+                    onClick={() => setExpandedId(technique.id)}
+                    className="w-full py-2 text-center text-sm font-medium text-mindtrack-sage hover:bg-mindtrack-sage/5 rounded-md transition-colors border border-mindtrack-sage/20 hover:border-mindtrack-sage/40"
+                  >
+                    Show more
+                  </button>
+                )}
 
             {isExpanded && (
               <motion.div
