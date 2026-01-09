@@ -282,50 +282,14 @@ const GoalTracker = ({ showOnlyFavorites = false }: GoalTrackerProps) => {
                   {goal.deadline && (
                     <div className="mb-4">
                       <div className="flex items-center gap-2 text-sm mb-2">
-                        <Calendar className={`w-4 h-4 ${getDeadlineColor(timeRemainingMap[goal.id])}`} />
-                        <span className={`font-medium ${getDeadlineColor(timeRemainingMap[goal.id])}`}>
-                          Target date: {goal.deadline}
+                        <Clock className={`w-4 h-4 ${getDeadlineColor(timeRemainingMap[goal.id])}`} />
+                        <span className="font-medium">
+                          {timeRemainingMap[goal.id]?.isExpired ? 'Deadline passed' : 'Time remaining'}:
+                        </span>
+                        <span className={getDeadlineColor(timeRemainingMap[goal.id])}>
+                          {formatTimeRemaining(timeRemainingMap[goal.id])}
                         </span>
                       </div>
-                      
-                      {timeRemainingMap[goal.id] && !timeRemainingMap[goal.id].isExpired ? (
-                        <div className="bg-gray-50 rounded-lg p-3 border border-mindtrack-sage/10">
-                          <div className="text-sm font-medium text-mindtrack-stone mb-2 flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            Time Remaining:
-                          </div>
-                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                            {timeRemainingMap[goal.id].years > 0 && (
-                              <TimeUnit value={timeRemainingMap[goal.id].years} label="Years" />
-                            )}
-                            {timeRemainingMap[goal.id].months > 0 && (
-                              <TimeUnit value={timeRemainingMap[goal.id].months} label="Months" />
-                            )}
-                            {timeRemainingMap[goal.id].weeks > 0 && (
-                              <TimeUnit value={timeRemainingMap[goal.id].weeks} label="Weeks" />
-                            )}
-                            <TimeUnit value={timeRemainingMap[goal.id].days} label="Days" />
-                            <TimeUnit value={timeRemainingMap[goal.id].hours} label="Hours" />
-                            <TimeUnit value={timeRemainingMap[goal.id].minutes} label="Minutes" />
-                            <TimeUnit value={timeRemainingMap[goal.id].seconds} label="Seconds" />
-                          </div>
-                          
-                          <div className="mt-3">
-                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                              <motion.div 
-                                initial={{ width: 0 }}
-                                animate={{ width: `${100 - Math.min(100, (timeRemainingMap[goal.id].totalSeconds / (30 * 24 * 60 * 60)) * 100)}%` }}
-                                transition={{ duration: 1, ease: "easeOut" }}
-                                className={`h-full ${getDeadlineColor(timeRemainingMap[goal.id])} bg-opacity-80`}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      ) : timeRemainingMap[goal.id]?.isExpired ? (
-                        <div className="bg-red-50 text-red-600 p-3 rounded-lg border border-red-100 text-sm font-medium">
-                          This deadline has passed. Consider updating your goal or setting a new deadline.
-                        </div>
-                      ) : null}
                     </div>
                   )}
 
@@ -334,43 +298,42 @@ const GoalTracker = ({ showOnlyFavorites = false }: GoalTrackerProps) => {
                       <span className="text-sm font-medium text-mindtrack-stone">Progress</span>
                       <span className="text-sm font-medium text-mindtrack-stone">{goal.progress}%</span>
                     </div>
-                    <div className="w-full h-2 bg-mindtrack-sage/20 rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-mindtrack-sage/10 rounded-full overflow-hidden">
                       <motion.div 
-                        className={`h-full transition-all duration-500 ease-in-out ${getProgressColor(goal.progress, timeRemainingMap[goal.id])}`}
                         initial={{ width: 0 }}
                         animate={{ width: `${goal.progress}%` }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                      ></motion.div>
+                        transition={{ duration: 1, ease: "easeOut" }}
+                        className={`h-full ${getProgressColor(goal.progress, timeRemainingMap[goal.id])}`}
+                      />
                     </div>
                   </div>
 
-                  <div className="mb-2">
-                    <h4 className="font-medium text-mindtrack-stone mb-2">Steps:</h4>
-                    <ul className="space-y-2">
-                      {goal.steps.map(step => (
-                        <li key={step.id} className="flex items-start gap-2">
-                          <button
-                            onClick={() => toggleStep(goal.id, step.id)}
-                            className={`p-0.5 rounded border ${step.completed 
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-mindtrack-stone mb-2">Steps</h4>
+                    {goal.steps.map(step => (
+                      <div key={step.id} className="flex items-center gap-2">
+                        <button
+                          onClick={() => toggleStep(goal.id, step.id)}
+                          className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+                            step.completed 
                               ? 'bg-mindtrack-sage border-mindtrack-sage text-white' 
-                              : 'border-mindtrack-sage/40 text-transparent'}`}
-                            title={step.completed ? "Mark step as incomplete" : "Mark step as complete"}
-                            aria-label={step.completed ? "Mark step as incomplete" : "Mark step as complete"}
-                          >
-                            <CheckSquare className="w-4 h-4" />
-                          </button>
-                          <span className={`text-mindtrack-stone/80 ${step.completed ? 'line-through text-mindtrack-stone/50' : ''}`}>
-                            {step.text}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+                              : 'border-mindtrack-sage/30 text-transparent hover:border-mindtrack-sage'
+                          }`}
+                          aria-label={step.completed ? `Mark "${step.text}" as incomplete` : `Mark "${step.text}" as complete`}
+                        >
+                          <CheckSquare className="w-3.5 h-3.5" />
+                        </button>
+                        <span className={`text-sm ${step.completed ? 'text-mindtrack-stone/40 line-through' : 'text-mindtrack-stone/80'}`}>
+                          {step.text}
+                        </span>
+                      </div>
+                    ))}
                   </div>
 
-                  <div className="flex justify-end">
+                  <div className="mt-6 pt-4 border-t border-mindtrack-sage/10 flex justify-end">
                     <button
                       onClick={() => deleteGoal(goal.id)}
-                      className="flex items-center gap-1 px-2 py-1 text-sm text-red-500 hover:bg-red-50 rounded transition-colors"
+                      className="flex items-center gap-1 text-xs text-red-500 hover:text-red-600 transition-colors"
                       title="Delete goal"
                       aria-label="Delete goal"
                     >
@@ -383,15 +346,18 @@ const GoalTracker = ({ showOnlyFavorites = false }: GoalTrackerProps) => {
             </motion.div>
           ))}
 
-          {goals.length === 0 && !isAdding && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mindtrack-card flex items-center gap-3 text-mindtrack-stone/70"
-            >
-              <AlertCircle className="w-5 h-5" />
-              <p>No goals set yet. Create your first goal to start tracking your progress.</p>
-            </motion.div>
+          {visibleGoals.length === 0 && !isAdding && (
+            <div className="text-center py-12 mindtrack-card border-dashed">
+              <Target className="w-12 h-12 text-mindtrack-sage/20 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-mindtrack-stone mb-2">No goals yet</h3>
+              <p className="text-mindtrack-stone/60 mb-6">Start your journey by setting your first goal.</p>
+              <button
+                onClick={() => setIsAdding(true)}
+                className="px-6 py-2 bg-mindtrack-sage text-white rounded-full hover:bg-mindtrack-sage/90 transition-colors"
+              >
+                Create Your First Goal
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -399,34 +365,36 @@ const GoalTracker = ({ showOnlyFavorites = false }: GoalTrackerProps) => {
   );
 };
 
-// Time Unit component for the countdown
-const TimeUnit = ({ value, label }: { value: number; label: string }) => (
-  <div className="bg-white p-2 rounded border border-mindtrack-sage/10 text-center">
-    <div className="text-xl font-bold text-mindtrack-stone">{value}</div>
-    <div className="text-xs text-mindtrack-stone/60">{label}</div>
-  </div>
-);
+const formatTimeRemaining = (time: TimeRemaining | undefined): string => {
+  if (!time) return "";
+  if (time.isExpired) return "Expired";
+  
+  const parts = [];
+  if (time.years > 0) parts.push(`${time.years}y`);
+  if (time.months > 0) parts.push(`${time.months}m`);
+  if (time.weeks > 0) parts.push(`${time.weeks}w`);
+  if (time.days > 0) parts.push(`${time.days}d`);
+  if (time.hours > 0) parts.push(`${time.hours}h`);
+  if (time.minutes > 0) parts.push(`${time.minutes}m`);
+  
+  return parts.slice(0, 2).join(" ");
+};
 
-const GoalForm = ({ 
-  onSubmit, 
-  onCancel,
-  initialData
-}: { 
+interface GoalFormProps {
   onSubmit: (goal: Goal) => void;
   onCancel: () => void;
   initialData?: Goal;
-}) => {
+}
+
+const GoalForm = ({ onSubmit, onCancel, initialData }: GoalFormProps) => {
   const [formData, setFormData] = useState({
     title: initialData?.title || "",
     description: initialData?.description || "",
-    deadline: initialData?.deadline || "",
     category: initialData?.category || "mental" as Goal["category"],
+    deadline: initialData?.deadline || "",
   });
-
-  const [steps, setSteps] = useState<Goal["steps"]>(
-    initialData?.steps || [{ id: Date.now(), text: "", completed: false }]
-  );
-
+  
+  const [steps, setSteps] = useState(initialData?.steps || [{ id: Date.now(), text: "", completed: false }]);
   const [newStep, setNewStep] = useState("");
 
   const addStep = () => {
@@ -437,76 +405,77 @@ const GoalForm = ({
   };
 
   const removeStep = (id: number) => {
-    setSteps(steps.filter(step => step.id !== id));
+    if (steps.length > 1) {
+      setSteps(steps.filter(s => s.id !== id));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title.trim() || steps.length === 0) return;
-
-    const validSteps = steps.filter(step => step.text.trim());
-    if (validSteps.length === 0) return;
-
-    const now = new Date();
-    const completedSteps = validSteps.filter(step => step.completed).length;
-    const progress = Math.round((completedSteps / validSteps.length) * 100);
-
-    onSubmit({
+    
+    const filteredSteps = steps.filter(s => s.text.trim() !== "");
+    
+    const goal: Goal = {
       id: initialData?.id || Date.now(),
       title: formData.title,
-      description: formData.description || undefined,
-      deadline: formData.deadline || undefined,
-      steps: validSteps,
-      progress,
-      createdAt: initialData?.createdAt || now.toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric"
-      }),
+      description: formData.description,
       category: formData.category,
+      deadline: formData.deadline,
+      progress: initialData?.progress || 0,
+      steps: filteredSteps,
+      createdAt: initialData?.createdAt || new Date().toLocaleDateString(),
       isFavorite: initialData?.isFavorite || false,
-    });
+    };
+    
+    onSubmit(goal);
   };
 
   return (
     <motion.form
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="mindtrack-card space-y-4"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
       onSubmit={handleSubmit}
+      className="mindtrack-card space-y-4 border-2 border-mindtrack-sage/30"
     >
+      <h3 className="font-medium text-mindtrack-stone mb-2">
+        {initialData ? 'Edit Goal' : 'New Goal'}
+      </h3>
+      
       <div>
-        <label className="block text-sm font-medium text-mindtrack-stone mb-1">
+        <label htmlFor="goal-title" className="block text-sm font-medium text-mindtrack-stone mb-1">
           Goal Title
         </label>
         <input
+          id="goal-title"
           type="text"
+          required
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           placeholder="What do you want to achieve?"
           className="w-full p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20"
-          required
         />
       </div>
       
       <div>
-        <label className="block text-sm font-medium text-mindtrack-stone mb-1">
+        <label htmlFor="goal-description" className="block text-sm font-medium text-mindtrack-stone mb-1">
           Description (optional)
         </label>
         <textarea
+          id="goal-description"
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          placeholder="Add more details about your goal"
-          className="w-full p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20 resize-none min-h-[80px]"
+          placeholder="Add some details about this goal..."
+          className="w-full p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20 min-h-[80px]"
         />
       </div>
       
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-mindtrack-stone mb-1">
+          <label htmlFor="goal-category" className="block text-sm font-medium text-mindtrack-stone mb-1">
             Category
           </label>
           <select
+            id="goal-category"
             value={formData.category}
             onChange={(e) => setFormData({ ...formData, category: e.target.value as Goal["category"] })}
             className="w-full p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20 bg-white"
@@ -518,10 +487,11 @@ const GoalForm = ({
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-mindtrack-stone mb-1">
+          <label htmlFor="goal-deadline" className="block text-sm font-medium text-mindtrack-stone mb-1">
             Target Date (optional)
           </label>
           <input
+            id="goal-deadline"
             type="date"
             value={formData.deadline}
             onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
@@ -536,9 +506,10 @@ const GoalForm = ({
         </label>
         
         <ul className="space-y-2 mb-3">
-          {steps.map(step => (
+          {steps.map((step, index) => (
             <li key={step.id} className="flex items-center gap-2">
               <input
+                id={`step-input-${step.id}`}
                 type="text"
                 value={step.text}
                 onChange={(e) => {
@@ -548,13 +519,14 @@ const GoalForm = ({
                 }}
                 placeholder="Add a step"
                 className="flex-1 p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/20"
+                aria-label={`Step ${index + 1}`}
               />
               <button
                 type="button"
                 onClick={() => removeStep(step.id)}
                 className="p-2 text-red-500 hover:bg-red-50 rounded-md transition-colors"
                 title="Remove step"
-                aria-label="Remove step"
+                aria-label={`Remove step ${index + 1}`}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -564,6 +536,7 @@ const GoalForm = ({
         
         <div className="flex gap-2">
           <input
+            id="new-step-input"
             type="text"
             value={newStep}
             onChange={(e) => setNewStep(e.target.value)}
