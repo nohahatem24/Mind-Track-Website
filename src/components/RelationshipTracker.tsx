@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { AlertCircle, Heart, MessageCircle, Pencil, Plus, Trash2, Users, ChevronDown, ChevronUp, TrendingUp } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
+import { useI18n } from "@/i18n/I18nProvider";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import ApexCharts from 'react-apexcharts';
 

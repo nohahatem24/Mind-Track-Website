@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { BarChart3, Zap, Heart, Brain, Target, Users, BookOpen, User, ArrowRight, Shield, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useI18n } from "@/i18n/I18nProvider";
 import AuthComponent from "./auth/AuthComponent";
 import ProfileMenu from "./auth/ProfileMenu";
 
@@ -50,6 +51,7 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ onFeatureClick }) => {
+  const { t, isRTL } = useI18n();
   const [userName, setUserName] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -157,63 +159,63 @@ const Dashboard: React.FC<DashboardProps> = ({ onFeatureClick }) => {
     {
       id: "mood",
       icon: <BarChart3 className="w-6 h-6 text-mindtrack-sage" />,
-      title: "Mood Tracking",
-      description: "Monitor your emotional patterns and discover what influences your mood throughout the day.",
+      title: t('navigation.mood_tracker'),
+      description: t('dashboard.track_mood'),
       color: "border-mindtrack-sage/20 bg-mindtrack-sage/10 hover:border-mindtrack-sage/40",
     },
     {
       id: "trigger",
       icon: <Zap className="w-6 h-6 text-amber-600" />,
-      title: "Trigger Tracking",
-      description: "Identify and understand what triggers your emotional responses.",
+      title: t('navigation.trigger_tracker'),
+      description: t('dashboard.discover_triggers'),
       color: "border-amber-200 bg-amber-50 hover:border-amber-300",
     },
     {
       id: "gratitude",
       icon: <Heart className="w-6 h-6 text-purple-600" />,
-      title: "Gratitude Journal",
-      description: "Cultivate positivity by reflecting on what you're grateful for each day.",
+      title: t('navigation.journal'),
+      description: t('journal.description'),
       color: "border-purple-200 bg-purple-50 hover:border-purple-300",
     },
     {
       id: "cbt",
-      icon: <Brain className="w-6 h-6 text-orange-600" />,
-      title: "CBT Techniques",
-      description: "Learn cognitive behavioral therapy skills to reshape unhelpful thought patterns.",
-      color: "border-orange-200 bg-orange-50 hover:border-orange-300",
+      icon: <Brain className="w-6 h-6 text-blue-600" />,
+      title: t('navigation.cbt_techniques'),
+      description: t('cbt_techniques.description'),
+      color: "border-blue-200 bg-blue-50 hover:border-blue-300",
     },
     {
       id: "dbt",
-      icon: <BookOpen className="w-6 h-6 text-blue-600" />,
-      title: "DBT Techniques",
-      description: "Practice dialectical behavior therapy skills for emotional regulation and distress tolerance.",
-      color: "border-blue-200 bg-blue-50 hover:border-blue-300",
+      icon: <BookOpen className="w-6 h-6 text-orange-600" />,
+      title: t('navigation.dbt_techniques'),
+      description: t('dbt_techniques.description'),
+      color: "border-orange-200 bg-orange-50 hover:border-orange-300",
     },  
-    {      
+    {
       id: "goals",
       icon: <Target className="w-6 h-6 text-green-600" />,
-      title: "Goal Tracker",
-      description: "Set, monitor, and achieve meaningful goals aligned with your values.",
+      title: t('navigation.goal_tracker'),
+      description: t('dashboard.build_goals'),
       color: "border-green-200 bg-green-50 hover:border-green-300",
     },
     {
       id: "relationships",
       icon: <Users className="w-6 h-6 text-cyan-600" />,
-      title: "Relationships",
-      description: "Explore and strengthen your connections with others.",
+      title: t('navigation.relationships'),
+      description: t('relationships.description'),
       color: "border-cyan-200 bg-cyan-50 hover:border-cyan-300",
     },
     {
       id: "crisis",
       icon: <AlertTriangle className="w-6 h-6 text-rose-600" />,
-      title: "Crisis Resources",
-      description: "Immediate support and resources for crisis moments - always available when you need help.",
+      title: t('crisis_resources.title'),
+      description: t('crisis_resources.description'),
       color: "border-rose-300 bg-rose-50 hover:border-rose-400",
     },
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className={`max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Welcome Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -221,18 +223,18 @@ const Dashboard: React.FC<DashboardProps> = ({ onFeatureClick }) => {
         className="mb-12"
       >
         <h1 className="text-4xl font-bold text-mindtrack-stone mb-3">
-          {isLoggedIn && userName ? `Welcome back, ${userName}!` : "Welcome to MindTrack"}
+          {isLoggedIn && userName ? `${t('dashboard.welcome').replace('MindTrack', '')} ${userName}!` : t('dashboard.welcome')}
         </h1>
         <p className="text-lg text-mindtrack-stone/70 mb-4">
-          {isLoggedIn ? "Here's your personal wellness dashboard." : "Track Your Journey to Better Mental Health."}
+          {isLoggedIn ? t('dashboard.personal_wellness') : t('dashboard.track_journey')}
         </p>
         <p className="text-mindtrack-stone/60 max-w-2xl">
-          MindTrack is a compassionate companion for understanding your emotions, tracking your patterns, and discovering tools that help you thrive. 
+          {t('dashboard.companion_text')}
         </p>
       </motion.div>
 
       {/* Feature Cards Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className={`grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 ${isRTL ? 'rtl' : ''}`}>
         {features.map((feature) => (
           <DashboardFeatureCard
             key={feature.id}
@@ -250,32 +252,32 @@ const Dashboard: React.FC<DashboardProps> = ({ onFeatureClick }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="mt-16 p-8 rounded-lg border border-mindtrack-sage/10 bg-mindtrack-sage/2"
+        className={`mt-16 p-8 rounded-lg border border-mindtrack-sage/10 bg-mindtrack-sage/2 ${isRTL ? 'rtl' : ''}`}
       >
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div>
+        <div className={`flex flex-col ${isRTL ? 'md:flex-row-reverse' : 'md:flex-row'} md:items-center md:justify-between gap-6`}>
+          <div className={isRTL ? 'text-right' : ''}>
             <h2 className="text-2xl font-semibold text-mindtrack-stone mb-4">
-              {isLoggedIn ? "Continue Your Journey" : "Ready to Get Started?"}
+              {isLoggedIn ? t('dashboard.continue_journey') : t('dashboard.ready_to_start')}
             </h2>
-            <ul className="space-y-2 text-mindtrack-stone/70 text-sm">
-              <li>✓ Track your mood and identify patterns</li>
-              <li>✓ Discover what triggers your emotions</li>
-              <li>✓ Practice evidence-based therapeutic techniques</li>
-              <li>✓ Build meaningful goals and relationships</li>
+            <ul className={`space-y-2 text-mindtrack-stone/70 text-sm ${isRTL ? 'text-right' : ''}`}>
+              <li>✓ {t('dashboard.track_mood')}</li>
+              <li>✓ {t('dashboard.discover_triggers')}</li>
+              <li>✓ {t('dashboard.practice_techniques')}</li>
+              <li>✓ {t('dashboard.build_goals')}</li>
             </ul>
           </div>
 
           {/* Register Button or Profile */}
           {isLoggedIn ? (
-            <div className="flex justify-center md:justify-end">
+            <div className={`flex ${isRTL ? 'justify-start' : 'justify-center'} md:justify-end`}>
               <ProfileMenu user={user!} fullName={fullName} />
             </div>
           ) : (
             <button
               onClick={() => setShowAuthModal(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-mindtrack-sage text-white rounded-lg hover:bg-mindtrack-sage/90 transition-colors font-medium shadow-md hover:shadow-lg whitespace-nowrap"
+              className={`flex ${isRTL ? 'flex-row-reverse' : ''} items-center gap-2 px-6 py-3 bg-mindtrack-sage text-white rounded-lg hover:bg-mindtrack-sage/90 transition-colors font-medium shadow-md hover:shadow-lg whitespace-nowrap`}
             >
-              <span>Register</span>
+              <span>{t('auth.signup')}</span>
               <ArrowRight className="w-5 h-5" />
             </button>
           )}

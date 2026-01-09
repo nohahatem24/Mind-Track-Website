@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Lightbulb, Moon, Sun, Waves, LucideIcon } from "lucide-react";
+import { useI18n } from "@/i18n/I18nProvider";
 import CognitiveRestructuringExercise from "./cbt/CognitiveRestructuringExercise";
 import BreathingExercise from "./cbt/BreathingExercise";
 import GroundingExercise from "./cbt/GroundingExercise";
@@ -14,30 +15,33 @@ interface Exercise {
   icon: LucideIcon;
 }
 
-const exercises: Exercise[] = [
-  {
-    id: "cognitive-restructuring",
-    name: "Cognitive Restructuring",
-    description: "Identify and challenge negative thought patterns.",
-    component: CognitiveRestructuringExercise,
-    icon: Lightbulb,
-  },
-  {
-    id: "breathing-exercise",
-    name: "Breathing Exercise",
-    description: "Practice deep breathing to reduce anxiety.",
-    component: BreathingExercise,
-    icon: Waves,
-  },
-  {
-    id: "grounding-exercise",
-    name: "Grounding Exercise",
-    description: "Use your senses to connect with the present moment.",
-    component: GroundingExercise,
-    icon: Sun,
-  },
-  {
-    id: "behavioral-activation",
+const CBTTechniquesComponent = () => {
+  const { t, isRTL } = useI18n();
+
+  const exercises: Exercise[] = [
+    {
+      id: "cognitive-restructuring",
+      name: t('cbt_techniques.cognitive_restructuring'),
+      description: t('cbt_techniques.cognitive_restructuring_desc'),
+      component: CognitiveRestructuringExercise,
+      icon: Lightbulb,
+    },
+    {
+      id: "breathing-exercise",
+      name: t('cbt_techniques.breathing_exercise'),
+      description: t('cbt_techniques.breathing_exercise_desc'),
+      component: BreathingExercise,
+      icon: Waves,
+    },
+    {
+      id: "grounding-exercise",
+      name: t('cbt_techniques.grounding_exercise'),
+      description: t('cbt_techniques.grounding_exercise_desc'),
+      component: GroundingExercise,
+      icon: Sun,
+    },
+    {
+      id: "behavioral-activation",
     name: "Behavioral Activation",
     description: "Increase engagement in rewarding activities.",
     component: BehavioralActivation,

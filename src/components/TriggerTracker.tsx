@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { AlertCircle, Heart, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
+import { useI18n } from "@/i18n/I18nProvider";
 import TriggerCategoryAnalysis from "./trigger-tracker/TriggerCategoryAnalysis";
 import TriggerForm, { Trigger } from "./trigger-tracker/TriggerForm";
 import FilterPanel, { FilterState } from "./trigger-tracker/FilterPanel";
@@ -14,6 +15,7 @@ interface TriggerTrackerProps {
 const STORAGE_KEY = 'mindtrack_triggers';
 
 const TriggerTracker = ({ showOnlyFavorites = false }: TriggerTrackerProps) => {
+  const { t, isRTL } = useI18n();
   const [triggers, setTriggers] = useState<Trigger[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);

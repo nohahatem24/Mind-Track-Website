@@ -1,6 +1,7 @@
 
 import { motion } from "framer-motion";
 import { useState, useRef } from "react";
+import { useI18n } from "@/i18n/I18nProvider";
 import DBTTechniqueHeader from "./DBTTechniqueHeader";
 import TechniquesList from "./TechniquesList";
 import ExerciseRenderer from "./ExerciseRenderer";
@@ -9,6 +10,7 @@ import useDBTTechniques from "./hooks/useDBTTechniques";
 import { DBTTechniquesProps } from "./types";
 
 const DBTTechniques = ({ showOnlyFavorites = false }: DBTTechniquesProps) => {
+  const { t, isRTL } = useI18n();
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const exerciseFormRef = useRef<HTMLDivElement>(null);
   const {

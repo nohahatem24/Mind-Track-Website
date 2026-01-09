@@ -52,10 +52,10 @@ const WiseMindContent: React.FC<WiseMindWithModesProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-mindtrack-stone">Mode:</span>
             <span className="text-sm text-mindtrack-sage font-semibold capitalize">
-              {mode === 'type' && '⌨️ Typing'}
-              {mode === 'speak' && '🎤 Voice'}
-              {mode === 'tap' && '✋ Tap/Click'}
-              {mode === 'silent' && '🤐 Silent'}
+              {mode === 'observe' && '👁️ Observe'}
+              {mode === 'participate' && '🎯 Participate'}
+              {mode === 'mindfulness' && '🧘 Mindfulness'}
+              {mode === 'self-soothe' && '💆 Self-Soothe'}
             </span>
           </div>
           <button

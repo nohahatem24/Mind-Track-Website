@@ -5,6 +5,7 @@ import GratitudeForm from "./gratitude/GratitudeForm";
 import GratitudeEntryList from "./gratitude/GratitudeEntryList";
 import GratitudeHeader from "./gratitude/GratitudeHeader";
 import { useGratitudeJournal } from "@/hooks/useGratitudeJournal";
+import { useI18n } from "@/i18n/I18nProvider";
 import FavoritesToggle from "./gratitude/FavoritesToggle";
 
 interface GratitudeJournalProps {
@@ -12,6 +13,7 @@ interface GratitudeJournalProps {
 }
 
 const GratitudeJournal = ({ showOnlyFavorites = false }: GratitudeJournalProps) => {
+  const { t, isRTL } = useI18n();
   const {
     entries,
     addEntry,
@@ -61,7 +63,7 @@ const GratitudeJournal = ({ showOnlyFavorites = false }: GratitudeJournalProps) 
   }, [entries, dateStart, dateEnd, searchText]);
 
   return (
-    <section id="gratitude" className="py-16 bg-mindtrack-cream/30">
+    <section id="gratitude" className={`py-16 bg-mindtrack-cream/30 ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="mindtrack-container">
         <GratitudeHeader />
 
@@ -69,28 +71,31 @@ const GratitudeJournal = ({ showOnlyFavorites = false }: GratitudeJournalProps) 
           <div className="space-y-4">
             {/* Filters */}
             <div className="mindtrack-card space-y-4">
-              <h3 className="text-sm font-medium text-mindtrack-stone/70">Filters</h3>
+              <h3 className={`text-sm font-medium text-mindtrack-stone/70 ${isRTL ? 'text-right' : ''}`}>
+                {t('journal.filters')}
+              </h3>
               
               {/* Search */}
               <div>
-                <label htmlFor="gratitude-search" className="block text-sm font-medium text-mindtrack-stone mb-2">
-                  Search entries
+                <label htmlFor="gratitude-search" className={`block text-sm font-medium text-mindtrack-stone mb-2 ${isRTL ? 'text-right' : ''}`}>
+                  {t('journal.search_entries')}
                 </label>
                 <input
                   id="gratitude-search"
                   type="text"
-                  placeholder="Find entries..."
+                  placeholder={t('journal.find_entries')}
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
-                  className="w-full p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/30"
+                  className={`w-full p-2 rounded-md border border-mindtrack-sage/20 focus:outline-none focus:ring-2 focus:ring-mindtrack-sage/30 ${isRTL ? 'text-right' : ''}`}
+                  dir={isRTL ? 'rtl' : 'ltr'}
                 />
               </div>
 
               {/* Date Range */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className={`grid grid-cols-2 gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <div>
-                  <label htmlFor="gratitude-date-start" className="block text-sm font-medium text-mindtrack-stone mb-2">
-                    From date
+                  <label htmlFor="gratitude-date-start" className={`block text-sm font-medium text-mindtrack-stone mb-2 ${isRTL ? 'text-right' : ''}`}>
+                    {t('journal.from_date')}
                   </label>
                   <input
                     id="gratitude-date-start"
@@ -101,8 +106,8 @@ const GratitudeJournal = ({ showOnlyFavorites = false }: GratitudeJournalProps) 
                   />
                 </div>
                 <div>
-                  <label htmlFor="gratitude-date-end" className="block text-sm font-medium text-mindtrack-stone mb-2">
-                    To date
+                  <label htmlFor="gratitude-date-end" className={`block text-sm font-medium text-mindtrack-stone mb-2 ${isRTL ? 'text-right' : ''}`}>
+                    {t('journal.to_date')}
                   </label>
                   <input
                     id="gratitude-date-end"
@@ -122,9 +127,9 @@ const GratitudeJournal = ({ showOnlyFavorites = false }: GratitudeJournalProps) 
                     setDateEnd("");
                     setSearchText("");
                   }}
-                  className="text-xs text-mindtrack-sage hover:text-mindtrack-sage/80 transition-colors"
+                  className={`text-xs text-mindtrack-sage hover:text-mindtrack-sage/80 transition-colors ${isRTL ? 'block mx-auto' : ''}`}
                 >
-                  Clear all filters
+                  {t('journal.clear_filters')}
                 </button>
               )}
             </div>

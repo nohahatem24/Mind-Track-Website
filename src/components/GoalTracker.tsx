@@ -1,7 +1,7 @@
-
 import { motion } from "framer-motion";
 import { AlertCircle, Calendar, CheckSquare, Clock, Heart, Pencil, PlusCircle, Target, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useI18n } from "@/i18n/I18nProvider";
 
 interface Goal {
   id: number;
@@ -32,6 +32,7 @@ interface GoalTrackerProps {
 }
 
 const GoalTracker = ({ showOnlyFavorites = false }: GoalTrackerProps) => {
+  const { t, isRTL } = useI18n();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -205,6 +206,8 @@ const GoalTracker = ({ showOnlyFavorites = false }: GoalTrackerProps) => {
               whileTap={{ scale: 0.98 }}
               onClick={() => setIsAdding(true)}
               className="w-full mindtrack-card flex items-center justify-center gap-2 text-mindtrack-sage hover:text-mindtrack-sage/80"
+              title="Create New Goal"
+              aria-label="Create New Goal"
             >
               <PlusCircle className="w-5 h-5" />
               Create New Goal
@@ -254,6 +257,8 @@ const GoalTracker = ({ showOnlyFavorites = false }: GoalTrackerProps) => {
                           setGoals(updatedGoals);
                         }}
                         className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                        title={goal.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                        aria-label={goal.isFavorite ? "Remove from favorites" : "Add to favorites"}
                       >
                         <Heart 
                           className={`w-4 h-4 ${goal.isFavorite ? 'fill-mindtrack-sage text-mindtrack-sage' : 'text-mindtrack-sage'}`} 
@@ -262,6 +267,8 @@ const GoalTracker = ({ showOnlyFavorites = false }: GoalTrackerProps) => {
                       <button
                         onClick={() => setEditingId(goal.id)}
                         className="p-1 hover:bg-mindtrack-sage/5 rounded-full transition-colors"
+                        title="Edit goal"
+                        aria-label="Edit goal"
                       >
                         <Pencil className="w-4 h-4 text-mindtrack-sage" />
                       </button>
@@ -347,6 +354,8 @@ const GoalTracker = ({ showOnlyFavorites = false }: GoalTrackerProps) => {
                             className={`p-0.5 rounded border ${step.completed 
                               ? 'bg-mindtrack-sage border-mindtrack-sage text-white' 
                               : 'border-mindtrack-sage/40 text-transparent'}`}
+                            title={step.completed ? "Mark step as incomplete" : "Mark step as complete"}
+                            aria-label={step.completed ? "Mark step as incomplete" : "Mark step as complete"}
                           >
                             <CheckSquare className="w-4 h-4" />
                           </button>
@@ -362,6 +371,8 @@ const GoalTracker = ({ showOnlyFavorites = false }: GoalTrackerProps) => {
                     <button
                       onClick={() => deleteGoal(goal.id)}
                       className="flex items-center gap-1 px-2 py-1 text-sm text-red-500 hover:bg-red-50 rounded transition-colors"
+                      title="Delete goal"
+                      aria-label="Delete goal"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       Delete Goal
@@ -542,6 +553,8 @@ const GoalForm = ({
                 type="button"
                 onClick={() => removeStep(step.id)}
                 className="p-2 text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                title="Remove step"
+                aria-label="Remove step"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -562,6 +575,7 @@ const GoalForm = ({
                 addStep();
               }
             }}
+            aria-label="Add another step"
           />
           <button
             type="button"

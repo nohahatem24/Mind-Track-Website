@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useI18n } from "@/i18n/I18nProvider";
 import AddActivityForm from "./AddActivityForm";
 import PendingActivityItem from "./PendingActivityItem";
 import CompletedActivityItem from "./CompletedActivityItem";
@@ -12,6 +13,7 @@ const BehavioralActivation = ({
   initialData,
   isEditing = false
 }: BehavioralActivationProps) => {
+  const { t, isRTL } = useI18n();
   const [activities, setActivities] = useState<Activity[]>(
     initialData?.activities || []
   );

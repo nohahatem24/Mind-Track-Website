@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-
+import { useI18n } from "@/i18n/I18nProvider";
 import { MoodEntry, STORAGE_KEY } from "./types";
 import MoodForm from "./MoodForm";
 import MoodChart from "./MoodChart";
@@ -20,6 +20,7 @@ interface MoodTrackerProps {
 }
 
 const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
+  const { t, isRTL } = useI18n();
   const [entries, setEntries] = useState<MoodEntry[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -92,7 +93,7 @@ const MoodTracker = ({ showOnlyFavorites = false }: MoodTrackerProps) => {
   const hasActiveFilters = selectedDate !== null || dateRange.startDate !== null || dateRange.endDate !== null || showFavoritesState;
 
   return (
-    <section id="mood" className="py-16 bg-gradient-to-b from-white to-mindtrack-sage/5">
+    <section id="mood" className={`py-16 bg-gradient-to-b from-white to-mindtrack-sage/5 ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="mindtrack-container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
