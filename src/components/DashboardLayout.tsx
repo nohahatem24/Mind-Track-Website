@@ -378,7 +378,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 <BookHeart className="w-7 h-7 text-white" />
               </div>
               
-              <span className={`font-semibold text-mindtrack-stone text-sm ${isRTL ? 'text-right' : ''}`}>
+              <span className={`font-semibold text-mindtrack-stone text-lg ${isRTL ? 'text-right' : ''}`}>
                 MindTrack
               </span>
             </button>
