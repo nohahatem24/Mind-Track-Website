@@ -275,6 +275,7 @@ export default {
       confidential_help: 'Confidential help available 24/7',
       you_are_not_alone: 'You are not alone. Help is available.',
     },
+    
   },
 
   ar: {

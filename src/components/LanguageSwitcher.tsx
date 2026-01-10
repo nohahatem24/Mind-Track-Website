@@ -7,6 +7,7 @@ import { ChevronDown, Globe } from 'lucide-react';
  * Language Switcher Component
  * Responsive button with dropdown for selecting languages
  * Works perfectly in both RTL and LTR modes
+ * Updated to be a drop-up on desktop and a drop-down on mobile
  */
 export const LanguageSwitcher: React.FC = () => {
   const { currentLanguage, setLanguage, isRTL } = useI18n();
@@ -60,15 +61,19 @@ export const LanguageSwitcher: React.FC = () => {
             aria-hidden="true"
           />
           
-          {/* Dropdown Panel */}
+          {/* Dropdown Panel - Responsive Positioning */}
           <div
             className={`
-              absolute top-full mt-1 w-48
+              absolute w-48
               bg-white dark:bg-slate-800
               border border-gray-300 dark:border-slate-700
               rounded-lg shadow-2xl z-50
               max-h-96 overflow-y-auto
               ${isRTL ? 'right-0' : 'left-0'}
+              /* Mobile: Drop-down */
+              top-full mt-1
+              /* Desktop (md and up): Drop-up */
+              md:top-auto md:bottom-full md:mb-1
             `}
             role="menu"
           >
